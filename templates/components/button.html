@@ -1,0 +1,28 @@
+{% comment %}
+  مكوّن: زر (Button)
+  المتغيّرات:
+    label    : النص (إلزامي)
+    variant  : primary | accent | secondary   (افتراضي: primary)
+    href     : لو مرّرته، يصير رابط <a> بدل <button>
+    type     : button | submit                (افتراضي: button)
+    icon     : إيموجي/رمز اختياري قبل النص
+    disabled : true لتعطيله
+    loading  : true لإظهار دوّارة التحميل
+  الاستعمال:
+    {% include 'components/button.html' with label='أضف للسلة' variant='primary' icon='🛒' only %}
+{% endcomment %}
+{% if href %}
+  <a class="btn btn--{{ variant|default:'primary' }}{% if loading %} is-loading{% endif %}"
+     href="{{ href }}"{% if disabled %} aria-disabled="true" tabindex="-1"{% endif %}>
+    {% if loading %}<span class="btn__spinner" aria-hidden="true"></span>{% endif %}
+    {% if icon %}<span class="btn__icon" aria-hidden="true">{{ icon }}</span>{% endif %}
+    <span class="btn__label">{{ label }}</span>
+  </a>
+{% else %}
+  <button class="btn btn--{{ variant|default:'primary' }}{% if loading %} is-loading{% endif %}"
+          type="{{ type|default:'button' }}"{% if disabled or loading %} disabled{% endif %}>
+    {% if loading %}<span class="btn__spinner" aria-hidden="true"></span>{% endif %}
+    {% if icon %}<span class="btn__icon" aria-hidden="true">{{ icon }}</span>{% endif %}
+    <span class="btn__label">{{ label }}</span>
+  </button>
+{% endif %}

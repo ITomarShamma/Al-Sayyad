@@ -148,16 +148,7 @@ h3 { font-size: var(--fs-h3); font-weight: var(--fw-semibold); }
 .bottom-nav__item.is-active { color: var(--primary); font-weight: var(--fw-semibold); }
 .bottom-nav__icon { font-size: 1.25rem; line-height: 1; }
 
-/* --- زر أساسي (النسخة الأساسية؛ مكتبة الأزرار الكاملة بالموديول M2) --- */
-.btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  min-block-size: var(--tap-min);
-  padding-inline: var(--space-5);
-  border: 1px solid transparent; border-radius: var(--radius-pill);
-  font-weight: var(--fw-semibold); font-size: var(--fs-body);
-}
-.btn--primary { background: var(--primary); color: var(--on-primary); }
-.btn--accent  { background: var(--accent);  color: var(--color-ink); }
+/* الأزرار وكل المكوّنات القابلة لإعادة الاستخدام → components.css */
 
 /* --- مقاطع الرئيسية --- */
 .hero {
@@ -173,14 +164,9 @@ h3 { font-size: var(--fs-h3); font-weight: var(--fw-semibold); }
 .section { margin-block-start: var(--space-6); }
 .section > h2 { margin-block-end: var(--space-4); }
 
-/* شبكة تتكيّف تلقائياً: عمودان على الموبايل، أكثر على الشاشات الأوسع */
+/* شبكة تتكيّف تلقائياً: عمودان على الموبايل، أكثر على الشاشات الأوسع.
+   كل عنصر داخلها يستعمل مكوّن .card (انظر components.css). */
 .pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); }
-.pillar {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius-md); padding: var(--space-4);
-}
-.pillar strong { color: var(--primary-strong); }
-.pillar p { color: var(--text-muted); font-size: var(--fs-caption); margin-block-start: var(--space-1); }
 
 /* ==========================================================================
    نقطة التحوّل: تابلت/سطح المكتب (≥ 768px)

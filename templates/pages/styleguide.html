@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}دليل المكوّنات — الصَّيَّاد{% endblock %}
+
+{% block content %}
+<h1>{% translate 'دليل المكوّنات' %}</h1>
+<p class="caption">{% translate 'كل قطع الواجهة وحالاتها بمكان واحد. أي مكوّن منبنيه مرّة ومنستعمله بكل الصفحات.' %}</p>
+
+{# ---------- الألوان ---------- #}
+<section class="sg-section">
+  <h2>{% translate 'الألوان (Tokens)' %}</h2>
+  <p class="sg-note">{% translate 'كل لون معرّف مرّة وحدة كمتغيّر في tokens.css.' %}</p>
+  <div class="sg-swatches">
+    {% for name, var, hex in colors %}
+    <div class="sg-swatch">
+      <div class="sg-swatch__chip" style="background: var({{ var }})"></div>
+      <div class="sg-swatch__meta">{{ name }}<br><code>{{ hex }}</code></div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+{# ---------- الطباعة ---------- #}
+<section class="sg-section">
+  <h2>{% translate 'الطباعة' %}</h2>
+  <p class="sg-note">IBM Plex Sans Arabic</p>
+  <div class="sg-stack">
+    <div><span class="caption">H1 · 32 / 700</span><h1>{% translate 'عنوان رئيسي للصفحة' %}</h1></div>
+    <div><span class="caption">H2 · 24 / 600</span><h2>{% translate 'عنوان قسم' %}</h2></div>
+    <div><span class="caption">H3 · 18 / 600</span><h3>{% translate 'عنوان فرعي' %}</h3></div>
+    <div><span class="caption">Body · 16 / 400</span><p>{% translate 'نص أساسي مريح للقراءة على الموبايل والشاشات الكبيرة.' %}</p></div>
+    <div><span class="caption">Caption · 13 / 500</span><p class="caption">{% translate 'نص صغير للملاحظات والتفاصيل.' %}</p></div>
+  </div>
+</section>
+
+{# ---------- الأزرار ---------- #}
+<section class="sg-section">
+  <h2>{% translate 'الأزرار' %}</h2>
+  <p class="sg-note">{% translate 'أنواع وحالات (عادي / معطّل / تحميل).' %}</p>
+  <div class="sg-row">
+    {% include 'components/button.html' with label='زر أساسي' variant='primary' only %}
+    {% include 'components/button.html' with label='زر تمييز' variant='accent' only %}
+    {% include 'components/button.html' with label='زر ثانوي' variant='secondary' only %}
+  </div>
+  <div class="sg-row" style="margin-block-start: var(--space-3)">
+    {% include 'components/button.html' with label='مع أيقونة' variant='primary' icon='🛒' only %}
+    {% include 'components/button.html' with label='معطّل' variant='primary' disabled=True only %}
+    {% include 'components/button.html' with label='جاري التحميل' variant='primary' loading=True only %}
+  </div>
+</section>
+
+{# ---------- الشارات ---------- #}
+<section class="sg-section">
+  <h2>{% translate 'الشارات' %}</h2>
+  <p class="sg-note">{% translate 'شارات الحالة وشارات الدفع.' %}</p>
+  <div class="sg-row">
+    {% include 'components/badge.html' with kind='default' label='افتراضي' only %}
+    {% include 'components/badge.html' with kind='success' label='نجاح' only %}
+    {% include 'components/badge.html' with kind='warning' label='تنبيه' only %}
+    {% include 'components/badge.html' with kind='error' label='خطأ' only %}
+    {% include 'components/badge.html' with kind='info' label='معلومة' only %}
+  </div>
+  <div class="sg-row" style="margin-block-start: var(--space-3)">
+    {% include 'components/badge.html' with kind='cod' label='دفع عند الاستلام' icon='💵' only %}
+    {% include 'components/badge.html' with kind='shamcash' label='شام كاش' only %}
+  </div>
+</section>
+
+{# ---------- الحقول ---------- #}
+<section class="sg-section">
+  <h2>{% translate 'الحقول' %}</h2>
+  <p class="sg-note">{% translate 'حقل عادي / مع مساعدة / إلزامي / مع خطأ.' %}</p>
+  <div class="sg-stack">
+    {% include 'components/field.html' with name='full_name' label='الاسم الكامل' placeholder='مثال: عمر شمّا' only %}
+    {% include 'components/field.html' with name='phone' label='رقم الموبايل' type='number' help='منستخدمه للتواصل وقت التوصيل.' required=True only %}
+    {% include 'components/field.html' with name='email' label='البريد الإلكتروني' type='email' value='wrong-email' error='صيغة البريد غير صحيحة.' only %}
+  </div>
+</section>
+
+{# ---------- البطاقة العامة ---------- #}
+<section class="sg-section">
+  <h2>{% translate 'البطاقة العامة' %}</h2>
+  <p class="sg-note">{% translate 'حاوية لأي محتوى.' %}</p>
+  <div class="sg-stack">
+    <div class="card">
+      <strong class="card__title">{% translate 'عنوان البطاقة' %}</strong>
+      <p class="card__text">{% translate 'نص توضيحي قصير داخل البطاقة.' %}</p>
+    </div>
+  </div>
+</section>
+
+{# ---------- بطاقات المنتجات ---------- #}
+<section class="sg-section">
+  <h2>{% translate 'بطاقات المنتجات' %}</h2>
+  <p class="sg-note">{% translate 'بيانات تجريبية الآن؛ بالموديول M4 منمرّر منتجات حقيقية من قاعدة البيانات.' %}</p>
+  <div class="product-grid">
+    {% include 'components/product_card.html' with name='سمّاعة لاسلكية' price='250,000' only %}
+    {% include 'components/product_card.html' with name='غلاية كهربائية' price='180,000' only %}
+    {% include 'components/product_card.html' with name='شاحن سريع 65 واط' price='95,000' only %}
+    {% include 'components/product_card.html' with name='حقيبة ظهر' price='120,000' only %}
+  </div>
+</section>
+{% endblock %}

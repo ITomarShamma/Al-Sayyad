@@ -25,3 +25,21 @@ class HomePageTests(TestCase):
         resp = self.client.get(self.url)
         self.assertContains(resp, "css/tokens.css")   # نظام التصميم محمّل
         self.assertContains(resp, "الصَّيَّاد")          # اسم البراند ظاهر
+
+
+class StyleguideTests(TestCase):
+    """دليل المكوّنات يعرض كل المكوّنات الأساسية وحالاتها."""
+
+    def setUp(self):
+        self.resp = self.client.get(reverse("pages:styleguide"))
+
+    def test_styleguide_returns_200(self):
+        self.assertEqual(self.resp.status_code, 200)
+
+    def test_styleguide_shows_all_components(self):
+        self.assertContains(self.resp, "btn--primary")    # زر
+        self.assertContains(self.resp, "btn--secondary")  # نوع ثانوي
+        self.assertContains(self.resp, "is-loading")      # حالة تحميل
+        self.assertContains(self.resp, "badge--shamcash") # شارة دفع
+        self.assertContains(self.resp, "field__input")    # حقل
+        self.assertContains(self.resp, "product-card")    # بطاقة منتج

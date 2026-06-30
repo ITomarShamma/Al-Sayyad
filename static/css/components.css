@@ -1,0 +1,103 @@
+/* ==========================================================================
+   الصَّيَّاد — Components
+   مكوّنات قابلة لإعادة الاستخدام، مبنية على متغيّرات tokens.css.
+   كل مكوّن = قالب جزئي في templates/components/ + تنسيقه هنا.
+   ========================================================================== */
+
+/* --- زر (Button) ---------------------------------------------------------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  min-block-size: var(--tap-min);
+  padding-inline: var(--space-5);
+  border: 1px solid transparent; border-radius: var(--radius-pill);
+  font-weight: var(--fw-semibold); font-size: var(--fs-body);
+  transition: filter .15s ease, opacity .15s ease;
+}
+.btn:hover { filter: brightness(0.96); }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: .55; cursor: not-allowed; filter: none; }
+.btn--primary   { background: var(--primary); color: var(--on-primary); }
+.btn--accent    { background: var(--accent);  color: var(--color-ink); }
+.btn--secondary { background: var(--surface); color: var(--primary); border-color: var(--border); }
+
+/* حالة التحميل: نخفي النص ونُظهر دوّارة في المنتصف */
+.btn.is-loading { color: transparent; position: relative; pointer-events: none; }
+.btn__spinner {
+  position: absolute; inset-block-start: 50%; inset-inline-start: 50%;
+  inline-size: 1.1em; block-size: 1.1em; margin: -0.55em 0 0 -0.55em;
+  border: 2px solid currentColor; border-block-start-color: transparent;
+  border-radius: 50%; animation: spin .7s linear infinite;
+}
+.btn--primary.is-loading .btn__spinner,
+.btn--accent.is-loading  .btn__spinner { border-color: var(--on-primary); border-block-start-color: transparent; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* --- شارة (Badge) --------------------------------------------------------- */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding-inline: var(--space-2); padding-block: 2px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-caption); font-weight: var(--fw-medium);
+  background: var(--color-sea-foam); color: var(--primary-strong);
+}
+.badge--success  { background: #E6F4EC; color: var(--color-success); }
+.badge--warning  { background: #FBF0D8; color: #9A6A0A; }
+.badge--error    { background: #FBE7E3; color: var(--color-error); }
+.badge--info     { background: #E4EEFA; color: var(--color-info); }
+.badge--cod      { background: #F1E9DA; color: var(--color-cod); }
+.badge--shamcash { background: #DEF0E9; color: var(--color-shamcash); }
+
+/* --- حقل إدخال (Field) ---------------------------------------------------- */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field__label { font-weight: var(--fw-medium); font-size: var(--fs-caption); }
+.field__req { color: var(--color-error); }
+.field__input {
+  inline-size: 100%; min-block-size: var(--tap-min);
+  padding-inline: var(--space-4);
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  background: var(--surface); color: var(--text); font-size: var(--fs-body);
+}
+.field__input:focus { outline: 2px solid var(--primary); outline-offset: 1px; border-color: var(--primary); }
+.field__input::placeholder { color: var(--text-muted); }
+.field__msg { font-size: var(--fs-caption); color: var(--text-muted); }
+.field__msg--error { color: var(--color-error); }
+.field--error .field__input { border-color: var(--color-error); }
+
+/* --- بطاقة عامة (Card) ---------------------------------------------------- */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: var(--space-4);
+}
+.card__title { color: var(--primary-strong); font-weight: var(--fw-semibold); }
+.card__text  { color: var(--text-muted); font-size: var(--fs-caption); margin-block-start: var(--space-1); }
+
+/* --- بطاقة منتج (ProductCard) -------------------------------------------- */
+.product-card {
+  display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); overflow: clip;
+}
+.product-card__media { display: block; aspect-ratio: 1 / 1; background: var(--color-sea-foam); }
+.product-card__media img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+.product-card__placeholder { block-size: 100%; display: grid; place-items: center; font-size: 2rem; color: var(--text-muted); }
+.product-card__body { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); }
+.product-card__name { font-size: var(--fs-body); font-weight: var(--fw-semibold); line-height: var(--lh-tight); }
+.product-card__price { color: var(--primary-strong); font-weight: var(--fw-bold); font-size: 1.05rem; }
+.product-card__currency { font-size: var(--fs-caption); font-weight: var(--fw-medium); color: var(--text-muted); }
+.product-card__badges { display: flex; flex-wrap: wrap; gap: 6px; }
+.product-card .btn { inline-size: 100%; }
+
+/* شبكة منتجات متجاوبة (تُستعمل بصفحات العرض لاحقاً) */
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-4); }
+@media (min-width: 768px) { .product-grid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); } }
+
+/* --- مساعدات صفحة دليل المكوّنات (Styleguide) ----------------------------- */
+.sg-section { margin-block-start: var(--space-8); }
+.sg-section > h2 { margin-block-end: var(--space-2); }
+.sg-section > .sg-note { color: var(--text-muted); margin-block-end: var(--space-4); font-size: var(--fs-caption); }
+.sg-row { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+.sg-stack { display: flex; flex-direction: column; gap: var(--space-4); max-inline-size: var(--content-narrow); }
+.sg-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-3); }
+.sg-swatch { border: 1px solid var(--border); border-radius: var(--radius-md); overflow: clip; }
+.sg-swatch__chip { block-size: 60px; }
+.sg-swatch__meta { padding: var(--space-2) var(--space-3); background: var(--surface); font-size: var(--fs-caption); }
+.sg-swatch__meta code { color: var(--text-muted); }

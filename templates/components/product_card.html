@@ -1,0 +1,27 @@
+{% comment %}
+  مكوّن: بطاقة منتج (ProductCard)
+  المتغيّرات:
+    name      : اسم المنتج (إلزامي)
+    price     : السعر كنص جاهز للعرض (مثل '250,000')
+    href      : رابط صفحة المنتج
+    image_url : رابط الصورة (إن غاب نعرض صورة بديلة)
+  ملاحظة: لاحقاً (M4) نمرّر كائن product من قاعدة البيانات بدل القيم المنفصلة.
+{% endcomment %}
+{% load i18n %}
+{% translate 'أضف للسلة' as add_label %}
+{% translate 'دفع عند الاستلام' as cod_label %}
+<article class="product-card">
+  <a class="product-card__media" href="{{ href|default:'#' }}">
+    {% if image_url %}<img src="{{ image_url }}" alt="{{ name }}" loading="lazy">
+    {% else %}<div class="product-card__placeholder" aria-hidden="true">🖼️</div>{% endif %}
+  </a>
+  <div class="product-card__body">
+    <h3 class="product-card__name"><a href="{{ href|default:'#' }}">{{ name }}</a></h3>
+    <div class="product-card__price">{{ price }} <span class="product-card__currency">{% translate 'ل.س' %}</span></div>
+    <div class="product-card__badges">
+      {% include 'components/badge.html' with kind='cod' label=cod_label only %}
+      {% include 'components/badge.html' with kind='shamcash' label='شام كاش' only %}
+    </div>
+    {% include 'components/button.html' with label=add_label variant='primary' icon='🛒' only %}
+  </div>
+</article>

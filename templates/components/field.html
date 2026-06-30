@@ -1,0 +1,24 @@
+{% comment %}
+  مكوّن: حقل إدخال (Field)
+  المتغيّرات:
+    name        : اسم الحقل (إلزامي — يُستعمل للـid والـname)
+    label       : النص الظاهر فوق الحقل (إلزامي)
+    type        : text | email | password | number | search  (افتراضي: text)
+    placeholder : نص إرشادي داخل الحقل
+    value       : قيمة مبدئية
+    help        : نص مساعدة أسفل الحقل
+    error       : نص خطأ (يلوّن الحقل بالأحمر)
+    required    : true ليصبح إلزامياً
+  الاستعمال:
+    {% include 'components/field.html' with name='phone' label='رقم الموبايل' type='number' required=True only %}
+{% endcomment %}
+<div class="field{% if error %} field--error{% endif %}">
+  <label class="field__label" for="id_{{ name }}">{{ label }}{% if required %} <span class="field__req" aria-hidden="true">*</span>{% endif %}</label>
+  <input class="field__input" id="id_{{ name }}" name="{{ name }}" type="{{ type|default:'text' }}"
+         {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+         {% if value %}value="{{ value }}"{% endif %}
+         {% if required %}required{% endif %}
+         {% if error %}aria-invalid="true"{% endif %}>
+  {% if error %}<p class="field__msg field__msg--error">{{ error }}</p>
+  {% elif help %}<p class="field__msg">{{ help }}</p>{% endif %}
+</div>
