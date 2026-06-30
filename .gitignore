@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtual environment
+.venv/
+venv/
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+/staticfiles/
+/media/
+
+# Secrets / environment
+.env
+
+# Compiled translations (regenerated with compilemessages)
+*.mo
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

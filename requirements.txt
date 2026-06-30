@@ -1,0 +1,8 @@
+# Core dependencies (install with: pip install -r requirements.txt)
+Django>=5.2,<6.0
+python-dotenv>=1.0
+
+# Production-only (install on the server, not needed for local development):
+#   psycopg[binary]>=3.2     # PostgreSQL driver
+#   gunicorn>=23.0           # WSGI application server
+#   whitenoise>=6.7          # static file serving
