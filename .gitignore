@@ -24,3 +24,6 @@ db.sqlite3-journal
 Thumbs.db
 .idea/
 .vscode/
+
+# Local tooling (machine-specific absolute paths)
+.claude/
