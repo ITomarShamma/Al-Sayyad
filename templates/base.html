@@ -13,49 +13,62 @@
   <script src="{% static 'js/htmx.min.js' %}" defer></script>
 </head>
 <body>
-  <div class="app">
 
-    <header class="site-header">
+  <header class="site-header">
+    <div class="container site-header__inner">
       <a class="brand" href="{% url 'pages:home' %}">
         {# علامة مؤقتة — تُستبدل باللوغو النهائي لاحقاً بدون لمس الكود #}
         <span class="brand__mark" aria-hidden="true">ص</span>
         <span class="brand__name">الصَّيَّاد</span>
       </a>
-    </header>
 
-    <form class="searchbar" role="search" action="#" method="get">
-      <input type="search" name="q"
-             placeholder="{% translate 'دوّر عن أي شي…' %}"
-             aria-label="{% translate 'بحث' %}">
-    </form>
+      <form class="searchbar" role="search" action="#" method="get">
+        <input type="search" name="q"
+               placeholder="{% translate 'دوّر عن أي شي…' %}"
+               aria-label="{% translate 'بحث' %}">
+      </form>
 
-    <main class="app__main">
+      {# تنقّل علوي — يظهر على التابلت/سطح المكتب فقط #}
+      <nav class="top-nav" aria-label="{% translate 'القائمة الرئيسية' %}">
+        <a class="is-active" href="{% url 'pages:home' %}"><span aria-hidden="true">🏠</span>{% translate 'الرئيسية' %}</a>
+        <a href="#"><span aria-hidden="true">🗂️</span>{% translate 'التصنيفات' %}</a>
+        <a href="#"><span aria-hidden="true">🛒</span>{% translate 'السلة' %}</a>
+        <a href="#"><span aria-hidden="true">👤</span>{% translate 'حسابي' %}</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="app__main">
+    <div class="container">
       {% block content %}{% endblock %}
+    </div>
+  </main>
 
-      <footer class="site-footer">
-        <p>الصَّيَّاد — {% translate 'سوقك السوري الموثوق' %}</p>
-      </footer>
-    </main>
+  <footer class="site-footer">
+    <div class="container">
+      <p>الصَّيَّاد — {% translate 'سوقك السوري الموثوق' %}</p>
+    </div>
+  </footer>
 
-    <nav class="bottom-nav" aria-label="{% translate 'التنقّل الأساسي' %}">
-      <a class="bottom-nav__item is-active" href="{% url 'pages:home' %}">
-        <span class="bottom-nav__icon" aria-hidden="true">🏠</span>
-        <span>{% translate 'الرئيسية' %}</span>
-      </a>
-      <a class="bottom-nav__item" href="#">
-        <span class="bottom-nav__icon" aria-hidden="true">🗂️</span>
-        <span>{% translate 'التصنيفات' %}</span>
-      </a>
-      <a class="bottom-nav__item" href="#">
-        <span class="bottom-nav__icon" aria-hidden="true">🛒</span>
-        <span>{% translate 'السلة' %}</span>
-      </a>
-      <a class="bottom-nav__item" href="#">
-        <span class="bottom-nav__icon" aria-hidden="true">👤</span>
-        <span>{% translate 'حسابي' %}</span>
-      </a>
-    </nav>
+  {# تنقّل سفلي — يظهر على الموبايل فقط #}
+  <nav class="bottom-nav" aria-label="{% translate 'التنقّل الأساسي' %}">
+    <a class="bottom-nav__item is-active" href="{% url 'pages:home' %}">
+      <span class="bottom-nav__icon" aria-hidden="true">🏠</span>
+      <span>{% translate 'الرئيسية' %}</span>
+    </a>
+    <a class="bottom-nav__item" href="#">
+      <span class="bottom-nav__icon" aria-hidden="true">🗂️</span>
+      <span>{% translate 'التصنيفات' %}</span>
+    </a>
+    <a class="bottom-nav__item" href="#">
+      <span class="bottom-nav__icon" aria-hidden="true">🛒</span>
+      <span>{% translate 'السلة' %}</span>
+    </a>
+    <a class="bottom-nav__item" href="#">
+      <span class="bottom-nav__icon" aria-hidden="true">👤</span>
+      <span>{% translate 'حسابي' %}</span>
+    </a>
+  </nav>
 
-  </div>
 </body>
 </html>

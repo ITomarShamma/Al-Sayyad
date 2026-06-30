@@ -1,12 +1,12 @@
 /* ==========================================================================
    الصَّيَّاد — Base styles
-   إعادة ضبط بسيطة + أساسيات + قشرة التطبيق (app shell).
-   مبني على المتغيّرات من tokens.css، ويستعمل خصائص CSS منطقية
-   (margin-inline / padding-inline / inset-inline …) ليقلب تلقائياً مع dir.
+   إعادة ضبط + أساسيات + تخطيط متجاوب (responsive) متعدّد المنصّات:
+   موبايل → تابلت → سطح مكتب. يعتمد على متغيّرات tokens.css ويستعمل
+   خصائص CSS منطقية ليقلب تلقائياً مع dir (عربي RTL / إنجليزي LTR).
    ========================================================================== */
 
 /* --- الخطوط (IBM Plex Sans Arabic — مستضافة محلياً) ------------------------
-   لكل وزن وجهان: عربي (بنطاق يونيكود عربي) ولاتيني (للأرقام والإنجليزية). */
+   لكل وزن وجهان: عربي (نطاق يونيكود عربي) ولاتيني (أرقام/إنجليزية). */
 @font-face {
   font-family: "IBM Plex Sans Arabic"; font-weight: 400; font-style: normal; font-display: swap;
   src: url("../fonts/ibm-plex-sans-arabic-arabic-400-normal.woff2") format("woff2");
@@ -70,40 +70,36 @@ h2 { font-size: var(--fs-h2); font-weight: var(--fw-semibold); line-height: var(
 h3 { font-size: var(--fs-h3); font-weight: var(--fw-semibold); }
 .caption, small { font-size: var(--fs-caption); }
 
-/* --- قشرة التطبيق (عمود مركزي، موبايل-أولاً) --- */
-.app {
+/* --- حاوية متجاوبة: تملأ العرض حتى حدّ أقصى ثم تتمركز --------------------- */
+.container {
+  inline-size: 100%;
   max-inline-size: var(--container-max);
   margin-inline: auto;
-  min-block-size: 100vh;
-  background: var(--bg);
-  position: relative;
-}
-.app__main {
-  padding: var(--space-4);
-  /* مساحة بالأسفل حتى لا يغطّي شريطُ التنقّل المحتوى */
-  padding-block-end: calc(var(--bottomnav-h) + var(--space-5));
+  padding-inline: var(--space-4);
 }
 
-/* --- الهيدر --- */
+/* --- الهيدر (شريط علوي بعرض كامل، محتواه داخل حاوية) --- */
 .site-header {
-  position: sticky; inset-block-start: 0; z-index: 10;
-  block-size: var(--header-h);
-  display: flex; align-items: center;
-  padding-inline: var(--space-4);
-  background: var(--primary);
-  color: var(--on-primary);
+  position: sticky; inset-block-start: 0; z-index: 20;
+  background: var(--primary); color: var(--on-primary);
+}
+.site-header__inner {
+  display: flex; align-items: center; flex-wrap: wrap;
+  gap: var(--space-3) var(--space-4);
+  min-block-size: var(--header-h);
+  padding-block: var(--space-3);
 }
 .brand { display: flex; align-items: center; gap: var(--space-2); font-weight: var(--fw-bold); }
 .brand__mark {            /* علامة مؤقتة — تُستبدل باللوغو لاحقاً */
-  inline-size: 32px; block-size: 32px;
+  inline-size: 34px; block-size: 34px;
   display: grid; place-items: center;
   background: var(--surface); color: var(--primary);
   border-radius: var(--radius-sm); font-weight: var(--fw-bold);
 }
 .brand__name { font-size: 1.25rem; }
 
-/* --- شريط البحث --- */
-.searchbar { padding: var(--space-3) var(--space-4); background: var(--primary); }
+/* شريط البحث: سطر كامل على الموبايل، يندمج بالهيدر على سطح المكتب */
+.searchbar { flex: 1 1 100%; }
 .searchbar input {
   inline-size: 100%; block-size: 44px;
   padding-inline: var(--space-4);
@@ -113,14 +109,35 @@ h3 { font-size: var(--fs-h3); font-weight: var(--fw-semibold); }
 }
 .searchbar input::placeholder { color: var(--text-muted); }
 
-/* --- شريط التنقّل السفلي (كل أيقونة معها كلمة — القاعدة #3) --- */
+/* تنقّل علوي (سطح المكتب فقط) */
+.top-nav { display: none; }
+.top-nav a {
+  display: inline-flex; align-items: center; gap: var(--space-1);
+  padding-inline: var(--space-3); padding-block: var(--space-2);
+  border-radius: var(--radius-pill);
+  color: var(--on-primary); font-weight: var(--fw-medium);
+  white-space: nowrap;
+}
+.top-nav a:hover { background: rgba(255, 255, 255, 0.12); }
+.top-nav a.is-active { background: rgba(255, 255, 255, 0.18); font-weight: var(--fw-semibold); }
+
+/* --- المحتوى --- */
+.app__main { padding-block: var(--space-5); }
+
+/* --- الفوتر --- */
+.site-footer {
+  margin-block-start: var(--space-8);
+  padding-block: var(--space-5);
+  text-align: center; color: var(--text-muted); font-size: var(--fs-caption);
+  border-block-start: 1px solid var(--border);
+}
+
+/* --- شريط التنقّل السفلي (موبايل فقط — كل أيقونة معها كلمة، القاعدة #3) --- */
 .bottom-nav {
-  position: fixed; inset-block-end: 0; inset-inline: 0;
-  max-inline-size: var(--container-max); margin-inline: auto;
+  position: fixed; inset-block-end: 0; inset-inline: 0; z-index: 20;
   block-size: var(--bottomnav-h);
   display: flex; justify-content: space-around; align-items: stretch;
-  background: var(--surface);
-  border-block-start: 1px solid var(--border);
+  background: var(--surface); border-block-start: 1px solid var(--border);
 }
 .bottom-nav__item {
   flex: 1;
@@ -131,14 +148,7 @@ h3 { font-size: var(--fs-h3); font-weight: var(--fw-semibold); }
 .bottom-nav__item.is-active { color: var(--primary); font-weight: var(--fw-semibold); }
 .bottom-nav__icon { font-size: 1.25rem; line-height: 1; }
 
-/* --- الفوتر --- */
-.site-footer {
-  padding: var(--space-5) var(--space-4);
-  text-align: center; color: var(--text-muted); font-size: var(--fs-caption);
-  border-block-start: 1px solid var(--border);
-}
-
-/* --- زر أساسي (النسخة الأساسية فقط؛ مكتبة الأزرار الكاملة بالموديول M2) --- */
+/* --- زر أساسي (النسخة الأساسية؛ مكتبة الأزرار الكاملة بالموديول M2) --- */
 .btn {
   display: inline-flex; align-items: center; justify-content: center;
   min-block-size: var(--tap-min);
@@ -149,23 +159,43 @@ h3 { font-size: var(--fs-h3); font-weight: var(--fw-semibold); }
 .btn--primary { background: var(--primary); color: var(--on-primary); }
 .btn--accent  { background: var(--accent);  color: var(--color-ink); }
 
-/* --- مقاطع الصفحة الرئيسية --- */
+/* --- مقاطع الرئيسية --- */
 .hero {
   background: linear-gradient(135deg, var(--primary-strong), var(--primary));
   color: var(--on-primary);
-  padding: var(--space-6) var(--space-5);
+  padding: var(--space-8) var(--space-6);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
 }
+.hero h1 { max-inline-size: 18ch; }
 .hero__tagline { color: var(--color-sea-foam); margin-block: var(--space-2) var(--space-5); }
 
 .section { margin-block-start: var(--space-6); }
 .section > h2 { margin-block-end: var(--space-4); }
 
-.pillars { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+/* شبكة تتكيّف تلقائياً: عمودان على الموبايل، أكثر على الشاشات الأوسع */
+.pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); }
 .pillar {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius-md); padding: var(--space-4);
 }
 .pillar strong { color: var(--primary-strong); }
 .pillar p { color: var(--text-muted); font-size: var(--fs-caption); margin-block-start: var(--space-1); }
+
+/* ==========================================================================
+   نقطة التحوّل: تابلت/سطح المكتب (≥ 768px)
+   - شريط البحث يندمج بالهيدر بعرض محدود.
+   - يظهر التنقّل العلوي، ويختفي الشريط السفلي.
+   ========================================================================== */
+@media (min-width: 768px) {
+  .searchbar { flex: 1 1 auto; max-inline-size: 460px; }
+  .top-nav { display: flex; gap: var(--space-1); margin-inline-start: auto; }
+  .bottom-nav { display: none; }
+  .hero { padding: var(--space-8); }
+  .hero h1 { font-size: 2.5rem; }
+}
+
+/* مساحة سفلية على الموبايل حتى لا يغطّي الشريطُ السفلي المحتوى/الفوتر */
+@media (max-width: 767px) {
+  body { padding-block-end: var(--bottomnav-h); }
+}
