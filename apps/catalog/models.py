@@ -1,3 +1,142 @@
-from django.db import models
+"""نماذج الكاتالوج: التصنيفات والمنتجات وصورها.
 
-# Create your models here.
+قرارات التصميم:
+- الأسعار DecimalField بلا كسور (الليرة السورية لا تُستعمل بكسور عملياً)
+  و max_digits=12 يستوعب الأسعار الكبيرة.
+- slug يُولَّد تلقائياً من الاسم العربي (allow_unicode) إن تُرك فارغاً.
+- حذف تصنيف فيه منتجات ممنوع (PROTECT) — حماية من فقدان بيانات بالغلط.
+- specs حقل JSON مرن: مواصفات تختلف من منتج لآخر (مقاس، لون، واط…)
+  بدون ما نضيف عمود جديد لكل مواصفة.
+"""
+
+from django.db import models
+from django.utils.text import slugify
+
+from apps.core.models import TimeStampedModel
+
+
+def unique_slugify(instance, value):
+    """يولّد slug فريداً من نص عربي/إنجليزي؛ يضيف -2 -3 … عند التكرار."""
+    base = slugify(value, allow_unicode=True) or "item"
+    slug = base
+    ModelClass = instance.__class__
+    counter = 2
+    while ModelClass.objects.filter(slug=slug).exclude(pk=instance.pk).exists():
+        slug = f"{base}-{counter}"
+        counter += 1
+    return slug
+
+
+class Category(TimeStampedModel):
+    """تصنيف شجري: تصنيف رئيسي (إلكترونيات) وتحته فرعية (سماعات…)."""
+
+    name = models.CharField("الاسم", max_length=100)
+    slug = models.SlugField(
+        "المعرّف بالرابط", max_length=120, unique=True, blank=True,
+        allow_unicode=True,
+        help_text="يُولّد تلقائياً من الاسم إذا تُرك فارغاً.",
+    )
+    parent = models.ForeignKey(
+        "self", verbose_name="التصنيف الأب",
+        null=True, blank=True,
+        on_delete=models.CASCADE, related_name="children",
+        help_text="اتركه فارغاً ليكون تصنيفاً رئيسياً.",
+    )
+    is_active = models.BooleanField("مفعّل", default=True)
+
+    class Meta:
+        verbose_name = "تصنيف"
+        verbose_name_plural = "التصنيفات"
+        ordering = ["name"]
+        constraints = [
+            # لا يجوز تكرار نفس الاسم تحت نفس الأب
+            models.UniqueConstraint(fields=["parent", "name"], name="uniq_category_name_per_parent"),
+        ]
+
+    def __str__(self):
+        return self.name if self.parent is None else f"{self.parent} ← {self.name}"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = unique_slugify(self, self.name)
+        super().save(*args, **kwargs)
+
+
+class Product(TimeStampedModel):
+    """المنتج — وحدة البيع الأساسية بالمتجر."""
+
+    category = models.ForeignKey(
+        Category, verbose_name="التصنيف",
+        on_delete=models.PROTECT, related_name="products",
+    )
+    name = models.CharField("الاسم", max_length=200)
+    slug = models.SlugField(
+        "المعرّف بالرابط", max_length=220, unique=True, blank=True,
+        allow_unicode=True,
+        help_text="يُولّد تلقائياً من الاسم إذا تُرك فارغاً.",
+    )
+    description = models.TextField("الوصف", blank=True)
+    price = models.DecimalField(
+        "السعر (ل.س)", max_digits=12, decimal_places=0,
+        help_text="بالليرة السورية، بدون كسور.",
+    )
+    stock = models.PositiveIntegerField("الكمية بالمخزون", default=0)
+    is_active = models.BooleanField(
+        "مفعّل", default=True,
+        help_text="المنتج غير المفعّل لا يظهر بالمتجر إطلاقاً.",
+    )
+    specs = models.JSONField(
+        "المواصفات", default=dict, blank=True,
+        help_text='مواصفات حرّة بصيغة JSON، مثال: {"اللون": "أسود", "الضمان": "سنة"}',
+    )
+
+    class Meta:
+        verbose_name = "منتج"
+        verbose_name_plural = "المنتجات"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["is_active", "category"]),
+            models.Index(fields=["-created_at"]),
+        ]
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = unique_slugify(self, self.name)
+        super().save(*args, **kwargs)
+
+    @property
+    def in_stock(self):
+        """هل المنتج متوفر للشراء الآن؟"""
+        return self.is_active and self.stock > 0
+
+    @property
+    def main_image(self):
+        """الصورة الرئيسية (أول صورة حسب الترتيب) أو None."""
+        return self.images.first()
+
+
+class ProductImage(TimeStampedModel):
+    """صورة منتج — منتج واحد ممكن يكون له عدة صور مرتّبة."""
+
+    product = models.ForeignKey(
+        Product, verbose_name="المنتج",
+        on_delete=models.CASCADE, related_name="images",
+    )
+    image = models.ImageField("الصورة", upload_to="products/%Y/%m/")
+    alt_text = models.CharField(
+        "النص البديل", max_length=200, blank=True,
+        help_text="وصف قصير للصورة (يفيد لضعاف البصر ومحركات البحث).",
+    )
+    is_main = models.BooleanField("رئيسية", default=False)
+    sort_order = models.PositiveSmallIntegerField("الترتيب", default=0)
+
+    class Meta:
+        verbose_name = "صورة منتج"
+        verbose_name_plural = "صور المنتجات"
+        ordering = ["-is_main", "sort_order", "pk"]
+
+    def __str__(self):
+        return f"صورة {self.product}"
