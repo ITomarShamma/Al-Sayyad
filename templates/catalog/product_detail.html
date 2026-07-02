@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ product.name }} — الصَّيَّاد{% endblock %}
+{% block description %}{{ product.description|truncatechars:150 }}{% endblock %}
+
+{% block content %}
+<nav class="breadcrumbs" aria-label="{% translate 'مسار التنقّل' %}">
+  <a href="{% url 'pages:home' %}">{% translate 'الرئيسية' %}</a>
+  <span aria-hidden="true">←</span>
+  <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a>
+  <span aria-hidden="true">←</span>
+  <span aria-current="page">{{ product.name }}</span>
+</nav>
+
+<div class="product-layout">
+
+  {# ---------- الصور ---------- #}
+  <div class="gallery">
+    <div class="gallery__main">
+      {% if product.main_image %}
+        <img id="gallery-main" src="{{ product.main_image.image.url }}"
+             alt="{{ product.main_image.alt_text|default:product.name }}">
+      {% else %}
+        <div class="gallery__placeholder" aria-hidden="true">🖼️</div>
+      {% endif %}
+    </div>
+    {% if product.images.count > 1 %}
+      <div class="gallery__thumbs">
+        {% for img in product.images.all %}
+          <button type="button" class="gallery__thumb"
+                  onclick="document.getElementById('gallery-main').src = this.querySelector('img').src">
+            <img src="{{ img.image.url }}" alt="{{ img.alt_text|default:product.name }}" loading="lazy">
+          </button>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  {# ---------- المعلومات والشراء ---------- #}
+  <div class="buybox">
+    <h1 class="buybox__title">{{ product.name }}</h1>
+
+    <div class="buybox__price">
+      {{ product.price_display }} <span class="buybox__currency">{% translate 'ل.س' %}</span>
+    </div>
+
+    <div class="sg-row">
+      {% if product.in_stock %}
+        {% include 'components/badge.html' with kind='success' label=_('متوفر') only %}
+      {% else %}
+        {% include 'components/badge.html' with kind='error' label=_('نفدت الكمية') only %}
+      {% endif %}
+      {% translate 'دفع عند الاستلام' as cod_label %}
+      {% include 'components/badge.html' with kind='cod' label=cod_label icon='💵' only %}
+      {% include 'components/badge.html' with kind='shamcash' label='شام كاش' only %}
+    </div>
+
+    {# زر الشراء — يتفعّل فعلياً بالموديول M5 (السلة) #}
+    {% if product.in_stock %}
+      {% translate 'أضف للسلة' as add_label %}
+      {% include 'components/button.html' with label=add_label variant='primary' icon='🛒' only %}
+    {% else %}
+      {% translate 'نفدت الكمية' as oos_label %}
+      {% include 'components/button.html' with label=oos_label variant='secondary' disabled=True only %}
+    {% endif %}
+
+    {% if product.description %}
+      <div class="buybox__section">
+        <h3>{% translate 'الوصف' %}</h3>
+        <p>{{ product.description|linebreaksbr }}</p>
+      </div>
+    {% endif %}
+
+    {% if product.specs %}
+      <div class="buybox__section">
+        <h3>{% translate 'المواصفات' %}</h3>
+        <table class="spec-table">
+          {% for key, value in product.specs.items %}
+            <tr><th>{{ key }}</th><td>{{ value }}</td></tr>
+          {% endfor %}
+        </table>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

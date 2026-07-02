@@ -10,6 +10,7 @@
 """
 
 from django.db import models
+from django.urls import reverse
 from django.utils.text import slugify
 
 from apps.core.models import TimeStampedModel
@@ -61,6 +62,9 @@ class Category(TimeStampedModel):
             self.slug = unique_slugify(self, self.name)
         super().save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        return reverse("catalog:category", args=[self.slug])
+
 
 class Product(TimeStampedModel):
     """المنتج — وحدة البيع الأساسية بالمتجر."""
@@ -107,15 +111,29 @@ class Product(TimeStampedModel):
             self.slug = unique_slugify(self, self.name)
         super().save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        return reverse("catalog:product", args=[self.slug])
+
     @property
     def in_stock(self):
         """هل المنتج متوفر للشراء الآن؟"""
         return self.is_active and self.stock > 0
 
     @property
+    def price_display(self):
+        """السعر منسّقاً بفواصل الآلاف: 250,000 (العملة تُضاف بالقالب)."""
+        return f"{self.price:,.0f}"
+
+    @property
     def main_image(self):
         """الصورة الرئيسية (أول صورة حسب الترتيب) أو None."""
         return self.images.first()
+
+    @property
+    def main_image_url(self):
+        """رابط الصورة الرئيسية، أو نص فارغ إن ما في صور (القالب يتصرّف)."""
+        img = self.main_image
+        return img.image.url if img else ""
 
 
 class ProductImage(TimeStampedModel):

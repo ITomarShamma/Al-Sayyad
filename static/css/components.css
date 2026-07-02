@@ -90,6 +90,86 @@
 .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-4); }
 @media (min-width: 768px) { .product-grid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); } }
 
+/* --- شريحة (Chip) — رابط تصنيف/ترشيح بهدف نقر مريح ------------------------ */
+.chip-row { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.chip {
+  display: inline-flex; align-items: center;
+  min-block-size: 44px; padding-inline: var(--space-4);
+  border: 1px solid var(--border); border-radius: var(--radius-pill);
+  background: var(--surface); font-weight: var(--fw-medium);
+}
+.chip:hover { border-color: var(--primary); color: var(--primary); }
+
+/* --- بطاقة قابلة للنقر (رابط) ---------------------------------------------- */
+.card--link { display: block; transition: border-color .15s ease; }
+.card--link:hover { border-color: var(--primary); }
+.card--link:hover .card__title { color: var(--primary); }
+
+/* --- مسار التنقّل (Breadcrumbs) -------------------------------------------- */
+.breadcrumbs {
+  display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center;
+  font-size: var(--fs-caption); color: var(--text-muted);
+  margin-block-end: var(--space-4);
+}
+.breadcrumbs a:hover { color: var(--primary); }
+.breadcrumbs [aria-current] { color: var(--text); font-weight: var(--fw-medium); }
+
+/* --- حالة فارغة (Empty state) ---------------------------------------------- */
+.empty {
+  text-align: center; color: var(--text-muted);
+  padding-block: var(--space-8);
+}
+.empty__icon { font-size: 2.5rem; margin-block-end: var(--space-2); }
+
+/* --- ترقيم الصفحات (Pagination) -------------------------------------------- */
+.pagination {
+  display: flex; align-items: center; justify-content: center;
+  gap: var(--space-4); margin-block-start: var(--space-6);
+}
+.pagination__status { color: var(--text-muted); font-size: var(--fs-caption); }
+
+/* --- صفحة المنتج: تخطيط عمودين على سطح المكتب ------------------------------ */
+.product-layout { display: grid; gap: var(--space-6); }
+@media (min-width: 768px) {
+  .product-layout { grid-template-columns: 1fr 1fr; align-items: start; }
+}
+
+/* معرض الصور */
+.gallery__main {
+  aspect-ratio: 1 / 1; overflow: clip;
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  background: var(--color-sea-foam);
+}
+.gallery__main img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+.gallery__placeholder {
+  block-size: 100%; display: grid; place-items: center;
+  font-size: 3rem; color: var(--text-muted);
+}
+.gallery__thumbs { display: flex; gap: var(--space-2); margin-block-start: var(--space-3); }
+.gallery__thumb {
+  inline-size: 72px; block-size: 72px; padding: 0; overflow: clip;
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  background: var(--color-sea-foam);
+}
+.gallery__thumb:hover { border-color: var(--primary); }
+.gallery__thumb img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+
+/* صندوق الشراء */
+.buybox { display: flex; flex-direction: column; gap: var(--space-4); }
+.buybox__price { font-size: var(--fs-h2); font-weight: var(--fw-bold); color: var(--primary-strong); }
+.buybox__currency { font-size: var(--fs-body); font-weight: var(--fw-medium); color: var(--text-muted); }
+.buybox__section { border-block-start: 1px solid var(--border); padding-block-start: var(--space-4); }
+.buybox__section h3 { margin-block-end: var(--space-2); }
+
+/* جدول المواصفات */
+.spec-table { inline-size: 100%; border-collapse: collapse; }
+.spec-table th, .spec-table td {
+  text-align: start; padding: var(--space-2) var(--space-3);
+  border-block-end: 1px solid var(--border); font-weight: var(--fw-regular);
+}
+.spec-table th { color: var(--text-muted); inline-size: 40%; }
+.spec-table tr:last-child th, .spec-table tr:last-child td { border-block-end: none; }
+
 /* --- مساعدات صفحة دليل المكوّنات (Styleguide) ----------------------------- */
 .sg-section { margin-block-start: var(--space-8); }
 .sg-section > h2 { margin-block-end: var(--space-2); }

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ category.name }} — الصَّيَّاد{% endblock %}
+
+{% block content %}
+{# مسار التنقّل: الرئيسية ← التصنيف الأب ← الحالي #}
+<nav class="breadcrumbs" aria-label="{% translate 'مسار التنقّل' %}">
+  <a href="{% url 'pages:home' %}">{% translate 'الرئيسية' %}</a>
+  <span aria-hidden="true">←</span>
+  {% if category.parent %}
+    <a href="{{ category.parent.get_absolute_url }}">{{ category.parent.name }}</a>
+    <span aria-hidden="true">←</span>
+  {% endif %}
+  <span aria-current="page">{{ category.name }}</span>
+</nav>
+
+<h1>{{ category.name }}</h1>
+
+{% if children %}
+  <div class="chip-row" style="margin-block-start: var(--space-3);">
+    {% for child in children %}
+      <a class="chip" href="{{ child.get_absolute_url }}">{{ child.name }}</a>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<section class="section">
+  {% if page.object_list %}
+    <div class="product-grid">
+      {% for p in page.object_list %}
+        {% include 'components/product_card.html' with name=p.name price=p.price_display href=p.get_absolute_url image_url=p.main_image_url only %}
+      {% endfor %}
+    </div>
+
+    {% if page.paginator.num_pages > 1 %}
+      <nav class="pagination" aria-label="{% translate 'صفحات' %}">
+        {% if page.has_previous %}
+          <a class="chip" href="?page={{ page.previous_page_number }}">{% translate 'السابق' %}</a>
+        {% endif %}
+        <span class="pagination__status">
+          {% blocktranslate with current=page.number total=page.paginator.num_pages %}صفحة {{ current }} من {{ total }}{% endblocktranslate %}
+        </span>
+        {% if page.has_next %}
+          <a class="chip" href="?page={{ page.next_page_number }}">{% translate 'التالي' %}</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="empty">
+      <p class="empty__icon" aria-hidden="true">🎣</p>
+      <p>{% translate 'ما في منتجات بهالتصنيف بعد.' %}</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

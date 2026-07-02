@@ -29,13 +29,15 @@
                aria-label="{% translate 'بحث' %}">
       </form>
 
-      {# تنقّل علوي — يظهر على التابلت/سطح المكتب فقط #}
+      {# تنقّل علوي (تابلت/سطح مكتب) — الحالة النشطة تُشتق من اسم الـview الحالي #}
+      {% with vn=request.resolver_match.view_name %}
       <nav class="top-nav" aria-label="{% translate 'القائمة الرئيسية' %}">
-        <a class="is-active" href="{% url 'pages:home' %}"><span aria-hidden="true">🏠</span>{% translate 'الرئيسية' %}</a>
-        <a href="#"><span aria-hidden="true">🗂️</span>{% translate 'التصنيفات' %}</a>
+        <a {% if vn == 'pages:home' %}class="is-active"{% endif %} href="{% url 'pages:home' %}"><span aria-hidden="true">🏠</span>{% translate 'الرئيسية' %}</a>
+        <a {% if vn == 'catalog:category_list' or vn == 'catalog:category' %}class="is-active"{% endif %} href="{% url 'catalog:category_list' %}"><span aria-hidden="true">🗂️</span>{% translate 'التصنيفات' %}</a>
         <a href="#"><span aria-hidden="true">🛒</span>{% translate 'السلة' %}</a>
         <a href="#"><span aria-hidden="true">👤</span>{% translate 'حسابي' %}</a>
       </nav>
+      {% endwith %}
     </div>
   </header>
 
@@ -52,12 +54,13 @@
   </footer>
 
   {# تنقّل سفلي — يظهر على الموبايل فقط #}
+  {% with vn=request.resolver_match.view_name %}
   <nav class="bottom-nav" aria-label="{% translate 'التنقّل الأساسي' %}">
-    <a class="bottom-nav__item is-active" href="{% url 'pages:home' %}">
+    <a class="bottom-nav__item {% if vn == 'pages:home' %}is-active{% endif %}" href="{% url 'pages:home' %}">
       <span class="bottom-nav__icon" aria-hidden="true">🏠</span>
       <span>{% translate 'الرئيسية' %}</span>
     </a>
-    <a class="bottom-nav__item" href="#">
+    <a class="bottom-nav__item {% if vn == 'catalog:category_list' or vn == 'catalog:category' %}is-active{% endif %}" href="{% url 'catalog:category_list' %}">
       <span class="bottom-nav__icon" aria-hidden="true">🗂️</span>
       <span>{% translate 'التصنيفات' %}</span>
     </a>
@@ -70,6 +73,7 @@
       <span>{% translate 'حسابي' %}</span>
     </a>
   </nav>
+  {% endwith %}
 
 </body>
 </html>

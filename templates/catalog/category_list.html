@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate 'التصنيفات' %} — الصَّيَّاد{% endblock %}
+
+{% block content %}
+<h1>{% translate 'التصنيفات' %}</h1>
+
+{% if categories %}
+  <div class="pillars" style="margin-block-start: var(--space-5);">
+    {% for cat in categories %}
+      <a class="card card--link" href="{{ cat.get_absolute_url }}">
+        <strong class="card__title">{{ cat.name }}</strong>
+        <p class="card__text">
+          {% blocktranslate count n=cat.products.count %}منتج واحد{% plural %}{{ n }} منتجات{% endblocktranslate %}
+        </p>
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty">
+    <p class="empty__icon" aria-hidden="true">🗂️</p>
+    <p>{% translate 'ما في تصنيفات بعد.' %}</p>
+  </div>
+{% endif %}
+{% endblock %}
