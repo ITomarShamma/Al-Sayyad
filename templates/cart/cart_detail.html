@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate 'سلة التسوّق' %} — الصَّيَّاد{% endblock %}
+
+{% block content %}
+<h1>{% translate 'سلة التسوّق' %}</h1>
+
+{# هذا الغلاف هو هدف HTMX: كل تعديل كمية/حذف يعيد رسم ما بداخله فقط #}
+<div id="cart-body" class="section">
+  {% include 'cart/partials/cart_body.html' %}
+</div>
+{% endblock %}

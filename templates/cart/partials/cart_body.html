@@ -1,0 +1,76 @@
+{% load i18n %}{% comment %}
+محتوى السلة — يُستعمل مرتين:
+1. داخل صفحة السلة الكاملة (render عادي).
+2. كردّ HTMX بعد تعديل/حذف: يُستبدل داخل #cart-body، ومعه (oob=True)
+   يُرفَق عدّاد الهيدر ليتحدّث خارج الهدف (out-of-band).
+{% endcomment %}
+{% if cart.items %}
+  <ul class="cart-list">
+    {% for item in cart.items %}
+      <li class="cart-item">
+        <a class="cart-item__media" href="{{ item.product.get_absolute_url }}">
+          {% if item.product.main_image_url %}
+            <img src="{{ item.product.main_image_url }}" alt="{{ item.product.name }}">
+          {% else %}
+            <span aria-hidden="true">🛍️</span>
+          {% endif %}
+        </a>
+
+        <div class="cart-item__info">
+          <a class="cart-item__name" href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
+          <span class="cart-item__unit caption">{{ item.product.price_display }} {% translate 'ل.س' %} / {% translate 'قطعة' %}</span>
+
+          <div class="qty">
+            <form method="post" action="{% url 'cart:update' item.product.id %}"
+                  hx-post="{% url 'cart:update' item.product.id %}"
+                  hx-target="#cart-body" hx-swap="innerHTML">
+              {% csrf_token %}
+              <input type="hidden" name="quantity" value="{{ item.quantity|add:'-1' }}">
+              <button class="qty__btn" type="submit" aria-label="{% translate 'أنقص الكمية' %}">−</button>
+            </form>
+
+            <span class="qty__value" aria-live="polite">{{ item.quantity }}</span>
+
+            <form method="post" action="{% url 'cart:update' item.product.id %}"
+                  hx-post="{% url 'cart:update' item.product.id %}"
+                  hx-target="#cart-body" hx-swap="innerHTML">
+              {% csrf_token %}
+              <input type="hidden" name="quantity" value="{{ item.quantity|add:'1' }}">
+              <button class="qty__btn" type="submit" aria-label="{% translate 'زد الكمية' %}"
+                      {% if item.quantity >= item.product.stock %}disabled title="{% translate 'وصلت أقصى كمية متوفرة' %}"{% endif %}>+</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="cart-item__side">
+          <span class="cart-item__total">{{ item.line_total_display }} <small>{% translate 'ل.س' %}</small></span>
+          <form method="post" action="{% url 'cart:remove' item.product.id %}"
+                hx-post="{% url 'cart:remove' item.product.id %}"
+                hx-target="#cart-body" hx-swap="innerHTML">
+            {% csrf_token %}
+            <button class="cart-item__remove" type="submit">{% translate 'حذف' %} 🗑️</button>
+          </form>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <div class="card cart-summary">
+    <div class="cart-summary__row">
+      <span>{% blocktranslate count n=cart.total_quantity %}قطعة واحدة{% plural %}{{ n }} قطع{% endblocktranslate %}</span>
+      <strong class="cart-summary__total">{{ cart.total_price_display }} {% translate 'ل.س' %}</strong>
+    </div>
+    <p class="caption" style="color: var(--text-muted);">{% translate 'التوصيل يُحسب عند إتمام الطلب.' %}</p>
+    {% translate 'إتمام الطلب — قريباً' as checkout_label %}
+    {% include 'components/button.html' with label=checkout_label variant='accent' disabled=True only %}
+    <a class="btn btn--secondary" href="{% url 'catalog:category_list' %}">{% translate 'متابعة التسوّق' %}</a>
+  </div>
+{% else %}
+  <div class="empty">
+    <p class="empty__icon" aria-hidden="true">🛒</p>
+    <p>{% translate 'سلتك فاضية بعد.' %}</p>
+    <a class="btn btn--primary" style="margin-block-start: var(--space-4);" href="{% url 'catalog:category_list' %}">{% translate 'ابدأ التسوّق' %}</a>
+  </div>
+{% endif %}
+
+{% if oob %}{% include 'cart/partials/badges_oob.html' %}{% endif %}

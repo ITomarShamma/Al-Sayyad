@@ -90,6 +90,69 @@
 .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-4); }
 @media (min-width: 768px) { .product-grid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); } }
 
+/* زر بعرض كامل (صفحة المنتج/السلة) */
+.btn--block { inline-size: 100%; }
+
+/* --- عدّاد السلة بالهيدر (Nav badge) ---------------------------------------- */
+.nav-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-inline-size: 20px; block-size: 20px; padding-inline: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--accent); color: var(--color-ink);
+  font-size: var(--fs-caption); font-weight: var(--fw-bold); line-height: 1;
+}
+/* نسخة عائمة فوق أيقونة التنقّل السفلي */
+.nav-badge--float {
+  position: absolute; inset-block-start: -6px; inset-inline-end: -12px;
+}
+.bottom-nav__icon { position: relative; }
+
+/* --- سطر السلة (Cart item) -------------------------------------------------- */
+.cart-list { display: flex; flex-direction: column; gap: var(--space-3); }
+.cart-item {
+  display: grid; grid-template-columns: 72px 1fr auto; gap: var(--space-3);
+  align-items: center;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: var(--space-3);
+}
+.cart-item__media {
+  inline-size: 72px; block-size: 72px; overflow: clip;
+  border-radius: var(--radius-sm); background: var(--color-sea-foam);
+  display: grid; place-items: center; font-size: 1.5rem;
+}
+.cart-item__media img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+.cart-item__info { display: flex; flex-direction: column; gap: var(--space-1); min-inline-size: 0; }
+.cart-item__name { font-weight: var(--fw-medium); }
+.cart-item__name:hover { color: var(--primary); }
+.cart-item__unit { color: var(--text-muted); }
+.cart-item__side {
+  display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-2);
+}
+.cart-item__total { font-weight: var(--fw-bold); color: var(--primary-strong); white-space: nowrap; }
+.cart-item__total small { color: var(--text-muted); font-weight: var(--fw-medium); }
+.cart-item__remove {
+  border: none; background: none; padding: var(--space-1) var(--space-2);
+  color: var(--color-error); font-size: var(--fs-caption); border-radius: var(--radius-sm);
+}
+.cart-item__remove:hover { background: #FBE7E3; }
+
+/* عدّاد الكمية (Quantity stepper) — أزرار بهدف نقر مريح */
+.qty { display: flex; align-items: center; gap: var(--space-2); margin-block-start: var(--space-1); }
+.qty__btn {
+  inline-size: 40px; block-size: 40px;
+  display: grid; place-items: center;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); font-size: 1.1rem; font-weight: var(--fw-bold);
+}
+.qty__btn:hover { border-color: var(--primary); color: var(--primary); }
+.qty__btn:disabled { opacity: .4; cursor: not-allowed; }
+.qty__value { min-inline-size: 28px; text-align: center; font-weight: var(--fw-semibold); }
+
+/* ملخص السلة */
+.cart-summary { margin-block-start: var(--space-5); display: flex; flex-direction: column; gap: var(--space-3); max-inline-size: 480px; }
+.cart-summary__row { display: flex; justify-content: space-between; align-items: center; }
+.cart-summary__total { font-size: var(--fs-h3); color: var(--primary-strong); }
+
 /* --- شريحة (Chip) — رابط تصنيف/ترشيح بهدف نقر مريح ------------------------ */
 .chip-row { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .chip {

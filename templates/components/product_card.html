@@ -1,11 +1,13 @@
 {% comment %}
   مكوّن: بطاقة منتج (ProductCard)
   المتغيّرات:
-    name      : اسم المنتج (إلزامي)
-    price     : السعر كنص جاهز للعرض (مثل '250,000')
-    href      : رابط صفحة المنتج
-    image_url : رابط الصورة (إن غاب نعرض صورة بديلة)
-  ملاحظة: لاحقاً (M4) نمرّر كائن product من قاعدة البيانات بدل القيم المنفصلة.
+    name       : اسم المنتج (إلزامي)
+    price      : السعر كنص جاهز للعرض (مثل '250,000')
+    href       : رابط صفحة المنتج
+    image_url  : رابط الصورة (إن غاب نعرض صورة بديلة)
+    product_id : رقم المنتج — وجوده يجعل زر «أضف للسلة» حقيقياً (HTMX)
+    in_stock   : False تعرض «نفدت الكمية» بدل الزر
+  بدون product_id (كالـstyleguide): يظهر زر شكلي فقط.
 {% endcomment %}
 {% load i18n %}
 {% translate 'أضف للسلة' as add_label %}
@@ -22,6 +24,23 @@
       {% include 'components/badge.html' with kind='cod' label=cod_label only %}
       {% include 'components/badge.html' with kind='shamcash' label='شام كاش' only %}
     </div>
-    {% include 'components/button.html' with label=add_label variant='primary' icon='🛒' only %}
+    {% if product_id %}
+      {% if in_stock %}
+        {# نموذج حقيقي: HTMX يحدّث عدّاد الهيدر فقط؛ بدون JS يرسل عادي #}
+        <form method="post" action="{% url 'cart:add' product_id %}"
+              hx-post="{% url 'cart:add' product_id %}" hx-swap="none">
+          {% csrf_token %}
+          <button class="btn btn--primary" type="submit">
+            <span class="btn__icon" aria-hidden="true">🛒</span>
+            <span class="btn__label">{{ add_label }}</span>
+          </button>
+        </form>
+      {% else %}
+        {% translate 'نفدت الكمية' as oos_label %}
+        {% include 'components/button.html' with label=oos_label variant='secondary' disabled=True only %}
+      {% endif %}
+    {% else %}
+      {% include 'components/button.html' with label=add_label variant='primary' icon='🛒' only %}
+    {% endif %}
   </div>
 </article>

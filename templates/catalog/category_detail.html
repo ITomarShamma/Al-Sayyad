@@ -29,7 +29,7 @@
   {% if page.object_list %}
     <div class="product-grid">
       {% for p in page.object_list %}
-        {% include 'components/product_card.html' with name=p.name price=p.price_display href=p.get_absolute_url image_url=p.main_image_url only %}
+        {% include 'components/product_card.html' with name=p.name price=p.price_display href=p.get_absolute_url image_url=p.main_image_url product_id=p.id in_stock=p.in_stock only %}
       {% endfor %}
     </div>
 

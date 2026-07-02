@@ -56,10 +56,16 @@
       {% include 'components/badge.html' with kind='shamcash' label='شام كاش' only %}
     </div>
 
-    {# زر الشراء — يتفعّل فعلياً بالموديول M5 (السلة) #}
+    {# زر الشراء — HTMX يحدّث عدّاد الهيدر؛ بدون JS يعمل كنموذج عادي #}
     {% if product.in_stock %}
-      {% translate 'أضف للسلة' as add_label %}
-      {% include 'components/button.html' with label=add_label variant='primary' icon='🛒' only %}
+      <form method="post" action="{% url 'cart:add' product.id %}"
+            hx-post="{% url 'cart:add' product.id %}" hx-swap="none">
+        {% csrf_token %}
+        <button class="btn btn--primary btn--block" type="submit">
+          <span class="btn__icon" aria-hidden="true">🛒</span>
+          <span class="btn__label">{% translate 'أضف للسلة' %}</span>
+        </button>
+      </form>
     {% else %}
       {% translate 'نفدت الكمية' as oos_label %}
       {% include 'components/button.html' with label=oos_label variant='secondary' disabled=True only %}

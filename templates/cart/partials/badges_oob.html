@@ -1,0 +1,7 @@
+{% comment %}
+عدّادا السلة بالهيدر (علوي + سفلي) — hx-swap-oob تعني: «استبدل العنصر
+الذي يحمل نفس الـid أينما كان بالصفحة» بدل الحقن مكان الهدف. هكذا يتحدّث
+العدّاد فوراً مهما كانت الصفحة، بدون إعادة تحميل.
+{% endcomment %}
+<span class="nav-badge" id="cart-count-top" hx-swap-oob="true">{{ cart.total_quantity }}</span>
+<span class="nav-badge" id="cart-count-bottom" hx-swap-oob="true">{{ cart.total_quantity }}</span>
