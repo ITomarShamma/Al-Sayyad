@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate 'تم استلام طلبك' %} — الصَّيَّاد{% endblock %}
+
+{% block content %}
+<div class="confirm">
+  <p class="confirm__icon" aria-hidden="true">🎣✅</p>
+  <h1>{% translate 'تم استلام طلبك!' %}</h1>
+  <p class="confirm__lead">
+    {% translate 'رقم طلبك' %}
+    <strong class="confirm__number" dir="ltr">{{ order.number }}</strong>
+    — {% translate 'احتفظ فيه لأي استفسار.' %}
+  </p>
+  <p>{% blocktranslate with phone=order.phone %}منتواصل معك على {{ phone }} خلال ساعات لتأكيد الطلب وترتيب التوصيل.{% endblocktranslate %}</p>
+
+  <div class="card confirm__summary">
+    <h3>{% translate 'ملخص الطلب' %}</h3>
+    <ul class="checkout-summary__list">
+      {% for item in order.items.all %}
+        <li>
+          <span>{{ item.product_name }} × {{ item.quantity }}</span>
+          <span class="checkout-summary__line">{{ item.line_total_display }} <small>{% translate 'ل.س' %}</small></span>
+        </li>
+      {% endfor %}
+    </ul>
+    <div class="cart-summary__row">
+      <span>{% translate 'الإجمالي' %}</span>
+      <strong class="cart-summary__total">{{ order.total_display }} {% translate 'ل.س' %}</strong>
+    </div>
+    <div class="sg-row" style="margin-block-start: var(--space-2);">
+      {% include 'components/badge.html' with kind='cod' label=order.get_payment_method_display icon='💵' only %}
+      {% include 'components/badge.html' with kind='info' label=order.get_status_display only %}
+    </div>
+  </div>
+
+  <a class="btn btn--primary" href="{% url 'pages:home' %}">{% translate 'رجوع للرئيسية' %}</a>
+</div>
+{% endblock %}

@@ -60,9 +60,8 @@
       <span>{% blocktranslate count n=cart.total_quantity %}قطعة واحدة{% plural %}{{ n }} قطع{% endblocktranslate %}</span>
       <strong class="cart-summary__total">{{ cart.total_price_display }} {% translate 'ل.س' %}</strong>
     </div>
-    <p class="caption" style="color: var(--text-muted);">{% translate 'التوصيل يُحسب عند إتمام الطلب.' %}</p>
-    {% translate 'إتمام الطلب — قريباً' as checkout_label %}
-    {% include 'components/button.html' with label=checkout_label variant='accent' disabled=True only %}
+    <p class="caption" style="color: var(--text-muted);">{% translate 'التوصيل يُتفق عليه عند تأكيد الطلب هاتفياً.' %}</p>
+    <a class="btn btn--accent" href="{% url 'orders:checkout' %}">{% translate 'إتمام الطلب' %}</a>
     <a class="btn btn--secondary" href="{% url 'catalog:category_list' %}">{% translate 'متابعة التسوّق' %}</a>
   </div>
 {% else %}

@@ -1,7 +1,7 @@
 # بنية قاعدة البيانات — متجر الصَّيَّاد
 
 > وثيقة مرجعية للشركة. تُحدَّث مع كل موديول جديد.
-> آخر تحديث: 2026-07-02 — بعد الموديول M3 (الكاتالوج).
+> آخر تحديث: 2026-07-02 — بعد الموديول M6 (الطلبات وإتمام الشراء).
 
 ## نظرة عامة
 
@@ -19,6 +19,8 @@ erDiagram
     CATEGORY ||--o{ CATEGORY : "أب/أبناء (شجرة)"
     CATEGORY ||--o{ PRODUCT  : "تحتوي (PROTECT)"
     PRODUCT  ||--o{ PRODUCT_IMAGE : "لها صور (CASCADE)"
+    ORDER    ||--o{ ORDER_ITEM : "أسطره (CASCADE)"
+    PRODUCT  ||--o{ ORDER_ITEM : "يُطلب في (PROTECT)"
 
     CATEGORY {
         bigint id PK
@@ -51,6 +53,28 @@ erDiagram
         smallint sort_order "الترتيب"
         datetime created_at
         datetime updated_at
+    }
+    ORDER {
+        bigint id PK
+        varchar number UK "رقم قصير 8 خانات للزبون"
+        varchar customer_name "الاسم (100)"
+        varchar phone "موبايل سوري 09xxxxxxxx"
+        varchar city "المحافظة/المدينة"
+        text address "العنوان بالتفصيل"
+        text notes "ملاحظات (اختياري)"
+        varchar payment_method "cod / shamcash"
+        varchar status "pending→confirmed→shipped→delivered / cancelled"
+        decimal total "الإجمالي ل.س (12,0)"
+        datetime created_at
+        datetime updated_at
+    }
+    ORDER_ITEM {
+        bigint id PK
+        bigint order_id FK "الطلب (CASCADE)"
+        bigint product_id FK "المنتج (PROTECT)"
+        varchar product_name "لقطة: الاسم وقت الطلب"
+        decimal unit_price "لقطة: السعر وقت الطلب"
+        int quantity "الكمية"
     }
 ```
 
@@ -117,9 +141,48 @@ erDiagram
 6. **جداول Django الجاهزة** (مستخدمون، صلاحيات، جلسات) تُدار تلقائياً:
    `auth_user`, `auth_group`, `django_session`, …
 
+### 4) `orders_order` — الطلبات
+
+| الحقل | النوع | ملاحظات |
+|---|---|---|
+| `id` | BigAuto | مفتاح أساسي |
+| `number` | VarChar(12) | **فريد**، 8 أرقام عشوائية — يُقرأ بسهولة عالتلفون، لا يكشف عدد طلباتك (عكس التسلسلي) |
+| `customer_name` | VarChar(100) | اسم الزبون |
+| `phone` | VarChar(10) | موبايل سوري `09xxxxxxxx` — يُطبَّع من الأرقام الهندية (٠٩…) تلقائياً |
+| `city` | VarChar(50) | المحافظة / المدينة |
+| `address` | Text | العنوان بالتفصيل |
+| `notes` | Text | ملاحظات الزبون (اختياري) |
+| `payment_method` | VarChar(10) | `cod` (الدفع عند الاستلام) أو `shamcash` (يُفعَّل لاحقاً) |
+| `status` | VarChar(10) | `pending` بانتظار التأكيد ← `confirmed` ← `shipped` ← `delivered`، أو `cancelled` |
+| `total` | Decimal(12,0) | إجمالي الطلب بالليرة — **لقطة** لحظة الشراء |
+| `created_at` / `updated_at` | DateTime | تلقائي |
+
+**فهرس:** `(status, -created_at)` — شاشة «الطلبات المعلّقة الأحدث أولاً» بلوحة التحكم.
+
+### 5) `orders_orderitem` — أسطر الطلب
+
+| الحقل | النوع | ملاحظات |
+|---|---|---|
+| `id` | BigAuto | مفتاح أساسي |
+| `order_id` | FK → order | **CASCADE**: حذف الطلب يحذف أسطره |
+| `product_id` | FK → product | **PROTECT**: منتج مطلوب سابقاً لا يُحذف — يُعطَّل فقط (`is_active=False`) |
+| `product_name` | VarChar(200) | **لقطة**: اسم المنتج وقت الطلب |
+| `unit_price` | Decimal(12,0) | **لقطة**: سعر القطعة وقت الطلب |
+| `quantity` | PositiveInt | الكمية |
+
+**لماذا اللقطات؟** الأسعار تتغيّر باستمرار؛ فاتورة الزبون يجب أن تبقى كما كانت
+يوم الطلب مهما تعدّل الكاتالوج بعدها. `product_id` يبقى للربط والتقارير فقط.
+
+## السلة — بلا جداول (بالتصميم)
+
+السلة تعيش في **جلسة المتصفح** (`django_session`) كقاموس `{رقم_المنتج: الكمية}` —
+لا حساب ولا جدول. عند إتمام الطلب تتحوّل لسجلّي `order` + `order_item` الدائمين
+داخل **معاملة ذرّية** (transaction) تقفل صفوف المنتجات، تتحقق من المخزون،
+تخصمه، وتفرّغ السلة — كلها تنجح معاً أو تفشل معاً.
+
 ## القادم (مخطَّط له، غير منفّذ بعد)
 
-| موديول | جداول متوقعة |
+| موديول | أثر على قاعدة البيانات |
 |---|---|
-| M5 السلة | بلا جداول — السلة بالجلسة (session) حتى إتمام الطلب |
-| M6 الطلبات | `orders_order` (بيانات الزبون، العنوان، طريقة الدفع COD/شام كاش، الحالة، الإجمالي) + `orders_orderitem` (سطر لكل منتج: الكمية × سعر لحظة الشراء) |
+| دمج شام كاش | حقول/جدول لعمليات الدفع (transaction id، حالة الدفع، إشعارات البوابة) — يتحدد شكله مع وثائق الـAPI |
+| حسابات الزبائن (اختياري مستقبلاً) | ربط `order` بـ`auth_user` لعرض «طلباتي» |

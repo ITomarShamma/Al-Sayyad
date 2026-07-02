@@ -153,6 +153,57 @@
 .cart-summary__row { display: flex; justify-content: space-between; align-items: center; }
 .cart-summary__total { font-size: var(--fs-h3); color: var(--primary-strong); }
 
+/* --- إتمام الطلب (Checkout) ------------------------------------------------- */
+.checkout-layout { display: grid; gap: var(--space-5); }
+@media (min-width: 768px) {
+  .checkout-layout { grid-template-columns: 1fr 380px; align-items: start; }
+}
+.checkout-form { display: flex; flex-direction: column; gap: var(--space-4); }
+
+/* خيارات الدفع — بطاقات راديو بهدف نقر كبير (من موكاب الهوية) */
+.pay-methods { border: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+.pay-methods legend { margin-block-end: var(--space-2); }
+.pay-option {
+  display: flex; align-items: center; gap: var(--space-3);
+  min-block-size: var(--tap-min);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  background: var(--surface); cursor: pointer;
+}
+.pay-option:has(input:checked) { border-color: var(--primary); background: var(--color-sea-foam); }
+.pay-option input { accent-color: var(--primary); inline-size: 20px; block-size: 20px; }
+.pay-option--disabled { opacity: .55; cursor: not-allowed; }
+.pay-option__label { font-weight: var(--fw-medium); }
+
+/* تنبيه أخطاء الفورم العامة */
+.form-alert {
+  display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-start;
+  background: #FBE7E3; border: 1px solid var(--color-error); color: #99301F;
+  border-radius: var(--radius-md); padding: var(--space-4);
+  margin-block-start: var(--space-4);
+}
+
+/* ملخص الطلب (بجانب الفورم وبصفحة التأكيد) */
+.checkout-summary { position: sticky; inset-block-start: calc(var(--header-h) + var(--space-4)); }
+.checkout-summary h3 { margin-block-end: var(--space-3); }
+.checkout-summary__list { display: flex; flex-direction: column; gap: var(--space-2); margin-block-end: var(--space-3); }
+.checkout-summary__list li { display: flex; justify-content: space-between; gap: var(--space-3); }
+.checkout-summary__line { white-space: nowrap; font-weight: var(--fw-semibold); color: var(--primary-strong); }
+.checkout-summary__line small { color: var(--text-muted); font-weight: var(--fw-regular); }
+
+/* --- صفحة التأكيد (Confirmation) -------------------------------------------- */
+.confirm {
+  max-inline-size: var(--content-narrow); margin-inline: auto;
+  display: flex; flex-direction: column; align-items: center; gap: var(--space-4);
+  text-align: center; padding-block: var(--space-6);
+}
+.confirm__icon { font-size: 3rem; }
+.confirm__number {
+  color: var(--primary-strong); font-size: var(--fs-h2);
+  letter-spacing: 2px; unicode-bidi: embed;
+}
+.confirm__summary { inline-size: 100%; text-align: start; }
+
 /* --- شريحة (Chip) — رابط تصنيف/ترشيح بهدف نقر مريح ------------------------ */
 .chip-row { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .chip {

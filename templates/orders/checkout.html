@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate 'إتمام الطلب' %} — الصَّيَّاد{% endblock %}
+
+{% block content %}
+<h1>{% translate 'إتمام الطلب' %}</h1>
+
+{# أخطاء عامة (مثل تغيّر المخزون) — واضحة أعلى الفورم، القاعدة #5 #}
+{% if form.non_field_errors %}
+  <div class="form-alert" role="alert">
+    {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+    <a class="chip" href="{% url 'cart:detail' %}">{% translate 'رجوع للسلة' %}</a>
+  </div>
+{% endif %}
+
+<div class="checkout-layout section">
+
+  <form method="post" class="checkout-form" novalidate>
+    {% csrf_token %}
+
+    <div class="field {% if form.customer_name.errors %}field--error{% endif %}">
+      <label class="field__label" for="id_customer_name">{% translate 'الاسم الكامل' %} <span class="field__req">*</span></label>
+      <input class="field__input" type="text" id="id_customer_name" name="customer_name"
+             value="{{ form.customer_name.value|default:'' }}" required>
+      {% if form.customer_name.errors %}<p class="field__msg field__msg--error">{{ form.customer_name.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div class="field {% if form.phone.errors %}field--error{% endif %}">
+      <label class="field__label" for="id_phone">{% translate 'رقم الموبايل' %} <span class="field__req">*</span></label>
+      <input class="field__input" type="tel" id="id_phone" name="phone" inputmode="numeric"
+             placeholder="09xxxxxxxx" value="{{ form.phone.value|default:'' }}" required>
+      {% if form.phone.errors %}<p class="field__msg field__msg--error">{{ form.phone.errors.0 }}</p>
+      {% else %}<p class="field__msg">{% translate 'منتواصل معك عليه لتأكيد الطلب والتوصيل.' %}</p>{% endif %}
+    </div>
+
+    <div class="field {% if form.city.errors %}field--error{% endif %}">
+      <label class="field__label" for="id_city">{% translate 'المحافظة / المدينة' %} <span class="field__req">*</span></label>
+      <input class="field__input" type="text" id="id_city" name="city"
+             value="{{ form.city.value|default:'' }}" required>
+      {% if form.city.errors %}<p class="field__msg field__msg--error">{{ form.city.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div class="field {% if form.address.errors %}field--error{% endif %}">
+      <label class="field__label" for="id_address">{% translate 'العنوان بالتفصيل' %} <span class="field__req">*</span></label>
+      <textarea class="field__input" id="id_address" name="address" rows="3"
+                placeholder="{% translate 'الحي، الشارع، رقم البناء، طابق…' %}" required>{{ form.address.value|default:'' }}</textarea>
+      {% if form.address.errors %}<p class="field__msg field__msg--error">{{ form.address.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="id_notes">{% translate 'ملاحظات (اختياري)' %}</label>
+      <textarea class="field__input" id="id_notes" name="notes" rows="2">{{ form.notes.value|default:'' }}</textarea>
+    </div>
+
+    <fieldset class="pay-methods">
+      <legend class="field__label">{% translate 'طريقة الدفع' %}</legend>
+      {% for value, label in form.fields.payment_method.choices %}
+        <label class="pay-option">
+          <input type="radio" name="payment_method" value="{{ value }}"
+                 {% if forloop.first %}checked{% endif %}>
+          <span class="pay-option__label">
+            {% if value == 'cod' %}💵{% else %}📱{% endif %} {{ label }}
+          </span>
+        </label>
+      {% endfor %}
+      {# شام كاش — معروض كمعطّل حتى يوصل الـAPI (انظر orders/payments.py) #}
+      <label class="pay-option pay-option--disabled" aria-disabled="true">
+        <input type="radio" disabled>
+        <span class="pay-option__label">📱 {% translate 'شام كاش — قريباً' %}</span>
+      </label>
+    </fieldset>
+
+    <button class="btn btn--accent btn--block" type="submit">{% translate 'أكّد الطلب' %}</button>
+  </form>
+
+  <aside class="card checkout-summary">
+    <h3>{% translate 'ملخص طلبك' %}</h3>
+    <ul class="checkout-summary__list">
+      {% for item in cart.items %}
+        <li>
+          <span>{{ item.product.name }} × {{ item.quantity }}</span>
+          <span class="checkout-summary__line">{{ item.line_total_display }} <small>{% translate 'ل.س' %}</small></span>
+        </li>
+      {% endfor %}
+    </ul>
+    <div class="cart-summary__row">
+      <span>{% translate 'الإجمالي' %}</span>
+      <strong class="cart-summary__total">{{ cart.total_price_display }} {% translate 'ل.س' %}</strong>
+    </div>
+    <p class="caption" style="color: var(--text-muted);">{% translate 'التوصيل يُتفق عليه عند تأكيد الطلب هاتفياً.' %}</p>
+  </aside>
+
+</div>
+{% endblock %}
