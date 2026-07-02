@@ -21,6 +21,12 @@ class HomePageTests(TestCase):
         self.assertContains(resp, 'dir="rtl"')   # اتجاه عربي مفعّل
         self.assertContains(resp, 'lang="ar"')
 
+    def test_home_stays_rtl_for_english_browsers(self):
+        """متصفح يفضّل الإنجليزية لازم يظل يشوف عربي RTL (ما في ترجمة بعد)."""
+        resp = self.client.get(self.url, HTTP_ACCEPT_LANGUAGE="en-US,en;q=0.9")
+        self.assertContains(resp, 'dir="rtl"')
+        self.assertContains(resp, 'lang="ar"')
+
     def test_home_loads_design_tokens_and_brand(self):
         resp = self.client.get(self.url)
         self.assertContains(resp, "css/tokens.css")   # نظام التصميم محمّل
