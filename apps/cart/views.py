@@ -33,8 +33,8 @@ def add(request, product_id):
     product = get_object_or_404(Product, id=product_id, is_active=True)
     Cart(request).add(product, _quantity(request))
     if request.headers.get("HX-Request"):
-        # الزر يستعمل hx-swap="none" — التحديث الوحيد هو عدّاد الهيدر (OOB)
-        return render(request, "cart/partials/badges_oob.html")
+        # الزر يستعمل hx-swap="none" — التحديث كله OOB: العدّادان + توست تأكيد
+        return render(request, "cart/partials/added_oob.html")
     return redirect("cart:detail")
 
 

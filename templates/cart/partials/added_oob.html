@@ -1,0 +1,11 @@
+{% load i18n %}{% comment %}
+ردّ «أضف للسلة» عبر HTMX: عدّادا الهيدر + توست تأكيد يظهر ويختفي وحده.
+استبدال #toast بالكامل (OOB) يعيد تشغيل أنيميشن الظهور مع كل إضافة.
+{% endcomment %}
+{% include 'cart/partials/badges_oob.html' %}
+<div id="toast" class="toast-region" aria-live="polite" hx-swap-oob="true">
+  <div class="toast">
+    ✓ {% translate 'أُضيف للسلة' %}
+    <a class="toast__link" href="{% url 'cart:detail' %}">{% translate 'اعرض السلة' %}</a>
+  </div>
+</div>

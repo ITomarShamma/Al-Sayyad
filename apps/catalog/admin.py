@@ -1,8 +1,34 @@
 """لوحة تحكم الكاتالوج — من هنا تُدخل التصنيفات والمنتجات والصور."""
 
 from django.contrib import admin
+from django.utils.html import format_html
 
 from .models import Category, Product, ProductImage
+
+LOW_STOCK_THRESHOLD = 3
+
+
+class StockLevelFilter(admin.SimpleListFilter):
+    """فلتر جانبي: شوف فوراً شو ناقص أو شارف يخلص."""
+
+    title = "مستوى المخزون"
+    parameter_name = "stock_level"
+
+    def lookups(self, request, model_admin):
+        return [
+            ("out", "نافد (0)"),
+            ("low", f"منخفض (≤ {LOW_STOCK_THRESHOLD})"),
+            ("ok", "متوفر"),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == "out":
+            return queryset.filter(stock=0)
+        if self.value() == "low":
+            return queryset.filter(stock__gt=0, stock__lte=LOW_STOCK_THRESHOLD)
+        if self.value() == "ok":
+            return queryset.filter(stock__gt=LOW_STOCK_THRESHOLD)
+        return queryset
 
 
 class ProductImageInline(admin.TabularInline):
@@ -28,10 +54,20 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("name", "category", "price_display", "stock", "is_active", "updated_at")
-    list_filter = ("is_active", "category")
+    list_display = ("name", "category", "price_display", "stock_display",
+                    "stock", "is_active", "updated_at")
+    list_filter = (StockLevelFilter, "is_active", "category")
     search_fields = ("name", "description")
     list_editable = ("stock", "is_active")   # تعديل سريع من الجدول مباشرة
+
+    @admin.display(description="حالة المخزون", ordering="stock")
+    def stock_display(self, obj):
+        """إشارة ملوّنة: أحمر نافد، برتقالي منخفض، أخضر متوفر."""
+        if obj.stock == 0:
+            return format_html('<b style="color:#D5402B;">● نافد</b>')
+        if obj.stock <= LOW_STOCK_THRESHOLD:
+            return format_html('<b style="color:#E8A317;">● منخفض ({})</b>', obj.stock)
+        return format_html('<span style="color:#2E9E54;">● متوفر</span>')
     list_per_page = 50
     inlines = [ProductImageInline]
     readonly_fields = ("created_at", "updated_at")

@@ -70,6 +70,18 @@ class CartViewsTests(TestCase):
         self.assertContains(resp, 'hx-swap-oob="true"')
         self.assertContains(resp, ">1<")               # العدّاد صار 1
 
+    def test_htmx_add_shows_toast(self):
+        resp = self.client.post(self.add_url, HTTP_HX_REQUEST="true")
+        self.assertContains(resp, 'id="toast"')
+        self.assertContains(resp, "أُضيف للسلة")
+
+    def test_update_does_not_show_toast(self):
+        """تعديل الكمية من صفحة السلة ما بدو توست — التغيير ظاهر قدامك."""
+        self.client.post(self.add_url)
+        resp = self.client.post(self.update_url, {"quantity": 2},
+                                HTTP_HX_REQUEST="true")
+        self.assertNotContains(resp, "أُضيف للسلة")
+
     def test_add_get_not_allowed(self):
         self.assertEqual(self.client.get(self.add_url).status_code, 405)
 

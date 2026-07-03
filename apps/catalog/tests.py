@@ -283,3 +283,17 @@ class CatalogAdminTests(TestCase):
         resp = self.client.get(reverse("admin:catalog_product_add"))
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, "السعر")             # الواجهة معرّبة
+
+    def test_admin_low_stock_filter(self):
+        make_product(name="نافد تماماً", stock=0)
+        make_product(name="شارف يخلص", stock=2)
+        make_product(name="مليان", stock=50)
+        url = reverse("admin:catalog_product_changelist")
+
+        resp = self.client.get(url, {"stock_level": "low"})
+        self.assertContains(resp, "شارف يخلص")
+        self.assertNotContains(resp, "مليان")
+
+        resp = self.client.get(url, {"stock_level": "out"})
+        self.assertContains(resp, "نافد تماماً")
+        self.assertNotContains(resp, "شارف يخلص")

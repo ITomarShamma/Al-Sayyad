@@ -153,6 +153,30 @@
 .cart-summary__row { display: flex; justify-content: space-between; align-items: center; }
 .cart-summary__total { font-size: var(--fs-h3); color: var(--primary-strong); }
 
+/* --- توست تأكيد (Toast) — يظهر ويختفي وحده بالأنيميشن، بلا JS ---------------- */
+.toast-region {
+  position: fixed; inset-inline: 0; z-index: 40;
+  inset-block-end: calc(var(--bottomnav-h) + var(--space-4));
+  display: flex; justify-content: center;
+  pointer-events: none;                 /* لا يحجب النقر على ما تحته */
+}
+@media (min-width: 768px) { .toast-region { inset-block-end: var(--space-5); } }
+.toast {
+  pointer-events: auto;
+  display: inline-flex; align-items: center; gap: var(--space-3);
+  background: var(--color-ink); color: var(--color-white);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-pill); box-shadow: var(--shadow-md);
+  animation: toast-in-out 3.5s ease forwards;
+}
+.toast__link { color: var(--accent); font-weight: var(--fw-semibold); }
+@keyframes toast-in-out {
+  0%   { opacity: 0; transform: translateY(12px); }
+  8%   { opacity: 1; transform: translateY(0); }
+  85%  { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
 /* --- اقتراحات البحث الحية (Search suggest) ----------------------------------- */
 .search-suggest {
   position: absolute; inset-block-start: calc(100% + 6px); inset-inline: 0;
