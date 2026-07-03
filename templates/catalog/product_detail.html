@@ -75,6 +75,12 @@
       {% include 'components/button.html' with label=oos_label variant='secondary' disabled=True only %}
     {% endif %}
 
+    {# مشاركة عالواتساب — أهم قناة تسوّق بسوريا (كل أيقونة معها كلمة، قاعدة #3) #}
+    <a class="btn btn--secondary" target="_blank" rel="noopener"
+       href="https://wa.me/?text={{ share_text|urlencode }}">
+      💬 {% translate 'شارك المنتج عالواتساب' %}
+    </a>
+
     {% if product.description %}
       <div class="buybox__section">
         <h3>{% translate 'الوصف' %}</h3>
@@ -95,4 +101,15 @@
   </div>
 
 </div>
+
+{% if related %}
+<section class="section">
+  <h2>{% translate 'منتجات مشابهة' %}</h2>
+  <div class="product-grid">
+    {% for p in related %}
+      {% include 'components/product_card.html' with name=p.name price=p.price_display href=p.get_absolute_url image_url=p.main_image_url product_id=p.id in_stock=p.in_stock only %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
 {% endblock %}

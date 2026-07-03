@@ -108,11 +108,33 @@ def category_detail(request, slug):
     })
 
 
+RELATED_LIMIT = 4
+
+
 def product_detail(request, slug):
-    """صفحة منتج: الصور والسعر والمواصفات وأزرار الشراء."""
+    """صفحة منتج: الصور والسعر والمواصفات والشراء + مشابهة + مشاركة."""
     product = get_object_or_404(
         Product.objects.select_related("category").prefetch_related("images"),
         slug=slug,
         is_active=True,
     )
-    return render(request, "catalog/product_detail.html", {"product": product})
+
+    # منتجات مشابهة: نفس التصنيف، المتوفر أولاً ثم الأحدث
+    related = (
+        Product.objects.filter(is_active=True, category=product.category)
+        .exclude(pk=product.pk)
+        .prefetch_related("images")
+        .order_by("-stock", "-created_at")[:RELATED_LIMIT]
+    )
+
+    # نص المشاركة عالواتساب — رابط مطلق (بالدومين) وليس نسبياً
+    share_text = (
+        f"{product.name} — {product.price_display} ل.س عالصَّيَّاد\n"
+        f"{request.build_absolute_uri(product.get_absolute_url())}"
+    )
+
+    return render(request, "catalog/product_detail.html", {
+        "product": product,
+        "related": related,
+        "share_text": share_text,
+    })

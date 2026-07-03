@@ -152,6 +152,49 @@ class BrowseTests(TestCase):
         self.assertContains(resp, 'name="q" value="سماعه"')
 
 
+class ProductPageExtrasTests(TestCase):
+    """M10: منتجات مشابهة + مشاركة واتساب."""
+
+    def setUp(self):
+        self.cat = Category.objects.create(name="إلكترونيات")
+        self.product = make_product(category=self.cat, name="سماعة رئيسية")
+        self.sibling = make_product(category=self.cat, name="سماعة شقيقة")
+        self.hidden_sibling = make_product(category=self.cat, name="شقيقة مخفية",
+                                           is_active=False)
+        other_cat = Category.objects.create(name="أدوات منزلية")
+        self.unrelated = make_product(category=other_cat, name="غلاية بعيدة")
+
+    def get(self):
+        return self.client.get(self.product.get_absolute_url())
+
+    def test_related_shows_same_category_only(self):
+        resp = self.get()
+        self.assertContains(resp, "منتجات مشابهة")
+        self.assertContains(resp, "سماعة شقيقة")
+        self.assertNotContains(resp, "غلاية بعيدة")
+
+    def test_related_excludes_self_and_inactive(self):
+        resp = self.get()
+        self.assertNotContains(resp, "شقيقة مخفية")
+        # اسم المنتج نفسه يظهر مرة بالعنوان/البطاقة الرئيسية لكن ليس ببطاقات المشابهة:
+        # نتأكد أن عدد البطاقات = 1 (الشقيقة فقط)
+        self.assertEqual(resp.content.decode().count("product-card__name"), 1)
+
+    def test_whatsapp_share_link_present_with_absolute_url(self):
+        resp = self.get()
+        self.assertContains(resp, "https://wa.me/?text=")
+        self.assertContains(resp, "شارك المنتج عالواتساب")
+        # الرابط المشارك مطلق (فيه الدومين) — مشفّراً داخل باراميتر النص
+        # (فلتر urlencode يترك / كما هي — قانونية داخل قيمة الاستعلام)
+        self.assertContains(resp, "http%3A//testserver")
+
+    def test_no_related_section_when_alone(self):
+        lonely_cat = Category.objects.create(name="فريد")
+        lonely = make_product(category=lonely_cat, name="منتج وحيد")
+        resp = self.client.get(lonely.get_absolute_url())
+        self.assertNotContains(resp, "منتجات مشابهة")
+
+
 class SearchNormalizeTests(TestCase):
     """قواعد تطبيع العربية — قلب البحث كله."""
 
