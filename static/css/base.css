@@ -132,6 +132,12 @@ h3 { font-size: var(--fs-h3); font-weight: var(--fw-semibold); }
   text-align: center; color: var(--text-muted); font-size: var(--fs-caption);
   border-block-start: 1px solid var(--border);
 }
+.site-footer__links {
+  display: flex; justify-content: center; flex-wrap: wrap;
+  gap: var(--space-4); margin-block-end: var(--space-3);
+}
+.site-footer__links a { color: var(--text); }
+.site-footer__links a:hover { color: var(--primary); }
 
 /* --- شريط التنقّل السفلي (موبايل فقط — كل أيقونة معها كلمة، القاعدة #3) --- */
 .bottom-nav {

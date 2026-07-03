@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate 'الصفحة غير موجودة' %} — الصَّيَّاد{% endblock %}
+
+{% block content %}
+<div class="empty" style="padding-block: var(--space-8);">
+  <p class="empty__icon" aria-hidden="true">🎣</p>
+  <h1>{% translate 'ما في شي هون!' %}</h1>
+  <p style="color: var(--text-muted); margin-block-start: var(--space-2);">
+    {% translate 'الصفحة يلي بتدوّر عليها غير موجودة أو انتقلت — جرّب البحث أو ارجع للرئيسية.' %}
+  </p>
+  <div class="sg-row" style="justify-content: center; margin-block-start: var(--space-5);">
+    <a class="btn btn--primary" href="/">{% translate 'الرئيسية' %}</a>
+    <a class="btn btn--secondary" href="/categories/">{% translate 'التصنيفات' %}</a>
+  </div>
+</div>
+{% endblock %}

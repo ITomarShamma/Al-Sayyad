@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate 'عن الصَّيَّاد' %} — الصَّيَّاد{% endblock %}
+
+{% block content %}
+<div class="confirm" style="text-align: start; align-items: stretch;">
+  <h1 style="text-align: center;">{% translate 'عن الصَّيَّاد' %}</h1>
+  <p style="text-align: center; color: var(--text-muted);">
+    «{% translate 'اطلب… ونحن نصطاد لك' %}»
+  </p>
+
+  <div class="card">
+    <p>
+      {% translate 'الصَّيَّاد سوق سوري إلكتروني: قُل ما تبحث عنه — ونُحضِر لك الصيد. سوقٌ موثوق وواسع، صُمِّم ليكون سهلاً على كل بيت سوري، حتى لو كانت هذه أول مرة تتسوق فيها أونلاين.' %}
+    </p>
+  </div>
+
+  <div class="pillars">
+    <div class="card">
+      <strong class="card__title">{% translate 'موثوق' %}</strong>
+      <p class="card__text">{% translate 'ادفع عند الاستلام — ما تدفع شي قبل ما توصلك أغراضك وتشوفها بعينك.' %}</p>
+    </div>
+    <div class="card">
+      <strong class="card__title">{% translate 'وافر' %}</strong>
+      <p class="card__text">{% translate 'كل احتياجات بيتك بمكان واحد، من الإلكترونيات للمطبخ.' %}</p>
+    </div>
+    <div class="card">
+      <strong class="card__title">{% translate 'بسيط' %}</strong>
+      <p class="card__text">{% translate 'شاشات واضحة وخطوات قليلة — بلا تسجيل حسابات ولا تعقيد.' %}</p>
+    </div>
+    <div class="card">
+      <strong class="card__title">{% translate 'قريب' %}</strong>
+      <p class="card__text">{% translate 'سوري بالكامل: باللغة، وبالليرة، وبطرق الدفع، وبالناس.' %}</p>
+    </div>
+  </div>
+
+  <a class="btn btn--primary" style="align-self: center;" href="{% url 'catalog:category_list' %}">{% translate 'ابدأ التسوّق' %}</a>
+</div>
+{% endblock %}

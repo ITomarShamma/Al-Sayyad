@@ -6,6 +6,14 @@
   <title>{% block title %}الصَّيَّاد{% endblock %}</title>
   <meta name="description" content="{% block description %}الصَّيَّاد — سوق سوري موثوق. اطلب… ونحن نصطاد لك.{% endblock %}">
 
+  {# بطاقات المشاركة (OpenGraph): كيف يظهر الرابط بالواتساب وفيسبوك #}
+  {% block og %}
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="الصَّيَّاد">
+  <meta property="og:title" content="الصَّيَّاد — سوقك السوري الموثوق">
+  <meta property="og:description" content="اطلب… ونحن نصطاد لك.">
+  {% endblock %}
+
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
   <link rel="stylesheet" href="{% static 'css/components.css' %}">
@@ -57,6 +65,11 @@
 
   <footer class="site-footer">
     <div class="container">
+      <nav class="site-footer__links" aria-label="{% translate 'روابط الموقع' %}">
+        <a href="{% url 'pages:about' %}">{% translate 'عن الصَّيَّاد' %}</a>
+        <a href="{% url 'pages:contact' %}">{% translate 'تواصل معنا' %}</a>
+        <a href="{% url 'orders:track' %}">{% translate 'تتبع طلبك' %}</a>
+      </nav>
       <p>الصَّيَّاد — {% translate 'سوقك السوري الموثوق' %}</p>
     </div>
   </footer>

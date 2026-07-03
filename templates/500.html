@@ -1,0 +1,27 @@
+<!doctype html>
+{# صفحة عطل السيرفر — قائمة بذاتها عمداً: عند الـ500 تُرسم بسياق فارغ
+   (بلا context processors ولا request)، فأي اعتماد على base.html قد يكسرها.
+   كل التنسيق داخلي (inline) حتى تشتغل حتى لو تعطل تقديم الملفات الساكنة. #}
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>عطل مؤقت — الصَّيَّاد</title>
+</head>
+<body style="margin:0; font-family:'IBM Plex Sans Arabic',system-ui,Tahoma,sans-serif;
+             background:#FAF8F2; color:#16261F; min-height:100vh;
+             display:grid; place-items:center; text-align:center; padding:24px;">
+  <div>
+    <div style="font-size:3rem;">⚓</div>
+    <h1 style="color:#0B4A41; margin:16px 0 8px;">صار عطل مؤقت عندنا</h1>
+    <p style="color:#5B6B64; line-height:1.75; margin:0 0 24px;">
+      المشكلة منّا مو منك — فريقنا انتبه لها وعم يشتغل عليها.<br>
+      جرّب تحدّث الصفحة بعد دقيقة.
+    </p>
+    <a href="/" style="display:inline-block; background:#0E6B5E; color:#fff;
+       padding:12px 32px; border-radius:999px; text-decoration:none; font-weight:600;">
+      رجوع للرئيسية
+    </a>
+  </div>
+</body>
+</html>

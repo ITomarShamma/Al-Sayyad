@@ -46,6 +46,7 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sitemaps",   # sitemap.xml لمحركات البحث
 ]
 
 # Our own apps. Each one is a self-contained module of the store.
@@ -127,6 +128,13 @@ STATIC_ROOT = BASE_DIR / "staticfiles"        # collected assets for production
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"               # user-uploaded files (product images)
+
+
+# --- Store contact info (صفحة «تواصل معنا» والفوتر) ------------------------
+# عدّل القيم من .env أو مباشرة هنا — تُعرض كما هي للزبائن.
+STORE_PHONE = env("STORE_PHONE", "0998625984")
+STORE_WHATSAPP = env("STORE_WHATSAPP", "963998625984")   # بصيغة دولية بلا +
+STORE_EMAIL = env("STORE_EMAIL", "tahashamma222@gmail.com")
 
 
 # --- Misc -----------------------------------------------------------------

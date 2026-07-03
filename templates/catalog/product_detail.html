@@ -4,6 +4,17 @@
 {% block title %}{{ product.name }} — الصَّيَّاد{% endblock %}
 {% block description %}{{ product.description|truncatechars:150 }}{% endblock %}
 
+{% block og %}
+  <meta property="og:type" content="product">
+  <meta property="og:site_name" content="الصَّيَّاد">
+  <meta property="og:title" content="{{ product.name }} — {{ product.price_display }} ل.س">
+  <meta property="og:description" content="{{ product.description|truncatechars:150 }}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  {% if product.main_image_url %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ product.main_image_url }}">
+  {% endif %}
+{% endblock %}
+
 {% block content %}
 <nav class="breadcrumbs" aria-label="{% translate 'مسار التنقّل' %}">
   <a href="{% url 'pages:home' %}">{% translate 'الرئيسية' %}</a>

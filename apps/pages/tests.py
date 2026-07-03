@@ -33,6 +33,54 @@ class HomePageTests(TestCase):
         self.assertContains(resp, "الصَّيَّاد")          # اسم البراند ظاهر
 
 
+class TrustAndSeoTests(TestCase):
+    """M11: صفحات الثقة + 404 مخصصة + sitemap/robots + OG."""
+
+    def test_about_page(self):
+        resp = self.client.get(reverse("pages:about"))
+        self.assertContains(resp, "عن الصَّيَّاد")
+        self.assertContains(resp, "موثوق")
+
+    def test_contact_page_shows_store_contact(self):
+        resp = self.client.get(reverse("pages:contact"))
+        self.assertContains(resp, "wa.me/")
+        self.assertContains(resp, "tel:")
+
+    def test_footer_links_everywhere(self):
+        resp = self.client.get(reverse("pages:home"))
+        self.assertContains(resp, reverse("pages:about"))
+        self.assertContains(resp, reverse("pages:contact"))
+
+    def test_custom_404_page(self):
+        with self.settings(DEBUG=False, ALLOWED_HOSTS=["testserver"]):
+            resp = self.client.get("/صفحة-غير-موجودة/")
+        self.assertEqual(resp.status_code, 404)
+        self.assertContains(resp, "ما في شي هون!", status_code=404)
+
+    def test_sitemap_lists_products_and_pages(self):
+        from apps.catalog.models import Category, Product
+        cat = Category.objects.create(name="إلكترونيات")
+        product = Product.objects.create(category=cat, name="سماعة", price=1000, stock=1)
+        resp = self.client.get("/sitemap.xml")
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, product.get_absolute_url())
+        self.assertContains(resp, reverse("pages:about"))
+
+    def test_robots_txt(self):
+        resp = self.client.get("/robots.txt")
+        self.assertEqual(resp["Content-Type"], "text/plain")
+        self.assertContains(resp, "Disallow: /admin/")
+        self.assertContains(resp, "Sitemap: http://testserver/sitemap.xml")
+
+    def test_product_page_has_og_tags(self):
+        from apps.catalog.models import Category, Product
+        cat = Category.objects.create(name="إلكترونيات")
+        product = Product.objects.create(category=cat, name="سماعة", price=1000, stock=1)
+        resp = self.client.get(product.get_absolute_url())
+        self.assertContains(resp, 'property="og:title"')
+        self.assertContains(resp, 'content="product"')
+
+
 class StyleguideTests(TestCase):
     """دليل المكوّنات يعرض كل المكوّنات الأساسية وحالاتها."""
 

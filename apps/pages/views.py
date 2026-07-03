@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.http import HttpResponse
 from django.shortcuts import render
 
 from apps.catalog.models import Category, Product
@@ -15,6 +17,34 @@ def home(request):
         "categories": categories,
         "latest_products": latest_products,
     })
+
+
+def about(request):
+    """عن الصَّيَّاد — من نحن ولماذا يثق فينا الزبون."""
+    return render(request, "pages/about.html")
+
+
+def contact(request):
+    """تواصل معنا — القيم من الإعدادات (STORE_*) لتُعدَّل بمكان واحد."""
+    return render(request, "pages/contact.html", {
+        "phone": settings.STORE_PHONE,
+        "whatsapp": settings.STORE_WHATSAPP,
+        "email": settings.STORE_EMAIL,
+    })
+
+
+def robots_txt(request):
+    """ملف robots.txt — يوجّه محركات البحث ويشير لخريطة الموقع."""
+    sitemap_url = request.build_absolute_uri("/sitemap.xml")
+    lines = [
+        "User-agent: *",
+        "Disallow: /admin/",
+        "Disallow: /cart/",
+        "Disallow: /checkout/",
+        "Disallow: /track/",
+        f"Sitemap: {sitemap_url}",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
 
 
 def styleguide(request):
