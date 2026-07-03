@@ -1,0 +1,17 @@
+{% load i18n %}{% comment %}
+ترقيم صفحات موحّد. وسم {% querystring %} (جديد بـDjango 5.1+) يبني الرابط
+محافظاً على *كل* الباراميترات الحالية (q, sort, available…) ويغيّر page فقط.
+{% endcomment %}
+{% if page.paginator.num_pages > 1 %}
+  <nav class="pagination" aria-label="{% translate 'صفحات' %}">
+    {% if page.has_previous %}
+      <a class="chip" href="{% querystring page=page.previous_page_number %}">{% translate 'السابق' %}</a>
+    {% endif %}
+    <span class="pagination__status">
+      {% blocktranslate with current=page.number total=page.paginator.num_pages %}صفحة {{ current }} من {{ total }}{% endblocktranslate %}
+    </span>
+    {% if page.has_next %}
+      <a class="chip" href="{% querystring page=page.next_page_number %}">{% translate 'التالي' %}</a>
+    {% endif %}
+  </nav>
+{% endif %}

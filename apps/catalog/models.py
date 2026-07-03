@@ -67,6 +67,33 @@ class Category(TimeStampedModel):
     def get_absolute_url(self):
         return reverse("catalog:category", args=[self.slug])
 
+    @property
+    def ancestors(self):
+        """سلسلة الآباء من الجذر حتى الأب المباشر — لمسار التنقّل الكامل."""
+        chain = []
+        node = self.parent
+        while node is not None:
+            chain.append(node)
+            node = node.parent
+        return list(reversed(chain))
+
+    def descendant_ids(self):
+        """معرّفي + معرّفات كل التصنيفات تحتي (لأي عمق) — باستعلام واحد.
+
+        نجلب خريطة (id ← parent_id) لكل التصنيفات مرة واحدة ثم نمشي
+        الشجرة بالذاكرة — بدل استعلام لكل مستوى.
+        """
+        children_map = {}
+        for cid, pid in Category.objects.values_list("id", "parent_id"):
+            children_map.setdefault(pid, []).append(cid)
+
+        ids, stack = [self.id], [self.id]
+        while stack:
+            for child_id in children_map.get(stack.pop(), []):
+                ids.append(child_id)
+                stack.append(child_id)
+        return ids
+
 
 class Product(TimeStampedModel):
     """المنتج — وحدة البيع الأساسية بالمتجر."""

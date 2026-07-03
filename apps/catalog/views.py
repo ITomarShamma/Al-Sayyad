@@ -13,6 +13,28 @@ from .search import normalize
 PRODUCTS_PER_PAGE = 24
 SUGGESTIONS_LIMIT = 5
 
+# خيارات الترتيب المسموحة — أي قيمة غريبة من الرابط ترجع للافتراضي
+SORTS = {
+    "new": "-created_at",
+    "price_asc": "price",
+    "price_desc": "-price",
+}
+
+
+def apply_browse_controls(request, qs):
+    """يطبّق الفرز والفلترة من باراميترات الرابط على أي قائمة منتجات.
+
+    يرجع (queryset, sort, available) — القيمتان تعودان للقالب
+    ليعرض أدوات التحكم بحالتها الحالية.
+    """
+    sort = request.GET.get("sort", "new")
+    if sort not in SORTS:
+        sort = "new"
+    available = request.GET.get("available") == "1"
+    if available:
+        qs = qs.filter(stock__gt=0)
+    return qs.order_by(SORTS[sort]), sort, available
+
 
 def _search_queryset(q):
     """منتجات مفعّلة تطابق كل كلمات البحث (بعد التطبيع).
@@ -29,15 +51,18 @@ def _search_queryset(q):
 
 
 def search(request):
-    """صفحة نتائج البحث — ?q=كلمات البحث."""
+    """صفحة نتائج البحث — ?q=كلمات البحث، مع نفس أدوات الفرز والفلترة."""
     q = request.GET.get("q", "").strip()
     results = _search_queryset(q).prefetch_related("images")
+    results, sort, available = apply_browse_controls(request, results)
     paginator = Paginator(results, PRODUCTS_PER_PAGE)
     page = paginator.get_page(request.GET.get("page"))
     return render(request, "catalog/search_results.html", {
         "q": q,
         "page": page,
         "total": paginator.count if q else 0,
+        "sort": sort,
+        "available": available,
     })
 
 
@@ -59,14 +84,18 @@ def category_list(request):
 
 
 def category_detail(request, slug):
-    """صفحة تصنيف: تصنيفاته الفرعية + منتجاته المفعّلة مع ترقيم صفحات."""
+    """صفحة تصنيف: منتجات الشجرة كاملة (هو + كل فروعه) + فرز وفلترة."""
     category = get_object_or_404(Category, slug=slug, is_active=True)
     children = category.children.filter(is_active=True)
 
     products_qs = (
-        category.products.filter(is_active=True)
+        Product.objects.filter(
+            is_active=True,
+            category_id__in=category.descendant_ids(),  # الشجرة كلها، مو المباشر فقط
+        )
         .prefetch_related("images")      # يمنع استعلاماً لكل بطاقة (N+1)
     )
+    products_qs, sort, available = apply_browse_controls(request, products_qs)
     paginator = Paginator(products_qs, PRODUCTS_PER_PAGE)
     page = paginator.get_page(request.GET.get("page"))  # رقم خاطئ؟ أول صفحة
 
@@ -74,6 +103,8 @@ def category_detail(request, slug):
         "category": category,
         "children": children,
         "page": page,
+        "sort": sort,
+        "available": available,
     })
 
 

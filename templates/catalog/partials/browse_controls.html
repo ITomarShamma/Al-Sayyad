@@ -1,0 +1,25 @@
+{% load i18n %}{% comment %}
+شريط أدوات التصفح: فرز + «المتوفر فقط». يُستعمل بصفحة التصنيف والبحث.
+GET form: تغيير أي خيار يعيد تحميل الصفحة بالباراميترات الجديدة —
+(q تُحفظ بحقل مخفي على صفحة البحث). بدون JS: زر «طبّق» داخل noscript.
+{% endcomment %}
+<form method="get" class="browse-controls">
+  {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+
+  <label class="browse-controls__group">
+    <span class="caption">{% translate 'ترتيب' %}</span>
+    <select class="browse-controls__select" name="sort" onchange="this.form.submit()">
+      <option value="new" {% if sort == 'new' %}selected{% endif %}>{% translate 'الأحدث' %}</option>
+      <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>{% translate 'السعر: من الأرخص' %}</option>
+      <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>{% translate 'السعر: من الأغلى' %}</option>
+    </select>
+  </label>
+
+  <label class="browse-controls__group browse-controls__check">
+    <input type="checkbox" name="available" value="1"
+           {% if available %}checked{% endif %} onchange="this.form.submit()">
+    <span>{% translate 'المتوفر فقط' %}</span>
+  </label>
+
+  <noscript><button class="btn btn--secondary" type="submit">{% translate 'طبّق' %}</button></noscript>
+</form>

@@ -4,14 +4,14 @@
 {% block title %}{{ category.name }} — الصَّيَّاد{% endblock %}
 
 {% block content %}
-{# مسار التنقّل: الرئيسية ← التصنيف الأب ← الحالي #}
+{# مسار التنقّل الكامل: الرئيسية ← كل الأجداد ← الحالي #}
 <nav class="breadcrumbs" aria-label="{% translate 'مسار التنقّل' %}">
   <a href="{% url 'pages:home' %}">{% translate 'الرئيسية' %}</a>
-  <span aria-hidden="true">←</span>
-  {% if category.parent %}
-    <a href="{{ category.parent.get_absolute_url }}">{{ category.parent.name }}</a>
+  {% for ancestor in category.ancestors %}
     <span aria-hidden="true">←</span>
-  {% endif %}
+    <a href="{{ ancestor.get_absolute_url }}">{{ ancestor.name }}</a>
+  {% endfor %}
+  <span aria-hidden="true">←</span>
   <span aria-current="page">{{ category.name }}</span>
 </nav>
 
@@ -26,30 +26,19 @@
 {% endif %}
 
 <section class="section">
+  {% include 'catalog/partials/browse_controls.html' %}
+
   {% if page.object_list %}
-    <div class="product-grid">
+    <div class="product-grid" style="margin-block-start: var(--space-4);">
       {% for p in page.object_list %}
         {% include 'components/product_card.html' with name=p.name price=p.price_display href=p.get_absolute_url image_url=p.main_image_url product_id=p.id in_stock=p.in_stock only %}
       {% endfor %}
     </div>
-
-    {% if page.paginator.num_pages > 1 %}
-      <nav class="pagination" aria-label="{% translate 'صفحات' %}">
-        {% if page.has_previous %}
-          <a class="chip" href="?page={{ page.previous_page_number }}">{% translate 'السابق' %}</a>
-        {% endif %}
-        <span class="pagination__status">
-          {% blocktranslate with current=page.number total=page.paginator.num_pages %}صفحة {{ current }} من {{ total }}{% endblocktranslate %}
-        </span>
-        {% if page.has_next %}
-          <a class="chip" href="?page={{ page.next_page_number }}">{% translate 'التالي' %}</a>
-        {% endif %}
-      </nav>
-    {% endif %}
+    {% include 'catalog/partials/pagination.html' %}
   {% else %}
     <div class="empty">
       <p class="empty__icon" aria-hidden="true">🎣</p>
-      <p>{% translate 'ما في منتجات بهالتصنيف بعد.' %}</p>
+      <p>{% translate 'ما في منتجات مطابقة بهالتصنيف.' %}</p>
     </div>
   {% endif %}
 </section>

@@ -218,6 +218,20 @@
 .checkout-summary__line { white-space: nowrap; font-weight: var(--fw-semibold); color: var(--primary-strong); }
 .checkout-summary__line small { color: var(--text-muted); font-weight: var(--fw-regular); }
 
+/* --- شريط أدوات التصفح (فرز + فلترة) ---------------------------------------- */
+.browse-controls {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4);
+}
+.browse-controls__group { display: inline-flex; align-items: center; gap: var(--space-2); }
+.browse-controls__select {
+  min-block-size: 44px; padding-inline: var(--space-3);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--text);
+  font-family: inherit; font-size: var(--fs-body);
+}
+.browse-controls__check { cursor: pointer; user-select: none; }
+.browse-controls__check input { accent-color: var(--primary); inline-size: 20px; block-size: 20px; }
+
 /* --- تتبع الطلب (Track) ------------------------------------------------------ */
 .track-form {
   display: flex; flex-direction: column; gap: var(--space-4);

@@ -7,6 +7,10 @@
 {% block content %}
 <nav class="breadcrumbs" aria-label="{% translate 'مسار التنقّل' %}">
   <a href="{% url 'pages:home' %}">{% translate 'الرئيسية' %}</a>
+  {% for ancestor in product.category.ancestors %}
+    <span aria-hidden="true">←</span>
+    <a href="{{ ancestor.get_absolute_url }}">{{ ancestor.name }}</a>
+  {% endfor %}
   <span aria-hidden="true">←</span>
   <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a>
   <span aria-hidden="true">←</span>

@@ -102,6 +102,56 @@ class CatalogViewsTests(TestCase):
         self.assertNotContains(resp, "منتج مخفي")
 
 
+class BrowseTests(TestCase):
+    """M9: منتجات الشجرة كاملة + الفرز + فلتر المتوفر + حفظ الباراميترات."""
+
+    def setUp(self):
+        self.root = Category.objects.create(name="إلكترونيات")
+        self.child = Category.objects.create(name="سماعات", parent=self.root)
+        self.grandchild = Category.objects.create(name="سماعات لاسلكية", parent=self.child)
+        self.p_root = make_product(category=self.root, name="تلفزيون", price=Decimal("900000"))
+        self.p_deep = make_product(category=self.grandchild, name="سماعة عميقة", price=Decimal("100000"))
+        self.p_oos = make_product(category=self.root, name="منتج نافد", stock=0)
+
+    def test_category_page_includes_descendant_products(self):
+        """منتج بالحفيد يظهر على صفحة الجد."""
+        resp = self.client.get(self.root.get_absolute_url())
+        self.assertContains(resp, "سماعة عميقة")
+
+    def test_descendant_ids_walks_whole_tree(self):
+        ids = self.root.descendant_ids()
+        self.assertIn(self.grandchild.id, ids)
+        self.assertIn(self.root.id, ids)
+
+    def test_full_breadcrumb_chain_on_deep_category(self):
+        resp = self.client.get(self.grandchild.get_absolute_url())
+        self.assertContains(resp, "إلكترونيات")   # الجذر ظاهر بمسار التنقّل
+        self.assertContains(resp, "سماعات")
+
+    def test_sort_by_price_ascending(self):
+        resp = self.client.get(self.root.get_absolute_url(), {"sort": "price_asc"})
+        products = list(resp.context["page"].object_list)
+        prices = [p.price for p in products]
+        self.assertEqual(prices, sorted(prices))
+
+    def test_bad_sort_value_falls_back_to_default(self):
+        resp = self.client.get(self.root.get_absolute_url(), {"sort": "hack'--"})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.context["sort"], "new")
+
+    def test_available_filter_hides_out_of_stock(self):
+        resp = self.client.get(self.root.get_absolute_url(), {"available": "1"})
+        self.assertNotContains(resp, "منتج نافد")
+        self.assertContains(resp, "تلفزيون")
+
+    def test_search_keeps_q_with_sort(self):
+        resp = self.client.get(reverse("catalog:search"),
+                               {"q": "سماعه", "sort": "price_asc"})
+        self.assertContains(resp, "سماعة عميقة")
+        # q محفوظ بحقل مخفي بشريط الأدوات
+        self.assertContains(resp, 'name="q" value="سماعه"')
+
+
 class SearchNormalizeTests(TestCase):
     """قواعد تطبيع العربية — قلب البحث كله."""
 
