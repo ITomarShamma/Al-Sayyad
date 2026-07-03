@@ -84,6 +84,18 @@
 .product-card__price { color: var(--primary-strong); font-weight: var(--fw-bold); font-size: 1.05rem; }
 .product-card__currency { font-size: var(--fs-caption); font-weight: var(--fw-medium); color: var(--text-muted); }
 .product-card__badges { display: flex; flex-wrap: wrap; gap: 6px; }
+.product-card__old-price { color: var(--text-muted); font-weight: var(--fw-regular); font-size: var(--fs-caption); margin-inline-start: var(--space-1); }
+/* شارة الخصم فوق صورة البطاقة */
+.product-card__media { position: relative; }
+.sale-flag {
+  position: absolute; inset-block-start: var(--space-2); inset-inline-start: var(--space-2);
+  z-index: 1;
+  background: var(--color-error); color: var(--color-white);
+  padding-inline: var(--space-2); padding-block: 2px;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-caption); font-weight: var(--fw-semibold);
+}
+.buybox__old-price { color: var(--text-muted); font-size: var(--fs-body); font-weight: var(--fw-regular); margin-inline: var(--space-2); }
 .product-card .btn { inline-size: 100%; }
 
 /* شبكة منتجات متجاوبة (تُستعمل بصفحات العرض لاحقاً) */

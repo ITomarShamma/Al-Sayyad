@@ -7,6 +7,8 @@
     image_url  : رابط الصورة (إن غاب نعرض صورة بديلة)
     product_id : رقم المنتج — وجوده يجعل زر «أضف للسلة» حقيقياً (HTMX)
     in_stock   : False تعرض «نفدت الكمية» بدل الزر
+    old_price  : السعر قبل التخفيض (اختياري — يفعّل عرض «تخفيض»)
+    discount   : نسبة التخفيض % (يرافق old_price)
   بدون product_id (كالـstyleguide): يظهر زر شكلي فقط.
 {% endcomment %}
 {% load i18n %}
@@ -14,12 +16,16 @@
 {% translate 'دفع عند الاستلام' as cod_label %}
 <article class="product-card">
   <a class="product-card__media" href="{{ href|default:'#' }}">
+    {% if old_price %}<span class="sale-flag">خصم {{ discount }}٪</span>{% endif %}
     {% if image_url %}<img src="{{ image_url }}" alt="{{ name }}" loading="lazy">
     {% else %}<div class="product-card__placeholder" aria-hidden="true">🖼️</div>{% endif %}
   </a>
   <div class="product-card__body">
     <h3 class="product-card__name"><a href="{{ href|default:'#' }}">{{ name }}</a></h3>
-    <div class="product-card__price">{{ price }} <span class="product-card__currency">{% translate 'ل.س' %}</span></div>
+    <div class="product-card__price">
+      {{ price }} <span class="product-card__currency">{% translate 'ل.س' %}</span>
+      {% if old_price %}<s class="product-card__old-price">{{ old_price }}</s>{% endif %}
+    </div>
     <div class="product-card__badges">
       {% include 'components/badge.html' with kind='cod' label=cod_label only %}
       {% include 'components/badge.html' with kind='shamcash' label='شام كاش' only %}

@@ -113,6 +113,12 @@ class Product(TimeStampedModel):
         "السعر (ل.س)", max_digits=12, decimal_places=0,
         help_text="بالليرة السورية، بدون كسور.",
     )
+    compare_at_price = models.DecimalField(
+        "السعر قبل التخفيض (ل.س)", max_digits=12, decimal_places=0,
+        null=True, blank=True,
+        help_text="اختياري: إن وُضع وكان أعلى من السعر، يظهر المنتج «بالتخفيضات» "
+                  "مع السعر القديم مشطوباً.",
+    )
     stock = models.PositiveIntegerField("الكمية بالمخزون", default=0)
     is_active = models.BooleanField(
         "مفعّل", default=True,
@@ -156,6 +162,23 @@ class Product(TimeStampedModel):
     def price_display(self):
         """السعر منسّقاً بفواصل الآلاف: 250,000 (العملة تُضاف بالقالب)."""
         return f"{self.price:,.0f}"
+
+    @property
+    def on_sale(self):
+        """مخفَّض؟ فقط إذا السعر القديم موجود وأعلى فعلاً من الحالي."""
+        return self.compare_at_price is not None and self.compare_at_price > self.price
+
+    @property
+    def old_price_display(self):
+        """السعر القديم منسّقاً — نص فارغ إن لم يكن المنتج مخفَّضاً فعلاً."""
+        return f"{self.compare_at_price:,.0f}" if self.on_sale else ""
+
+    @property
+    def discount_percent(self):
+        """نسبة التخفيض كعدد صحيح: 250→200 = 20%."""
+        if not self.on_sale:
+            return 0
+        return round((1 - self.price / self.compare_at_price) * 100)
 
     @property
     def main_image(self):

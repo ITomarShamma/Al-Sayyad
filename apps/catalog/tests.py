@@ -152,6 +152,42 @@ class BrowseTests(TestCase):
         self.assertContains(resp, 'name="q" value="سماعه"')
 
 
+class SalePricingTests(TestCase):
+    """M13: التخفيضات — السعر القديم والشارة والنسبة."""
+
+    def test_on_sale_only_when_old_price_is_higher(self):
+        p = make_product(price=Decimal("200000"))
+        self.assertFalse(p.on_sale)                      # بلا سعر قديم
+        p.compare_at_price = Decimal("150000")           # أدنى من الحالي؟ ليس تخفيضاً
+        self.assertFalse(p.on_sale)
+        p.compare_at_price = Decimal("250000")
+        self.assertTrue(p.on_sale)
+
+    def test_discount_percent(self):
+        p = make_product(price=Decimal("200000"))
+        p.compare_at_price = Decimal("250000")
+        self.assertEqual(p.discount_percent, 20)         # 50/250
+
+    def test_old_price_display_empty_when_not_on_sale(self):
+        p = make_product(price=Decimal("200000"))
+        self.assertEqual(p.old_price_display, "")
+
+    def test_sale_shows_on_card_and_product_page(self):
+        p = make_product(name="سماعة مخفّضة", price=Decimal("200000"))
+        p.compare_at_price = Decimal("250000")
+        p.save()
+        home = self.client.get(reverse("pages:home"))
+        self.assertContains(home, "sale-flag")           # شارة الخصم عالبطاقة
+        self.assertContains(home, "250,000")             # السعر القديم مشطوب
+        page = self.client.get(p.get_absolute_url())
+        self.assertContains(page, "خصم 20٪")
+
+    def test_no_sale_ui_for_normal_product(self):
+        make_product(name="عادي", price=Decimal("200000"))
+        home = self.client.get(reverse("pages:home"))
+        self.assertNotContains(home, "sale-flag")
+
+
 class ProductPageExtrasTests(TestCase):
     """M10: منتجات مشابهة + مشاركة واتساب."""
 

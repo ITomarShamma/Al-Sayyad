@@ -58,6 +58,10 @@
 
     <div class="buybox__price">
       {{ product.price_display }} <span class="buybox__currency">{% translate 'ل.س' %}</span>
+      {% if product.on_sale %}
+        <s class="buybox__old-price">{{ product.old_price_display }}</s>
+        <span class="badge badge--error">خصم {{ product.discount_percent }}٪</span>
+      {% endif %}
     </div>
 
     <div class="sg-row">
@@ -118,7 +122,7 @@
   <h2>{% translate 'منتجات مشابهة' %}</h2>
   <div class="product-grid">
     {% for p in related %}
-      {% include 'components/product_card.html' with name=p.name price=p.price_display href=p.get_absolute_url image_url=p.main_image_url product_id=p.id in_stock=p.in_stock only %}
+      {% include 'components/product_card.html' with name=p.name price=p.price_display href=p.get_absolute_url image_url=p.main_image_url product_id=p.id in_stock=p.in_stock old_price=p.old_price_display discount=p.discount_percent only %}
     {% endfor %}
   </div>
 </section>

@@ -73,7 +73,7 @@ class ProductAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at", "updated_at")
     fieldsets = (
         ("الأساسيات", {"fields": ("category", "name", "slug", "description")}),
-        ("السعر والمخزون", {"fields": ("price", "stock", "is_active")}),
+        ("السعر والمخزون", {"fields": ("price", "compare_at_price", "stock", "is_active")}),
         ("المواصفات", {"fields": ("specs",), "description": "مواصفات حرّة تظهر بصفحة المنتج."}),
         ("سجلّ", {"fields": ("created_at", "updated_at"), "classes": ("collapse",)}),
     )
