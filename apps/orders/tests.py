@@ -118,6 +118,59 @@ class CheckoutFlowTests(TestCase):
         self.assertContains(resp, "الدفع عند الاستلام")
 
 
+class TrackOrderTests(TestCase):
+    """صفحة «وين طلبي؟» — البحث برقم الطلب + الموبايل."""
+
+    def setUp(self):
+        make_product(stock=5)
+        product = Product.objects.get()
+        self.client.post(reverse("cart:add", args=[product.id]), {"quantity": 1})
+        self.client.post(reverse("orders:checkout"), VALID_FORM)
+        self.order = Order.objects.get()
+        self.url = reverse("orders:track")
+
+    def test_page_renders_empty_form(self):
+        resp = self.client.get(self.url)
+        self.assertContains(resp, "وين طلبي؟")
+        self.assertNotContains(resp, "ما لقينا طلباً")   # لسا ما بحث
+
+    def test_correct_pair_finds_order_with_timeline(self):
+        resp = self.client.get(self.url, {"number": self.order.number,
+                                          "phone": self.order.phone})
+        self.assertContains(resp, self.order.number)
+        self.assertContains(resp, "بانتظار التأكيد")     # الحالة الحالية
+        self.assertContains(resp, "is-current")          # خط الزمن مفعّل
+
+    def test_arabic_digits_accepted(self):
+        arabic_number = self.order.number.translate(
+            str.maketrans("0123456789", "٠١٢٣٤٥٦٧٨٩"))
+        resp = self.client.get(self.url, {"number": arabic_number,
+                                          "phone": "٠٩٩٨٦٢٥٩٨٤"})
+        self.assertContains(resp, self.order.number)
+
+    def test_wrong_phone_reveals_nothing(self):
+        """رقم طلب صحيح مع موبايل غلط = لا شيء (خصوصية الزبائن)."""
+        resp = self.client.get(self.url, {"number": self.order.number,
+                                          "phone": "0911111111"})
+        self.assertContains(resp, "ما لقينا طلباً")
+        self.assertNotContains(resp, VALID_FORM["customer_name"])
+
+    def test_cancelled_order_shows_notice_not_timeline(self):
+        self.order.status = Order.Status.CANCELLED
+        self.order.save()
+        resp = self.client.get(self.url, {"number": self.order.number,
+                                          "phone": self.order.phone})
+        self.assertContains(resp, "ملغى")
+        self.assertNotContains(resp, "is-current")
+
+    def test_shipped_order_marks_progress(self):
+        self.order.status = Order.Status.SHIPPED
+        self.order.save()
+        resp = self.client.get(self.url, {"number": self.order.number,
+                                          "phone": self.order.phone})
+        self.assertContains(resp, "قيد التوصيل")
+
+
 class OrdersAdminTests(TestCase):
     def test_admin_changelist_opens(self):
         from django.contrib.auth import get_user_model

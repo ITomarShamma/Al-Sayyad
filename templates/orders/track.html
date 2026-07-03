@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate 'تتبع طلبك' %} — الصَّيَّاد{% endblock %}
+
+{% block content %}
+<h1>{% translate 'وين طلبي؟' %}</h1>
+<p class="caption" style="color: var(--text-muted);">
+  {% translate 'اكتب رقم الطلب (من صفحة التأكيد) ورقم الموبايل يلي طلبت فيه.' %}
+</p>
+
+<form method="get" class="track-form section" novalidate>
+  <div class="field">
+    <label class="field__label" for="id_number">{% translate 'رقم الطلب' %}</label>
+    <input class="field__input" type="text" id="id_number" name="number" inputmode="numeric"
+           value="{{ form.number.value|default:'' }}" placeholder="12345678" required>
+  </div>
+  <div class="field">
+    <label class="field__label" for="id_phone">{% translate 'رقم الموبايل' %}</label>
+    <input class="field__input" type="tel" id="id_phone" name="phone" inputmode="numeric"
+           value="{{ form.phone.value|default:'' }}" placeholder="09xxxxxxxx" required>
+  </div>
+  <button class="btn btn--primary" type="submit">🔎 {% translate 'دوّر عالطلب' %}</button>
+</form>
+
+{% if searched %}
+  {% if order %}
+    <section class="section">
+      <div class="card">
+        <div class="cart-summary__row">
+          <h3>{% translate 'طلب' %} <span dir="ltr">{{ order.number }}</span></h3>
+          <span class="caption" style="color: var(--text-muted);">{{ order.created_at|date:"Y/m/d" }}</span>
+        </div>
+
+        {% if order.timeline %}
+          {# خط الزمن: أين وصل الطلب #}
+          <ol class="timeline">
+            {% for label, reached, is_current in order.timeline %}
+              <li class="timeline__step {% if reached %}is-reached{% endif %} {% if is_current %}is-current{% endif %}">
+                <span class="timeline__dot" aria-hidden="true"></span>
+                <span class="timeline__label">{{ label }}</span>
+              </li>
+            {% endfor %}
+          </ol>
+        {% else %}
+          <p class="form-alert" role="status">{% translate 'هذا الطلب ملغى. إذا في خطأ، تواصل معنا.' %}</p>
+        {% endif %}
+
+        <ul class="checkout-summary__list" style="margin-block-start: var(--space-4);">
+          {% for item in order.items.all %}
+            <li>
+              <span>{{ item.product_name }} × {{ item.quantity }}</span>
+              <span class="checkout-summary__line">{{ item.line_total_display }} <small>{% translate 'ل.س' %}</small></span>
+            </li>
+          {% endfor %}
+        </ul>
+        <div class="cart-summary__row">
+          <span>{% translate 'الإجمالي' %}</span>
+          <strong class="cart-summary__total">{{ order.total_display }} {% translate 'ل.س' %}</strong>
+        </div>
+      </div>
+    </section>
+  {% else %}
+    <div class="empty">
+      <p class="empty__icon" aria-hidden="true">🔍</p>
+      <p>{% translate 'ما لقينا طلباً بهالرقمين — تأكد من رقم الطلب ورقم الموبايل وجرّب مرة ثانية.' %}</p>
+    </div>
+  {% endif %}
+{% endif %}
+{% endblock %}

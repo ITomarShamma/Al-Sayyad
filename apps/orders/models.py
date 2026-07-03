@@ -76,6 +76,21 @@ class Order(TimeStampedModel):
     def total_display(self):
         return f"{self.total:,.0f}"
 
+    # مسار الطلب الطبيعي بالترتيب — «ملغى» خارجه (حالة خاصة بالعرض)
+    STATUS_FLOW = [Status.PENDING, Status.CONFIRMED, Status.SHIPPED, Status.DELIVERED]
+
+    @property
+    def timeline(self):
+        """خطوات التتبع للعرض: [(التسمية، وصلنا لها؟، هي الحالية؟)، …]"""
+        try:
+            current = self.STATUS_FLOW.index(self.status)
+        except ValueError:                 # ملغى — القالب يعرض تنبيهاً بدل الخط
+            return []
+        return [
+            (status.label, i <= current, i == current)
+            for i, status in enumerate(self.STATUS_FLOW)
+        ]
+
 
 class OrderItem(models.Model):
     """سطر بالطلب: منتج × كمية، بسعر واسم مُثبَّتين لحظة الشراء."""

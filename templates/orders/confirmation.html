@@ -35,5 +35,6 @@
   </div>
 
   <a class="btn btn--primary" href="{% url 'pages:home' %}">{% translate 'رجوع للرئيسية' %}</a>
+  <a class="btn btn--secondary" href="{% url 'orders:track' %}?number={{ order.number }}&phone={{ order.phone }}">{% translate 'تتبع طلبك' %} 📦</a>
 </div>
 {% endblock %}

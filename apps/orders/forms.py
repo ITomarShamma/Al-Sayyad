@@ -9,6 +9,24 @@ from .payments import available_payment_choices
 ARABIC_TO_ASCII_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
 
 
+def normalize_digits(value):
+    """يطبّع الأرقام الهندية ويشيل الفراغات — لأي حقل رقمي يدخله المستخدم."""
+    return (value or "").strip().replace(" ", "").translate(ARABIC_TO_ASCII_DIGITS)
+
+
+class TrackOrderForm(forms.Form):
+    """فورم «وين طلبي؟» — رقم الطلب + الموبايل معاً (الموبايل بمثابة كلمة سر)."""
+
+    number = forms.CharField(label="رقم الطلب", max_length=12)
+    phone = forms.CharField(label="رقم الموبايل", max_length=15)
+
+    def clean_number(self):
+        return normalize_digits(self.cleaned_data["number"])
+
+    def clean_phone(self):
+        return normalize_digits(self.cleaned_data["phone"])
+
+
 class CheckoutForm(forms.ModelForm):
     class Meta:
         model = Order
@@ -22,9 +40,8 @@ class CheckoutForm(forms.ModelForm):
         self.fields["payment_method"].initial = Order.PaymentMethod.COD
 
     def clean_phone(self):
-        """يطبّع الأرقام الهندية ويشيل الفراغات قبل تحقق النمط 09xxxxxxxx."""
-        phone = (self.cleaned_data["phone"] or "").strip().replace(" ", "")
-        phone = phone.translate(ARABIC_TO_ASCII_DIGITS)
+        """يطبّع الأرقام الهندية قبل تحقق النمط 09xxxxxxxx."""
+        phone = normalize_digits(self.cleaned_data["phone"])
         # نعيد تشغيل مدقّق الموديل يدوياً لأننا عدّلنا القيمة
         for validator in self._meta.model._meta.get_field("phone").validators:
             validator(phone)
