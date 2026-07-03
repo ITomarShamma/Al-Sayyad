@@ -102,6 +102,76 @@ class CatalogViewsTests(TestCase):
         self.assertNotContains(resp, "منتج مخفي")
 
 
+class SearchNormalizeTests(TestCase):
+    """قواعد تطبيع العربية — قلب البحث كله."""
+
+    def test_ta_marbuta_and_alef_forms(self):
+        from .search import normalize
+        self.assertEqual(normalize("سماعة"), normalize("سماعه"))
+        self.assertEqual(normalize("أصلي"), normalize("اصلي"))
+        self.assertEqual(normalize("إبريق"), normalize("ابريق"))
+        self.assertEqual(normalize("مقلى"), normalize("مقلي"))
+
+    def test_diacritics_and_digits(self):
+        from .search import normalize
+        self.assertEqual(normalize("مُكَيِّف"), "مكيف")
+        self.assertEqual(normalize("شاحن ٦٥ واط"), "شاحن 65 واط")
+
+    def test_latin_lowercased_and_spaces_collapsed(self):
+        from .search import normalize
+        self.assertEqual(normalize("  USB-C   Charger "), "usb-c charger")
+
+
+class SearchViewsTests(TestCase):
+    """صفحة النتائج والاقتراحات الحية."""
+
+    def setUp(self):
+        self.p1 = make_product(name="سماعة لاسلكية أصلية")
+        self.p2 = make_product(name="شاحن سريع 65 واط",
+                               description="شاحن أصلي يدعم كل الأجهزة")
+        self.hidden = make_product(name="سماعة مخفية", is_active=False)
+        self.url = reverse("catalog:search")
+
+    def test_search_matches_despite_spelling_variants(self):
+        """«سماعه» (بالهاء) تلاقي «سماعة» (بالتاء المربوطة)."""
+        resp = self.client.get(self.url, {"q": "سماعه"})
+        self.assertContains(resp, self.p1.name)
+        self.assertNotContains(resp, "سماعة مخفية")   # غير المفعّل لا يظهر
+
+    def test_multiword_query_requires_all_words(self):
+        resp = self.client.get(self.url, {"q": "شاحن اصلي"})
+        self.assertContains(resp, self.p2.name)        # فيه الكلمتين
+        self.assertNotContains(resp, self.p1.name)     # أصلية بلا شاحن
+
+    def test_description_is_searchable(self):
+        resp = self.client.get(self.url, {"q": "الأجهزة"})
+        self.assertContains(resp, self.p2.name)
+
+    def test_no_results_shows_empty_state(self):
+        resp = self.client.get(self.url, {"q": "غواصة نووية"})
+        self.assertContains(resp, "ما لقينا شي")
+
+    def test_empty_query_shows_prompt(self):
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "اكتب بشريط البحث")
+
+    def test_editing_product_updates_search_text(self):
+        self.p1.name = "مكواة بخار"
+        self.p1.save()
+        resp = self.client.get(self.url, {"q": "مكواه"})   # بالهاء
+        self.assertContains(resp, "مكواة بخار")
+
+    def test_suggest_returns_items_and_view_all_link(self):
+        resp = self.client.get(reverse("catalog:search_suggest"), {"q": "سماعه"})
+        self.assertContains(resp, self.p1.name)
+        self.assertContains(resp, "كل النتائج")
+
+    def test_suggest_short_query_is_silent(self):
+        resp = self.client.get(reverse("catalog:search_suggest"), {"q": "س"})
+        self.assertNotContains(resp, "search-suggest__item")
+
+
 class CatalogAdminTests(TestCase):
     """لوحة التحكم تفتح وتعرض نماذج الكاتالوج لمدير مسجَّل دخوله."""
 

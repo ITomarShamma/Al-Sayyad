@@ -15,6 +15,8 @@ from django.utils.text import slugify
 
 from apps.core.models import TimeStampedModel
 
+from .search import normalize
+
 
 def unique_slugify(instance, value):
     """يولّد slug فريداً من نص عربي/إنجليزي؛ يضيف -2 -3 … عند التكرار."""
@@ -93,6 +95,9 @@ class Product(TimeStampedModel):
         "المواصفات", default=dict, blank=True,
         help_text='مواصفات حرّة بصيغة JSON، مثال: {"اللون": "أسود", "الضمان": "سنة"}',
     )
+    # نسخة مطبَّعة من الاسم والوصف للبحث العربي — تُحدَّث تلقائياً في save
+    # (انظر catalog/search.py: سماعه تلاقي سماعة، اصلي يلاقي أصلي…)
+    search_text = models.TextField(editable=False, blank=True, default="")
 
     class Meta:
         verbose_name = "منتج"
@@ -109,6 +114,7 @@ class Product(TimeStampedModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = unique_slugify(self, self.name)
+        self.search_text = normalize(f"{self.name} {self.description}")
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):

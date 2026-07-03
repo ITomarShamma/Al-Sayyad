@@ -98,8 +98,9 @@ h3 { font-size: var(--fs-h3); font-weight: var(--fw-semibold); }
 }
 .brand__name { font-size: 1.25rem; }
 
-/* شريط البحث: سطر كامل على الموبايل، يندمج بالهيدر على سطح المكتب */
-.searchbar { flex: 1 1 100%; }
+/* شريط البحث: سطر كامل على الموبايل، يندمج بالهيدر على سطح المكتب.
+   position: relative ليتموضع صندوق الاقتراحات الحية تحته مباشرة. */
+.searchbar { flex: 1 1 100%; position: relative; }
 .searchbar input {
   inline-size: 100%; block-size: 44px;
   padding-inline: var(--space-4);

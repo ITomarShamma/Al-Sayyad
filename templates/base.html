@@ -12,6 +12,7 @@
   {% block extra_css %}{% endblock %}
 
   <script src="{% static 'js/htmx.min.js' %}" defer></script>
+  <script src="{% static 'js/app.js' %}" defer></script>
 </head>
 {# hx-headers: كل طلب HTMX بالصفحة يحمل رمز CSRF تلقائياً — شرط Django للـPOST #}
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
@@ -24,10 +25,16 @@
         <span class="brand__name">الصَّيَّاد</span>
       </a>
 
-      <form class="searchbar" role="search" action="#" method="get">
-        <input type="search" name="q"
+      {# بحث حقيقي: Enter يفتح صفحة النتائج، والكتابة تعرض اقتراحات حية (HTMX) #}
+      <form class="searchbar" role="search" action="{% url 'catalog:search' %}" method="get">
+        <input type="search" name="q" autocomplete="off"
+               value="{{ request.GET.q|default:'' }}"
                placeholder="{% translate 'دوّر عن أي شي…' %}"
-               aria-label="{% translate 'بحث' %}">
+               aria-label="{% translate 'بحث' %}"
+               hx-get="{% url 'catalog:search_suggest' %}"
+               hx-trigger="input changed delay:300ms"
+               hx-target="#search-suggest">
+        <div id="search-suggest" class="search-suggest"></div>
       </form>
 
       {# تنقّل علوي (تابلت/سطح مكتب) — الحالة النشطة تُشتق من اسم الـview الحالي #}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktranslate %}بحث: {{ q }}{% endblocktranslate %} — الصَّيَّاد{% endblock %}
+
+{% block content %}
+{% if q %}
+  <h1>{% blocktranslate %}نتائج البحث عن «{{ q }}»{% endblocktranslate %}</h1>
+  <p class="caption" style="color: var(--text-muted);">
+    {% blocktranslate count n=total %}نتيجة واحدة{% plural %}{{ n }} نتائج{% endblocktranslate %}
+  </p>
+
+  <section class="section">
+    {% if page.object_list %}
+      <div class="product-grid">
+        {% for p in page.object_list %}
+          {% include 'components/product_card.html' with name=p.name price=p.price_display href=p.get_absolute_url image_url=p.main_image_url product_id=p.id in_stock=p.in_stock only %}
+        {% endfor %}
+      </div>
+
+      {% if page.paginator.num_pages > 1 %}
+        <nav class="pagination" aria-label="{% translate 'صفحات' %}">
+          {% if page.has_previous %}
+            <a class="chip" href="?q={{ q|urlencode }}&page={{ page.previous_page_number }}">{% translate 'السابق' %}</a>
+          {% endif %}
+          <span class="pagination__status">
+            {% blocktranslate with current=page.number total=page.paginator.num_pages %}صفحة {{ current }} من {{ total }}{% endblocktranslate %}
+          </span>
+          {% if page.has_next %}
+            <a class="chip" href="?q={{ q|urlencode }}&page={{ page.next_page_number }}">{% translate 'التالي' %}</a>
+          {% endif %}
+        </nav>
+      {% endif %}
+    {% else %}
+      <div class="empty">
+        <p class="empty__icon" aria-hidden="true">🎣</p>
+        <p>{% blocktranslate %}ما لقينا شي عن «{{ q }}» — جرّب كلمة أبسط أو أقصر.{% endblocktranslate %}</p>
+        <a class="btn btn--primary" style="margin-block-start: var(--space-4);" href="{% url 'catalog:category_list' %}">{% translate 'تصفّح التصنيفات' %}</a>
+      </div>
+    {% endif %}
+  </section>
+{% else %}
+  <h1>{% translate 'البحث' %}</h1>
+  <div class="empty">
+    <p class="empty__icon" aria-hidden="true">🔍</p>
+    <p>{% translate 'اكتب بشريط البحث فوق شو عم تدوّر عليه — ونحن نصطاده لك.' %}</p>
+  </div>
+{% endif %}
+{% endblock %}

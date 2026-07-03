@@ -8,8 +8,48 @@ from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, render
 
 from .models import Category, Product
+from .search import normalize
 
 PRODUCTS_PER_PAGE = 24
+SUGGESTIONS_LIMIT = 5
+
+
+def _search_queryset(q):
+    """منتجات مفعّلة تطابق كل كلمات البحث (بعد التطبيع).
+
+    كل كلمة تضيّق النتائج (AND): «شاحن سريع» يرجع ما يحوي الكلمتين معاً.
+    """
+    nq = normalize(q)
+    if not nq:
+        return Product.objects.none()
+    qs = Product.objects.filter(is_active=True)
+    for word in nq.split():
+        qs = qs.filter(search_text__contains=word)
+    return qs
+
+
+def search(request):
+    """صفحة نتائج البحث — ?q=كلمات البحث."""
+    q = request.GET.get("q", "").strip()
+    results = _search_queryset(q).prefetch_related("images")
+    paginator = Paginator(results, PRODUCTS_PER_PAGE)
+    page = paginator.get_page(request.GET.get("page"))
+    return render(request, "catalog/search_results.html", {
+        "q": q,
+        "page": page,
+        "total": paginator.count if q else 0,
+    })
+
+
+def search_suggest(request):
+    """اقتراحات حية تحت شريط البحث (HTMX) — أول 5 نتائج مطابقة."""
+    q = request.GET.get("q", "").strip()
+    if len(q) < 2:                       # حرف واحد؟ لسا بكير عالاقتراح
+        return render(request, "catalog/partials/search_suggest.html",
+                      {"q": q, "products": []})
+    products = _search_queryset(q)[:SUGGESTIONS_LIMIT]
+    return render(request, "catalog/partials/search_suggest.html",
+                  {"q": q, "products": products})
 
 
 def category_list(request):

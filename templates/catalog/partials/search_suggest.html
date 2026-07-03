@@ -1,0 +1,21 @@
+{% load i18n %}{% comment %}
+قائمة الاقتراحات الحية تحت شريط البحث — يرجّعها search_suggest عبر HTMX
+كل ما كتب المستخدم (بعد مهلة 300ms). فارغة = القائمة تختفي.
+{% endcomment %}
+{% if products %}
+  <ul class="search-suggest__list" role="listbox">
+    {% for p in products %}
+      <li>
+        <a class="search-suggest__item" href="{{ p.get_absolute_url }}" role="option">
+          <span class="search-suggest__name">{{ p.name }}</span>
+          <span class="search-suggest__price">{{ p.price_display }} <small>{% translate 'ل.س' %}</small></span>
+        </a>
+      </li>
+    {% endfor %}
+    <li>
+      <a class="search-suggest__item search-suggest__all" href="{% url 'catalog:search' %}?q={{ q|urlencode }}">
+        {% blocktranslate %}كل النتائج عن «{{ q }}»{% endblocktranslate %} ←
+      </a>
+    </li>
+  </ul>
+{% endif %}
