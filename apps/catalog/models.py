@@ -187,9 +187,11 @@ class Product(TimeStampedModel):
 
     @property
     def main_image_url(self):
-        """رابط الصورة الرئيسية، أو نص فارغ إن ما في صور (القالب يتصرّف)."""
+        """رابط الصورة الرئيسية للبطاقات — المصغّرة إن وُجدت (أخف بكثير)."""
         img = self.main_image
-        return img.image.url if img else ""
+        if img is None:
+            return ""
+        return img.thumb.url if img.thumb else img.image.url
 
 
 class ProductImage(TimeStampedModel):
@@ -200,6 +202,11 @@ class ProductImage(TimeStampedModel):
         on_delete=models.CASCADE, related_name="images",
     )
     image = models.ImageField("الصورة", upload_to="products/%Y/%m/")
+    # مصغّرة 480px تتولّد تلقائياً عند الحفظ (انظر save و catalog/images.py)
+    thumb = models.ImageField(
+        "المصغّرة", upload_to="products/thumbs/%Y/%m/",
+        editable=False, blank=True,
+    )
     alt_text = models.CharField(
         "النص البديل", max_length=200, blank=True,
         help_text="وصف قصير للصورة (يفيد لضعاف البصر ومحركات البحث).",
@@ -214,3 +221,19 @@ class ProductImage(TimeStampedModel):
 
     def __str__(self):
         return f"صورة {self.product}"
+
+    def save(self, *args, **kwargs):
+        # نولّد المصغّرة عند أول حفظ أو عند تبديل ملف الصورة فقط —
+        # لا داعي لإعادة توليدها مع كل تعديل ترتيب/نص بديل.
+        needs_thumb = self.image and not self.thumb
+        if self.pk and self.image:
+            old = ProductImage.objects.filter(pk=self.pk).values_list("image", flat=True).first()
+            if old and old != self.image.name:
+                needs_thumb = True
+        if needs_thumb:
+            from .images import make_thumbnail
+            result = make_thumbnail(self.image)
+            if result:
+                name, content = result
+                self.thumb.save(name, content, save=False)
+        super().save(*args, **kwargs)

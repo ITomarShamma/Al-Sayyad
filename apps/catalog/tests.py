@@ -1,13 +1,16 @@
 """اختبارات الكاتالوج: سلوك النماذج + وصول لوحة التحكم."""
 
+import tempfile
 from decimal import Decimal
+from io import BytesIO
 
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import ProtectedError
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from .models import Category, Product
+from .models import Category, Product, ProductImage
 
 
 def make_product(**kwargs):
@@ -150,6 +153,47 @@ class BrowseTests(TestCase):
         self.assertContains(resp, "سماعة عميقة")
         # q محفوظ بحقل مخفي بشريط الأدوات
         self.assertContains(resp, 'name="q" value="سماعه"')
+
+
+def fake_image_file(name="photo.png", size=(800, 600), color=(200, 50, 50)):
+    """صورة PNG حقيقية بالذاكرة — لاختبار الرفع بدون ملفات على القرص."""
+    from PIL import Image
+    buffer = BytesIO()
+    Image.new("RGB", size, color).save(buffer, "PNG")
+    return SimpleUploadedFile(name, buffer.getvalue(), content_type="image/png")
+
+
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp(prefix="alsayyad_test_media_"))
+class ThumbnailTests(TestCase):
+    """M14: توليد المصغّرات تلقائياً عند الحفظ."""
+
+    def setUp(self):
+        self.product = make_product()
+
+    def test_thumbnail_generated_on_save(self):
+        pi = ProductImage.objects.create(product=self.product, image=fake_image_file())
+        self.assertTrue(pi.thumb)                        # اتولّدت
+        self.assertIn("_thumb", pi.thumb.name)
+
+    def test_thumbnail_is_small_square_jpeg(self):
+        from PIL import Image
+        pi = ProductImage.objects.create(product=self.product, image=fake_image_file())
+        with pi.thumb.open("rb") as fh:
+            img = Image.open(fh)
+            self.assertEqual(img.format, "JPEG")
+            self.assertLessEqual(max(img.size), 480)
+            self.assertEqual(img.size[0], img.size[1])   # مربّعة (قصّ مركزي)
+
+    def test_cards_use_thumbnail_url(self):
+        ProductImage.objects.create(product=self.product, image=fake_image_file())
+        self.assertIn("thumbs/", self.product.main_image_url)
+
+    def test_metadata_edit_does_not_regenerate(self):
+        pi = ProductImage.objects.create(product=self.product, image=fake_image_file())
+        first_thumb = pi.thumb.name
+        pi.alt_text = "وصف جديد"
+        pi.save()                                        # تعديل نص فقط
+        self.assertEqual(pi.thumb.name, first_thumb)     # نفس الملف، بلا توليد جديد
 
 
 class SalePricingTests(TestCase):

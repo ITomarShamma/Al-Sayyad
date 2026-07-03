@@ -43,9 +43,11 @@
     {% if product.images.count > 1 %}
       <div class="gallery__thumbs">
         {% for img in product.images.all %}
-          <button type="button" class="gallery__thumb"
-                  onclick="document.getElementById('gallery-main').src = this.querySelector('img').src">
-            <img src="{{ img.image.url }}" alt="{{ img.alt_text|default:product.name }}" loading="lazy">
+          {# الزر الصغير يعرض المصغّرة، والنقر يحمّل الأصلية بالمعرض #}
+          <button type="button" class="gallery__thumb" data-full="{{ img.image.url }}"
+                  onclick="document.getElementById('gallery-main').src = this.dataset.full">
+            <img src="{% if img.thumb %}{{ img.thumb.url }}{% else %}{{ img.image.url }}{% endif %}"
+                 alt="{{ img.alt_text|default:product.name }}" loading="lazy">
           </button>
         {% endfor %}
       </div>
