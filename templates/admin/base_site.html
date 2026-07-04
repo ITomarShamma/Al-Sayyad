@@ -1,0 +1,26 @@
+{% extends "admin/base.html" %}
+{% load static %}
+{% comment %}
+تخصيص لوحة تحكم Django بهوية الصَّيَّاد:
+- هذا الملف يطغى على admin/base_site.html الافتراضي (نفس الاسم بمجلدنا).
+- الألوان والخط في admin-theme.css — مبنية على متغيرات Django admin نفسها.
+{% endcomment %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | لوحة تحكم الصَّيَّاد{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+  <link rel="stylesheet" href="{% static 'css/admin-theme.css' %}">
+{% endblock %}
+
+{% block branding %}
+<div id="site-name">
+  <a href="{% url 'admin:index' %}">
+    <span class="sayyad-mark" aria-hidden="true">ص</span>
+    الصَّيَّاد <span class="sayyad-sub">· لوحة التحكم</span>
+  </a>
+</div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

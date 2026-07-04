@@ -81,6 +81,17 @@ class TrustAndSeoTests(TestCase):
         self.assertContains(resp, 'content="product"')
 
 
+class AdminThemeTests(TestCase):
+    """M19: لوحة التحكم بهوية الصَّيَّاد."""
+
+    def test_admin_login_uses_brand_theme(self):
+        resp = self.client.get("/admin/login/")
+        self.assertContains(resp, "css/admin-theme.css")
+        self.assertContains(resp, "css/fonts.css")
+        self.assertContains(resp, "لوحة تحكم الصَّيَّاد")
+        self.assertContains(resp, "sayyad-mark")
+
+
 class StyleguideTests(TestCase):
     """دليل المكوّنات يعرض كل المكوّنات الأساسية وحالاتها."""
 

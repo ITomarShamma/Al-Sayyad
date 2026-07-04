@@ -1,0 +1,122 @@
+/* ==========================================================================
+   الصَّيَّاد — ثيم لوحة التحكم
+   لوحة تحكم Django قابلة للتخصيص عبر متغيّرات CSS معرَّفة عندها أصلاً —
+   نعيد تعريفها بألوان الهوية + خط IBM Plex Sans Arabic (من fonts.css).
+   نثبّت الوضع الفاتح: نفس القيم لكل حالات data-theme حتى لا يختلط
+   الوضع الداكن الافتراضي بألواننا.
+   ========================================================================== */
+:root,
+html[data-theme="light"],
+html[data-theme="dark"],
+html[data-theme="auto"] {
+  /* الهوية */
+  --primary: #0E6B5E;               /* Tide */
+  --secondary: #0B4A41;             /* Deep Sea — رأس الصفحة */
+  --accent: #D99A2B;                /* Catch Gold */
+  --primary-fg: #FFFFFF;
+
+  /* النصوص والخلفيات */
+  --body-fg: #16261F;               /* Ink */
+  --body-bg: #FAF8F2;               /* Paper */
+  --body-quiet-color: #5B6B64;      /* Slate */
+  --body-loud-color: #0B4A41;
+
+  /* الرأس */
+  --header-color: #E4F1ED;          /* Sea Foam */
+  --header-bg: #0B4A41;
+  --header-branding-color: #FFFFFF;
+  --header-link-color: #FFFFFF;
+
+  /* مسار التنقل */
+  --breadcrumbs-fg: #5B6B64;
+  --breadcrumbs-link-fg: #0E6B5E;
+  --breadcrumbs-bg: #FAF8F2;
+
+  /* الروابط */
+  --link-fg: #0E6B5E;
+  --link-hover-color: #0B4A41;
+  --link-selected-fg: #0B4A41;
+
+  /* الحدود والفواصل */
+  --hairline-color: #E6E1D3;        /* Line */
+  --border-color: #E6E1D3;
+
+  /* الأزرار */
+  --button-fg: #FFFFFF;
+  --button-bg: #0E6B5E;
+  --button-hover-bg: #0B4A41;
+  --default-button-bg: #0B4A41;
+  --default-button-hover-bg: #16261F;
+  --close-button-bg: #5B6B64;
+  --close-button-hover-bg: #16261F;
+  --delete-button-bg: #D5402B;      /* Error */
+  --delete-button-hover-bg: #99301F;
+
+  /* أدوات الكائن (أزرار «أضف …» أعلى القوائم) */
+  --object-tools-fg: #16261F;
+  --object-tools-bg: #D99A2B;       /* ذهبي مثل زر المتجر */
+  --object-tools-hover-bg: #C08620;
+
+  /* التحديد والصفوف */
+  --selected-bg: #E4F1ED;           /* Sea Foam */
+  --selected-row: #F3EBDD;
+  --darkened-bg: #F3F0E8;
+
+  /* الرسائل */
+  --message-success-bg: #E6F4EC;
+  --message-warning-bg: #FBF0D8;
+  --message-error-bg: #FBE7E3;
+  --error-fg: #D5402B;
+
+  /* الخط — نفس خط المتجر */
+  --font-family-primary: "IBM Plex Sans Arabic", system-ui, "Segoe UI", Tahoma, sans-serif;
+
+  color-scheme: light;              /* نثبّت الفاتح */
+}
+
+/* زر تبديل الوضع الداكن ما عاد له معنى مع الثيم الموحّد */
+#header button.theme-toggle { display: none; }
+
+/* --- لمسات شكلية فوق المتغيّرات ------------------------------------------- */
+
+/* العلامة برأس الصفحة (مثل هيدر المتجر) */
+#site-name a { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; }
+.sayyad-mark {
+  inline-size: 32px; block-size: 32px;
+  display: inline-grid; place-items: center;
+  background: #FFFFFF; color: #0E6B5E;
+  border-radius: 8px; font-weight: 700; font-size: 1.05rem;
+}
+.sayyad-sub { font-weight: 400; color: #E4F1ED; font-size: 0.85em; }
+
+/* بطاقات ناعمة بدل الصناديق الحادة */
+#content-main .module, .dashboard .module,
+fieldset.module, .login #content {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--hairline-color);
+  box-shadow: 0 1px 2px rgba(22, 38, 31, 0.06);
+}
+.module h2, .module caption {
+  background: var(--secondary);
+  color: #E4F1ED;
+}
+
+/* أزرار أنعم وأهداف نقر أكبر */
+.button, input[type="submit"], input[type="button"], .submit-row input {
+  border-radius: 8px;
+  padding: 9px 18px;
+}
+.object-tools a { border-radius: 999px; font-weight: 600; }
+
+/* حقول الإدخال بنفس إحساس المتجر */
+input[type="text"], input[type="password"], input[type="email"],
+input[type="url"], input[type="number"], input[type="tel"],
+textarea, select, .vTextField {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+/* صفحة الدخول */
+.login #header { border-radius: 12px 12px 0 0; }
+.login #content-main { padding-top: 8px; }
