@@ -17,7 +17,8 @@ db.sqlite3-journal
 .env
 
 # Compiled translations (regenerated with compilemessages)
-*.mo
+# ملاحظة: ملفات ‎.mo (الترجمات المُجمَّعة) تُرفع عمداً — لا خط نشر يجمعها بعد،
+# ورفعها يضمن اشتغال الإنجليزية من أي نسخة جديدة بدون خطوة إضافية.
 
 # OS / editor
 .DS_Store
