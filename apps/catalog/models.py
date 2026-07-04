@@ -102,6 +102,14 @@ class Product(TimeStampedModel):
         Category, verbose_name="التصنيف",
         on_delete=models.PROTECT, related_name="products",
     )
+    # بائع المنتج: NULL = بضاعة الصَّيَّاد نفسه؛ غير ذلك = تاجر بالمنصة.
+    # PROTECT: التاجر يُعطَّل (is_approved=False) ولا يُحذف وله منتجات.
+    merchant = models.ForeignKey(
+        "accounts.MerchantProfile", verbose_name="البائع",
+        null=True, blank=True,
+        on_delete=models.PROTECT, related_name="products",
+        help_text="اتركه فارغاً إذا المنتج من بضاعة الصَّيَّاد مباشرة.",
+    )
     name = models.CharField("الاسم", max_length=200)
     slug = models.SlugField(
         "المعرّف بالرابط", max_length=220, unique=True, blank=True,

@@ -115,6 +115,97 @@ class AccountAreaTests(TestCase):
                             "قيد المراجعة")
 
 
+class MerchantRoleTests(TestCase):
+    """M17+M18: الموافقة على التاجر وعزله بمنتجاته + مجموعات الأدوار."""
+
+    def setUp(self):
+        from apps.accounts.admin import MerchantProfileAdmin
+        from apps.accounts.models import MerchantProfile
+        from django.contrib.admin.sites import AdminSite
+
+        self.cat = Category.objects.create(name="إلكترونيات")
+        # تاجران بطلبين مقدَّمين
+        self.m_user = User.objects.create_user("0911111111", password="x",
+                                               first_name="أبو أحمد")
+        Profile.objects.create(user=self.m_user, phone="0911111111")
+        self.merchant = MerchantProfile.objects.create(
+            user=self.m_user, store_name="متجر النور", phone="0911111111", city="دمشق")
+
+        self.other_user = User.objects.create_user("0922222222", password="x")
+        self.other = MerchantProfile.objects.create(
+            user=self.other_user, store_name="متجر الشام", phone="0922222222",
+            city="حلب", is_approved=True)
+
+        # منتجات: واحد للمتجر نفسه + واحد لكل تاجر
+        Product.objects.create(category=self.cat, name="بضاعة الصياد",
+                               price=Decimal("1000"), stock=1)
+        self.m_product = Product.objects.create(
+            category=self.cat, name="بضاعة النور", price=Decimal("2000"),
+            stock=1, merchant=self.merchant)
+        Product.objects.create(category=self.cat, name="بضاعة الشام",
+                               price=Decimal("3000"), stock=1, merchant=self.other)
+
+        self.admin = MerchantProfileAdmin(MerchantProfile, AdminSite())
+
+    def approve(self):
+        from apps.accounts.models import MerchantProfile
+        from django.contrib.messages.storage.fallback import FallbackStorage
+        from django.test import RequestFactory
+
+        request = RequestFactory().post("/")
+        request.user = User.objects.create_superuser("boss", "b@b.b", "x")
+        request.session = self.client.session
+        request._messages = FallbackStorage(request)
+        self.admin.approve_merchants(
+            request, MerchantProfile.objects.filter(pk=self.merchant.pk))
+        self.merchant.refresh_from_db()
+        self.m_user.refresh_from_db()
+
+    def test_role_groups_exist_with_permissions(self):
+        from django.contrib.auth.models import Group
+        for name in ["مدير المتجر", "موظف الطلبات", "مدخل بيانات", "تاجر"]:
+            group = Group.objects.get(name=name)
+            self.assertGreater(group.permissions.count(), 0, name)
+        merchant_group = Group.objects.get(name="تاجر")
+        self.assertTrue(merchant_group.permissions.filter(
+            codename="add_product").exists())
+
+    def test_approval_action_grants_access(self):
+        self.approve()
+        self.assertTrue(self.merchant.is_approved)
+        self.assertTrue(self.m_user.is_staff)
+        self.assertTrue(self.m_user.groups.filter(name="تاجر").exists())
+        self.assertEqual(self.m_user.profile.role, Profile.Role.MERCHANT)
+
+    def test_merchant_sees_only_own_products_in_admin(self):
+        self.approve()
+        self.client.force_login(self.m_user)
+        resp = self.client.get(reverse("admin:catalog_product_changelist"))
+        self.assertContains(resp, "بضاعة النور")
+        self.assertNotContains(resp, "بضاعة الشام")     # منتجات غيره مخفية
+        self.assertNotContains(resp, "بضاعة الصياد")
+
+    def test_merchant_new_product_assigned_to_him(self):
+        self.approve()
+        self.client.force_login(self.m_user)
+        resp = self.client.post(reverse("admin:catalog_product_add"), {
+            "category": self.cat.id, "name": "منتج جديد للنور",
+            "price": "5000", "stock": "2", "is_active": "on", "specs": "{}",
+            "images-TOTAL_FORMS": "0", "images-INITIAL_FORMS": "0",
+            "images-MIN_NUM_FORMS": "0", "images-MAX_NUM_FORMS": "1000",
+        })
+        self.assertEqual(resp.status_code, 302)          # حُفظ ورجع للقائمة
+        product = Product.objects.get(name="منتج جديد للنور")
+        self.assertEqual(product.merchant, self.merchant)  # انتسب له تلقائياً
+
+    def test_product_page_shows_seller_name(self):
+        resp = self.client.get(self.m_product.get_absolute_url())
+        self.assertContains(resp, "متجر النور")
+        store_product = Product.objects.get(name="بضاعة الصياد")
+        resp = self.client.get(store_product.get_absolute_url())
+        self.assertContains(resp, "الصَّيَّاد")
+
+
 class OrderLinkingTests(TestCase):
     """الطلبات: تنربط بالمسجَّل، ويظل الزائر (guest) يطلب عادي."""
 

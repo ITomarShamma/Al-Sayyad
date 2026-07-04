@@ -66,6 +66,11 @@
       {% endif %}
     </div>
 
+    <p class="caption" style="color: var(--text-muted);">
+      {% translate 'البائع:' %}
+      <strong style="color: var(--primary-strong);">{{ product.merchant.store_name|default:'الصَّيَّاد' }}</strong>
+    </p>
+
     <div class="sg-row">
       {% if product.in_stock %}
         {% include 'components/badge.html' with kind='success' label=_('متوفر') only %}

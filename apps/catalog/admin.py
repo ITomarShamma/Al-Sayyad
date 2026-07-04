@@ -52,13 +52,56 @@ class CategoryAdmin(admin.ModelAdmin):
         return obj.products.count()
 
 
+def merchant_of(request):
+    """ملف التاجر المفعَّل لمستخدم اللوحة — None لموظفي المتجر والمدراء."""
+    if request.user.is_superuser:
+        return None
+    mp = getattr(request.user, "merchant_profile", None)
+    return mp if (mp and mp.is_approved) else None
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("name", "category", "price_display", "stock_display",
+    list_display = ("name", "seller", "category", "price_display", "stock_display",
                     "stock", "is_active", "updated_at")
-    list_filter = (StockLevelFilter, "is_active", "category")
+    list_filter = (StockLevelFilter, "is_active", "category", "merchant")
     search_fields = ("name", "description")
     list_editable = ("stock", "is_active")   # تعديل سريع من الجدول مباشرة
+
+    @admin.display(description="البائع", ordering="merchant")
+    def seller(self, obj):
+        return obj.merchant.store_name if obj.merchant else "الصَّيَّاد"
+
+    # --- عزل التجّار: كلٌّ يرى ويدير منتجاته فقط -----------------------------
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        mp = merchant_of(request)
+        return qs.filter(merchant=mp) if mp else qs
+
+    def save_model(self, request, obj, form, change):
+        mp = merchant_of(request)
+        if mp:
+            obj.merchant = mp        # منتجات التاجر تُنسب له إجبارياً
+        super().save_model(request, obj, form, change)
+
+    def get_exclude(self, request, obj=None):
+        # التاجر لا يرى حقل «البائع» أصلاً — يُعبّأ عنه تلقائياً
+        return ("merchant",) if merchant_of(request) else None
+
+    def get_fieldsets(self, request, obj=None):
+        # مع exclude لازم نشيل الحقل من fieldsets أيضاً وإلا انكسر الفورم
+        fieldsets = super().get_fieldsets(request, obj)
+        if not merchant_of(request):
+            return fieldsets
+        return [
+            (title, {**opts, "fields": tuple(f for f in opts["fields"] if f != "merchant")})
+            for title, opts in fieldsets
+        ]
+
+    def get_list_filter(self, request):
+        if merchant_of(request):
+            return (StockLevelFilter, "is_active", "category")
+        return self.list_filter
 
     @admin.display(description="حالة المخزون", ordering="stock")
     def stock_display(self, obj):
@@ -72,7 +115,7 @@ class ProductAdmin(admin.ModelAdmin):
     inlines = [ProductImageInline]
     readonly_fields = ("created_at", "updated_at")
     fieldsets = (
-        ("الأساسيات", {"fields": ("category", "name", "slug", "description")}),
+        ("الأساسيات", {"fields": ("merchant", "category", "name", "slug", "description")}),
         ("السعر والمخزون", {"fields": ("price", "compare_at_price", "stock", "is_active")}),
         ("المواصفات", {"fields": ("specs",), "description": "مواصفات حرّة تظهر بصفحة المنتج."}),
         ("سجلّ", {"fields": ("created_at", "updated_at"), "classes": ("collapse",)}),
