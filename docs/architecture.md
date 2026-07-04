@@ -97,9 +97,9 @@ apps/
 
 - **شام كاش:** نقطة الوصل جاهزة في `apps/orders/payments.py`
   (`ENABLED_METHODS` + هيكل `ShamCashGateway`). ينتظر API والهوية البصرية.
-- **الإنجليزية:** الكود جاهز بالكامل. المتطلب الوحيد: تنصيب GNU gettext على
-  ويندوز (`choco install gettext` كمسؤول) ثم:
-  `django-admin makemessages -l en` → ترجمة `locale/en/LC_MESSAGES/django.po`
-  → `compilemessages` → إضافة `("en", "English")` في `LANGUAGES`.
+- ~~الإنجليزية~~ **صارت شغّالة ✓** — مبدّل لغة بالفوتر، والاختيار يُحفظ بالجلسة.
+  عند إضافة نصوص جديدة: `manage.py makemessages -l en` ثم
+  `python scripts/translate_en.py` (يملأ الترجمات ويكشف الناقص) ثم
+  `manage.py compilemessages`. (gettext منصّب عبر winget: mlocati.GetText)
 - **النشر:** VPS + Gunicorn/Nginx + PostgreSQL (`config/settings/prod.py`
   جاهزة وتُقرأ من `.env`). بعض المزوّدين يحجبون IP سوري — يُختار المزوّد وفق ذلك.

@@ -32,6 +32,7 @@ sitemaps = {
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("i18n/", include("django.conf.urls.i18n")),   # مبدّل اللغة (set_language)
     path("cart/", include("apps.cart.urls")),
     path("account/", include("apps.accounts.urls")),
     path("sitemap.xml", sitemap, {"sitemaps": sitemaps},

@@ -31,7 +31,7 @@
       <a class="brand" href="{% url 'pages:home' %}">
         {# علامة مؤقتة — تُستبدل باللوغو النهائي لاحقاً بدون لمس الكود #}
         <span class="brand__mark" aria-hidden="true">ص</span>
-        <span class="brand__name">الصَّيَّاد</span>
+        <span class="brand__name">{% translate 'الصَّيَّاد' %}</span>
       </a>
 
       {# بحث حقيقي: Enter يفتح صفحة النتائج، والكتابة تعرض اقتراحات حية (HTMX) #}
@@ -80,6 +80,17 @@
         <a href="{% url 'pages:contact' %}">{% translate 'تواصل معنا' %}</a>
         <a href="{% url 'orders:track' %}">{% translate 'تتبع طلبك' %}</a>
       </nav>
+
+      {# مبدّل اللغة: زر واحد للغة الأخرى — set_language يخزّن الاختيار بالجلسة #}
+      <form class="lang-switch" action="{% url 'set_language' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
+        {% if LANGUAGE_CODE == 'ar' %}
+          <button class="chip" type="submit" name="language" value="en">🌐 English</button>
+        {% else %}
+          <button class="chip" type="submit" name="language" value="ar">🌐 العربية</button>
+        {% endif %}
+      </form>
       <p>الصَّيَّاد — {% translate 'سوقك السوري الموثوق' %}</p>
     </div>
   </footer>

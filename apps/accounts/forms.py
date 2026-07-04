@@ -3,6 +3,7 @@
 from django import forms
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import AuthenticationForm
+from django.utils.translation import gettext_lazy as _
 
 from apps.core.validators import normalize_digits, syrian_phone
 
@@ -24,7 +25,7 @@ class SignupForm(forms.Form):
         syrian_phone(phone)                       # نفس قاعدة 09xxxxxxxx دائماً
         if User.objects.filter(username=phone).exists():
             raise forms.ValidationError(
-                "في حساب مسجَّل بهالرقم أصلاً — جرّب تسجيل الدخول.")
+                _("في حساب مسجَّل بهالرقم أصلاً — جرّب تسجيل الدخول."))
         return phone
 
     def clean_password1(self):
@@ -36,7 +37,7 @@ class SignupForm(forms.Form):
         cleaned = super().clean()
         if (cleaned.get("password1") and cleaned.get("password2")
                 and cleaned["password1"] != cleaned["password2"]):
-            self.add_error("password2", "كلمتا السر غير متطابقتين.")
+            self.add_error("password2", _("كلمتا السر غير متطابقتين."))
         return cleaned
 
 
@@ -45,10 +46,10 @@ class PhoneLoginForm(AuthenticationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["username"].label = "رقم الموبايل"
-        self.fields["password"].label = "كلمة السر"
+        self.fields["username"].label = _("رقم الموبايل")
+        self.fields["password"].label = _("كلمة السر")
         # رسالة خطأ واحدة مفهومة بدل رسالة Django التقنية
-        self.error_messages["invalid_login"] = (
+        self.error_messages["invalid_login"] = _(
             "الرقم أو كلمة السر غير صحيحة — تأكد وجرّب مرة ثانية."
         )
 

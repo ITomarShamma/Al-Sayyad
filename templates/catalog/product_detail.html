@@ -62,7 +62,7 @@
       {{ product.price_display }} <span class="buybox__currency">{% translate 'ل.س' %}</span>
       {% if product.on_sale %}
         <s class="buybox__old-price">{{ product.old_price_display }}</s>
-        <span class="badge badge--error">خصم {{ product.discount_percent }}٪</span>
+        <span class="badge badge--error">{% blocktranslate with discount=product.discount_percent %}خصم {{ discount }}٪{% endblocktranslate %}</span>
       {% endif %}
     </div>
 

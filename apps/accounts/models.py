@@ -8,6 +8,7 @@
 
 from django.conf import settings
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import TimeStampedModel
 from apps.core.validators import syrian_phone
@@ -17,8 +18,8 @@ class Profile(TimeStampedModel):
     """بيانات إضافية لكل مستخدم مسجَّل + دوره بالمنصة."""
 
     class Role(models.TextChoices):
-        CUSTOMER = "customer", "زبون"
-        MERCHANT = "merchant", "تاجر"
+        CUSTOMER = "customer", _("زبون")
+        MERCHANT = "merchant", _("تاجر")
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, verbose_name="المستخدم",

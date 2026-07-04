@@ -1,10 +1,11 @@
 """مدقّقات وأدوات إدخال مشتركة بين كل التطبيقات."""
 
 from django.core.validators import RegexValidator
+from django.utils.translation import gettext_lazy as _
 
 # رقم موبايل سوري: 09 يتبعها 8 أرقام
 syrian_phone = RegexValidator(
-    r"^09\d{8}$", "أدخل رقم موبايل سوري صحيح: 09 يتبعها 8 أرقام."
+    r"^09\d{8}$", _("أدخل رقم موبايل سوري صحيح: 09 يتبعها 8 أرقام.")
 )
 
 # المستخدم السوري كثيراً ما يكتب الأرقام بالهندية (٠٩…) — نطبّعها لأسكي

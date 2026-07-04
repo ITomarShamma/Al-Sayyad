@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
+from django.utils.translation import gettext as _
 
 from apps.orders.models import Order
 
@@ -30,7 +31,7 @@ def signup(request):
         )
         Profile.objects.create(user=user, phone=data["phone"])
         login(request, user)                      # لا نطلب منه الدخول بعد التسجيل
-        messages.success(request, "أهلاً فيك بالصَّيَّاد! حسابك جاهز 🎣")
+        messages.success(request, _("أهلاً فيك بالصَّيَّاد! حسابك جاهز 🎣"))
         return redirect("accounts:account")
 
     return render(request, "accounts/signup.html", {"form": form})
@@ -73,7 +74,7 @@ def edit(request):
         if profile:
             profile.city = form.cleaned_data["city"]
             profile.save(update_fields=["city", "updated_at"])
-        messages.success(request, "انحفظت بياناتك ✓")
+        messages.success(request, _("انحفظت بياناتك ✓"))
         return redirect("accounts:account")
     return render(request, "accounts/edit.html", {"form": form})
 
@@ -83,7 +84,7 @@ class ChangePasswordView(PasswordChangeView):
     success_url = reverse_lazy("accounts:account")
 
     def form_valid(self, form):
-        messages.success(self.request, "تغيّرت كلمة السر ✓")
+        messages.success(self.request, _("تغيّرت كلمة السر ✓"))
         return super().form_valid(form)
 
 
@@ -99,7 +100,7 @@ def merchant_apply(request):
         merchant.user = request.user
         merchant.save()
         messages.success(
-            request, "وصلنا طلبك 🏪 — منراجعه ومنتواصل معك خلال يوم عمل.")
+            request, _("وصلنا طلبك 🏪 — منراجعه ومنتواصل معك خلال يوم عمل."))
         return redirect("accounts:account")
 
     return render(request, "accounts/merchant_apply.html", {"form": form})

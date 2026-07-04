@@ -8,6 +8,7 @@
 from django.conf import settings
 from django.db import models
 from django.utils.crypto import get_random_string
+from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import TimeStampedModel
 
@@ -20,15 +21,15 @@ class Order(TimeStampedModel):
     """طلب شراء واحد — من لحظة التأكيد حتى التسليم."""
 
     class Status(models.TextChoices):
-        PENDING = "pending", "بانتظار التأكيد"
-        CONFIRMED = "confirmed", "مؤكّد"
-        SHIPPED = "shipped", "قيد التوصيل"
-        DELIVERED = "delivered", "مُسلَّم"
-        CANCELLED = "cancelled", "ملغى"
+        PENDING = "pending", _("بانتظار التأكيد")
+        CONFIRMED = "confirmed", _("مؤكّد")
+        SHIPPED = "shipped", _("قيد التوصيل")
+        DELIVERED = "delivered", _("مُسلَّم")
+        CANCELLED = "cancelled", _("ملغى")
 
     class PaymentMethod(models.TextChoices):
-        COD = "cod", "الدفع عند الاستلام"
-        SHAMCASH = "shamcash", "شام كاش"
+        COD = "cod", _("الدفع عند الاستلام")
+        SHAMCASH = "shamcash", _("شام كاش")
 
     # رقم قصير يُقرأ بسهولة عالتلفون — يتولّد تلقائياً (انظر save)
     number = models.CharField("رقم الطلب", max_length=12, unique=True, editable=False)

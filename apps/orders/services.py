@@ -6,6 +6,7 @@
 """
 
 from django.db import transaction
+from django.utils.translation import gettext as _
 
 from apps.catalog.models import Product
 
@@ -43,9 +44,8 @@ def create_order_from_cart(cart, order):
     ]
     if unavailable:
         raise OutOfStockError(
-            "الكمية المتوفرة تغيّرت لهالمنتجات: "
-            + "، ".join(unavailable)
-            + " — حدّث سلتك وجرّب مرة ثانية."
+            _("الكمية المتوفرة تغيّرت لهالمنتجات: %(names)s — حدّث سلتك وجرّب مرة ثانية.")
+            % {"names": "، ".join(unavailable)}
         )
 
     # 3) إنشاء الطلب وأسطره — الاسم والسعر لقطة لحظة الشراء

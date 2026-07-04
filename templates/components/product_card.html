@@ -16,7 +16,7 @@
 {% translate 'دفع عند الاستلام' as cod_label %}
 <article class="product-card">
   <a class="product-card__media" href="{{ href|default:'#' }}">
-    {% if old_price %}<span class="sale-flag">خصم {{ discount }}٪</span>{% endif %}
+    {% if old_price %}<span class="sale-flag">{% blocktranslate %}خصم {{ discount }}٪{% endblocktranslate %}</span>{% endif %}
     {% if image_url %}<img src="{{ image_url }}" alt="{{ name }}" loading="lazy">
     {% else %}<div class="product-card__placeholder" aria-hidden="true">🖼️</div>{% endif %}
   </a>

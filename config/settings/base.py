@@ -110,14 +110,13 @@ TIME_ZONE = "Asia/Damascus"    # Syria
 USE_I18N = True
 USE_TZ = True
 
-# Languages the site can be shown in.
-# Arabic only for now: LocaleMiddleware negotiates the language per request
-# from the browser's Accept-Language header — if "en" were listed here,
-# English-preferring browsers would get dir=ltr while the content is still
-# Arabic (no translations yet). Add ("en", "English") back once the English
-# translation files actually exist.
+# Languages the site can be shown in. English translations live in
+# locale/en/ (extracted with makemessages, filled by scripts/translate_en.py,
+# compiled with compilemessages). LocaleMiddleware negotiates per request:
+# session choice (language switcher) > cookie > Accept-Language > default ar.
 LANGUAGES = [
     ("ar", "العربية"),
+    ("en", "English"),
 ]
 LOCALE_PATHS = [BASE_DIR / "locale"]
 

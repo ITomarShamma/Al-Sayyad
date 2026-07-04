@@ -1,0 +1,902 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Al-Sayyad\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-04 18:58+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: en\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\apps\accounts\forms.py:28
+msgid "في حساب مسجَّل بهالرقم أصلاً — جرّب تسجيل الدخول."
+msgstr "An account with this number already exists — try logging in."
+
+#: .\apps\accounts\forms.py:40
+msgid "كلمتا السر غير متطابقتين."
+msgstr "The two passwords don't match."
+
+#: .\apps\accounts\forms.py:49 .\templates\accounts\login.html:19
+#: .\templates\accounts\signup.html:22 .\templates\orders\checkout.html:30
+#: .\templates\orders\track.html:19
+msgid "رقم الموبايل"
+msgstr "Mobile number"
+
+#: .\apps\accounts\forms.py:50 .\templates\accounts\login.html:24
+#: .\templates\accounts\signup.html:29
+msgid "كلمة السر"
+msgstr "Password"
+
+#: .\apps\accounts\forms.py:53
+msgid "الرقم أو كلمة السر غير صحيحة — تأكد وجرّب مرة ثانية."
+msgstr "Wrong number or password — check and try again."
+
+#: .\apps\accounts\models.py:21
+msgid "زبون"
+msgstr "Customer"
+
+#: .\apps\accounts\models.py:22
+msgid "تاجر"
+msgstr "Merchant"
+
+#: .\apps\accounts\views.py:34
+msgid "أهلاً فيك بالصَّيَّاد! حسابك جاهز 🎣"
+msgstr "Welcome to Al-Sayyad! Your account is ready 🎣"
+
+#: .\apps\accounts\views.py:77
+msgid "انحفظت بياناتك ✓"
+msgstr "Your details were saved ✓"
+
+#: .\apps\accounts\views.py:87
+msgid "تغيّرت كلمة السر ✓"
+msgstr "Password changed ✓"
+
+#: .\apps\accounts\views.py:103
+msgid "وصلنا طلبك 🏪 — منراجعه ومنتواصل معك خلال يوم عمل."
+msgstr "We received your application 🏪 — we'll review it and contact you within one business day."
+
+#: .\apps\core\validators.py:8
+msgid "أدخل رقم موبايل سوري صحيح: 09 يتبعها 8 أرقام."
+msgstr "Enter a valid Syrian mobile number: 09 followed by 8 digits."
+
+#: .\apps\orders\models.py:24
+msgid "بانتظار التأكيد"
+msgstr "Awaiting confirmation"
+
+#: .\apps\orders\models.py:25
+msgid "مؤكّد"
+msgstr "Confirmed"
+
+#: .\apps\orders\models.py:26
+msgid "قيد التوصيل"
+msgstr "Out for delivery"
+
+#: .\apps\orders\models.py:27
+msgid "مُسلَّم"
+msgstr "Delivered"
+
+#: .\apps\orders\models.py:28
+msgid "ملغى"
+msgstr "Cancelled"
+
+#: .\apps\orders\models.py:31
+msgid "الدفع عند الاستلام"
+msgstr "Cash on delivery"
+
+#: .\apps\orders\models.py:32
+msgid "شام كاش"
+msgstr "ShamCash"
+
+#: .\apps\orders\services.py:47
+#, python-format
+msgid "الكمية المتوفرة تغيّرت لهالمنتجات: %(names)s — حدّث سلتك وجرّب مرة ثانية."
+msgstr "Available stock changed for: %(names)s — update your cart and try again."
+
+#: .\templates\404.html:4
+msgid "الصفحة غير موجودة"
+msgstr "Page not found"
+
+#: .\templates\404.html:9
+msgid "ما في شي هون!"
+msgstr "Nothing here!"
+
+#: .\templates\404.html:11
+msgid ""
+"الصفحة يلي بتدوّر عليها غير موجودة أو انتقلت — جرّب البحث أو ارجع للرئيسية."
+msgstr "The page you're looking for doesn't exist or has moved — try searching or go back home."
+
+#: .\templates\404.html:14 .\templates\base.html:52 .\templates\base.html:92
+#: .\templates\catalog\category_detail.html:9
+#: .\templates\catalog\product_detail.html:20
+msgid "الرئيسية"
+msgstr "Home"
+
+#: .\templates\404.html:15 .\templates\base.html:53 .\templates\base.html:96
+#: .\templates\catalog\category_list.html:4
+#: .\templates\catalog\category_list.html:7
+msgid "التصنيفات"
+msgstr "Categories"
+
+#: .\templates\accounts\account.html:4 .\templates\base.html:55
+#: .\templates\base.html:104
+msgid "حسابي"
+msgstr "My account"
+
+#: .\templates\accounts\account.html:7
+msgid "أهلاً"
+msgstr "Hello"
+
+#: .\templates\accounts\account.html:12
+msgid "بياناتي"
+msgstr "My details"
+
+#: .\templates\accounts\account.html:14
+msgid "الاسم"
+msgstr "Name"
+
+#: .\templates\accounts\account.html:15
+msgid "الموبايل"
+msgstr "Mobile"
+
+#: .\templates\accounts\account.html:16
+msgid "المدينة"
+msgstr "City"
+
+#: .\templates\accounts\account.html:17
+msgid "الدور"
+msgstr "Role"
+
+#: .\templates\accounts\account.html:20
+msgid "تعديل البيانات"
+msgstr "Edit details"
+
+#: .\templates\accounts\account.html:21
+#: .\templates\accounts\password_change.html:4
+#: .\templates\accounts\password_change.html:8
+msgid "تغيير كلمة السر"
+msgstr "Change password"
+
+#: .\templates\accounts\account.html:26
+msgid "طلباتي"
+msgstr "My orders"
+
+#: .\templates\accounts\account.html:34
+#: .\templates\cart\partials\cart_body.html:21
+#: .\templates\cart\partials\cart_body.html:46
+#: .\templates\cart\partials\cart_body.html:61
+#: .\templates\catalog\partials\search_suggest.html:11
+#: .\templates\catalog\product_detail.html:62
+#: .\templates\components\product_card.html:26
+#: .\templates\orders\checkout.html:83 .\templates\orders\checkout.html:89
+#: .\templates\orders\confirmation.html:23
+#: .\templates\orders\confirmation.html:29 .\templates\orders\track.html:53
+#: .\templates\orders\track.html:59
+msgid "ل.س"
+msgstr "SYP"
+
+#: .\templates\accounts\account.html:41
+msgid "ما في طلبات بعد — طلباتك الجاية رح تظهر هون."
+msgstr "No orders yet — your future orders will show up here."
+
+#: .\templates\accounts\account.html:43
+#: .\templates\cart\partials\cart_body.html:71 .\templates\pages\about.html:38
+#: .\templates\pages\home.html:10
+msgid "ابدأ التسوّق"
+msgstr "Start shopping"
+
+#: .\templates\accounts\account.html:48
+msgid "للتجّار"
+msgstr "For merchants"
+
+#: .\templates\accounts\account.html:52
+msgid "متجرك"
+msgstr "Your store"
+
+#: .\templates\accounts\account.html:55
+msgid "إدارة منتجاتي"
+msgstr "Manage my products"
+
+#: .\templates\accounts\account.html:58
+msgid "طلبك لمتجر"
+msgstr "Your application for"
+
+#: .\templates\accounts\account.html:61
+msgid "منتواصل معك بعد مراجعة الطلب."
+msgstr "We'll contact you once it's reviewed."
+
+#: .\templates\accounts\account.html:65
+msgid "عندك بضاعة وبدك تبيع عالصَّيَّاد؟ قدّم طلب انضمام كتاجر."
+msgstr "Got goods to sell on Al-Sayyad? Apply to join as a merchant."
+
+#: .\templates\accounts\account.html:67
+#: .\templates\accounts\merchant_apply.html:4
+#: .\templates\accounts\merchant_apply.html:8
+msgid "انضم كتاجر"
+msgstr "Join as a merchant"
+
+#: .\templates\accounts\account.html:73
+msgid "تسجيل الخروج"
+msgstr "Log out"
+
+#: .\templates\accounts\edit.html:4 .\templates\accounts\edit.html:8
+msgid "تعديل بياناتي"
+msgstr "Edit my details"
+
+#: .\templates\accounts\edit.html:13 .\templates\accounts\signup.html:16
+#: .\templates\orders\checkout.html:23
+msgid "الاسم الكامل"
+msgstr "Full name"
+
+#: .\templates\accounts\edit.html:19
+#: .\templates\accounts\merchant_apply.html:28
+#: .\templates\orders\checkout.html:38
+msgid "المحافظة / المدينة"
+msgstr "Governorate / city"
+
+#: .\templates\accounts\edit.html:22
+msgid "تتعبّى تلقائياً بصفحة إتمام الطلب."
+msgstr "Filled in automatically at checkout."
+
+#: .\templates\accounts\edit.html:25
+msgid "رقم الموبايل هو اسم دخولك — لتغييره تواصل معنا."
+msgstr "Your mobile number is your login — contact us to change it."
+
+#: .\templates\accounts\edit.html:27
+msgid "حفظ"
+msgstr "Save"
+
+#: .\templates\accounts\edit.html:28
+#: .\templates\accounts\password_change.html:34
+msgid "رجوع"
+msgstr "Back"
+
+#: .\templates\accounts\login.html:4 .\templates\accounts\login.html:8
+msgid "تسجيل الدخول"
+msgstr "Log in"
+
+#: .\templates\accounts\login.html:28
+msgid "دخول"
+msgstr "Log in"
+
+#: .\templates\accounts\login.html:32
+msgid "ما عندك حساب؟"
+msgstr "No account yet?"
+
+#: .\templates\accounts\login.html:33
+msgid "سجّل جديد"
+msgstr "Sign up"
+
+#: .\templates\accounts\login.html:36
+msgid "طلبت كزائر؟ تقدر تتبع طلبك بلا حساب من"
+msgstr "Ordered as a guest? Track your order without an account from the"
+
+#: .\templates\accounts\login.html:37
+msgid "صفحة التتبع"
+msgstr "tracking page"
+
+#: .\templates\accounts\merchant_apply.html:10
+msgid ""
+"بيع بضاعتك عالصَّيَّاد: أنت تضيف منتجاتك، ونحن منتكفّل بالواجهة والطلبات والتوصيل."
+msgstr "Sell your goods on Al-Sayyad: you add your products, we handle the storefront, orders and delivery."
+
+#: .\templates\accounts\merchant_apply.html:16
+msgid "اسم المتجر"
+msgstr "Store name"
+
+#: .\templates\accounts\merchant_apply.html:22
+msgid "موبايل التواصل"
+msgstr "Contact mobile"
+
+#: .\templates\accounts\merchant_apply.html:34
+msgid "عن المتجر (اختياري)"
+msgstr "About the store (optional)"
+
+#: .\templates\accounts\merchant_apply.html:36
+msgid "شو بتبيعوا؟ من متى وأنتم شغالين؟"
+msgstr "What do you sell? How long have you been in business?"
+
+#: .\templates\accounts\merchant_apply.html:38
+msgid "قدّم الطلب"
+msgstr "Submit application"
+
+#: .\templates\accounts\password_change.html:19
+msgid "كلمة السر الحالية"
+msgstr "Current password"
+
+#: .\templates\accounts\password_change.html:24
+msgid "كلمة السر الجديدة"
+msgstr "New password"
+
+#: .\templates\accounts\password_change.html:29
+msgid "تأكيد كلمة السر الجديدة"
+msgstr "Confirm new password"
+
+#: .\templates\accounts\password_change.html:33
+msgid "تغيير"
+msgstr "Change"
+
+#: .\templates\accounts\signup.html:4 .\templates\accounts\signup.html:8
+msgid "حساب جديد"
+msgstr "New account"
+
+#: .\templates\accounts\signup.html:10
+msgid "بحساب واحد: طلباتك محفوظة، وبياناتك تتعبّى وحدها عند الطلب."
+msgstr "With one account your orders are saved and your details fill in automatically at checkout."
+
+#: .\templates\accounts\signup.html:26
+msgid "هو نفسه اسم دخولك — منتواصل معك عليه."
+msgstr "It's also your login — we'll contact you on it."
+
+#: .\templates\accounts\signup.html:34
+msgid "تأكيد كلمة السر"
+msgstr "Confirm password"
+
+#: .\templates\accounts\signup.html:38
+msgid "أنشئ حسابي"
+msgstr "Create my account"
+
+#: .\templates\accounts\signup.html:42
+msgid "عندك حساب؟"
+msgstr "Already have an account?"
+
+#: .\templates\accounts\signup.html:43
+msgid "سجّل دخول"
+msgstr "Log in"
+
+#: .\templates\base.html:34
+msgid "الصَّيَّاد"
+msgstr "Al-Sayyad"
+
+#: .\templates\base.html:41
+msgid "دوّر عن أي شي…"
+msgstr "Search for anything…"
+
+#: .\templates\base.html:42
+msgid "بحث"
+msgstr "Search"
+
+#: .\templates\base.html:51
+msgid "القائمة الرئيسية"
+msgstr "Main menu"
+
+#: .\templates\base.html:54 .\templates\base.html:100
+msgid "السلة"
+msgstr "Cart"
+
+#: .\templates\base.html:78
+msgid "روابط الموقع"
+msgstr "Site links"
+
+#: .\templates\base.html:79 .\templates\pages\about.html:4
+#: .\templates\pages\about.html:8
+msgid "عن الصَّيَّاد"
+msgstr "About Al-Sayyad"
+
+#: .\templates\base.html:80 .\templates\pages\contact.html:4
+#: .\templates\pages\contact.html:8
+msgid "تواصل معنا"
+msgstr "Contact us"
+
+#: .\templates\base.html:81 .\templates\orders\confirmation.html:38
+#: .\templates\orders\track.html:4
+msgid "تتبع طلبك"
+msgstr "Track your order"
+
+#: .\templates\base.html:83
+msgid "سوقك السوري الموثوق"
+msgstr "Your trusted Syrian marketplace"
+
+#: .\templates\base.html:89
+msgid "التنقّل الأساسي"
+msgstr "Primary navigation"
+
+#: .\templates\cart\cart_detail.html:4 .\templates\cart\cart_detail.html:7
+msgid "سلة التسوّق"
+msgstr "Shopping cart"
+
+#: .\templates\cart\partials\added_oob.html:8
+msgid "أُضيف للسلة"
+msgstr "Added to cart"
+
+#: .\templates\cart\partials\added_oob.html:9
+msgid "اعرض السلة"
+msgstr "View cart"
+
+#: .\templates\cart\partials\cart_body.html:21
+msgid "قطعة"
+msgstr "item"
+
+#: .\templates\cart\partials\cart_body.html:29
+msgid "أنقص الكمية"
+msgstr "Decrease quantity"
+
+#: .\templates\cart\partials\cart_body.html:39
+msgid "زد الكمية"
+msgstr "Increase quantity"
+
+#: .\templates\cart\partials\cart_body.html:40
+msgid "وصلت أقصى كمية متوفرة"
+msgstr "Maximum available quantity reached"
+
+#: .\templates\cart\partials\cart_body.html:51
+msgid "حذف"
+msgstr "Remove"
+
+#: .\templates\cart\partials\cart_body.html:60
+#, python-format
+msgid "قطعة واحدة"
+msgid_plural "%(n)s قطع"
+msgstr[0] "One item"
+msgstr[1] "%(n)s items"
+
+#: .\templates\cart\partials\cart_body.html:63
+#: .\templates\orders\checkout.html:91
+msgid "التوصيل يُتفق عليه عند تأكيد الطلب هاتفياً."
+msgstr "Delivery is arranged when we confirm your order by phone."
+
+#: .\templates\cart\partials\cart_body.html:64
+#: .\templates\orders\checkout.html:4 .\templates\orders\checkout.html:7
+msgid "إتمام الطلب"
+msgstr "Checkout"
+
+#: .\templates\cart\partials\cart_body.html:65
+msgid "متابعة التسوّق"
+msgstr "Continue shopping"
+
+#: .\templates\cart\partials\cart_body.html:70
+msgid "سلتك فاضية بعد."
+msgstr "Your cart is still empty."
+
+#: .\templates\catalog\category_detail.html:8
+#: .\templates\catalog\product_detail.html:19
+msgid "مسار التنقّل"
+msgstr "Breadcrumb"
+
+#: .\templates\catalog\category_detail.html:41
+msgid "ما في منتجات مطابقة بهالتصنيف."
+msgstr "No matching products in this category."
+
+#: .\templates\catalog\category_list.html:15
+#, python-format
+msgid "منتج واحد"
+msgid_plural "%(n)s منتجات"
+msgstr[0] "One product"
+msgstr[1] "%(n)s products"
+
+#: .\templates\catalog\category_list.html:23
+msgid "ما في تصنيفات بعد."
+msgstr "No categories yet."
+
+#: .\templates\catalog\partials\browse_controls.html:10
+msgid "ترتيب"
+msgstr "Sort"
+
+#: .\templates\catalog\partials\browse_controls.html:12
+msgid "الأحدث"
+msgstr "Newest"
+
+#: .\templates\catalog\partials\browse_controls.html:13
+msgid "السعر: من الأرخص"
+msgstr "Price: low to high"
+
+#: .\templates\catalog\partials\browse_controls.html:14
+msgid "السعر: من الأغلى"
+msgstr "Price: high to low"
+
+#: .\templates\catalog\partials\browse_controls.html:21
+msgid "المتوفر فقط"
+msgstr "In stock only"
+
+#: .\templates\catalog\partials\browse_controls.html:24
+msgid "طبّق"
+msgstr "Apply"
+
+#: .\templates\catalog\partials\pagination.html:6
+msgid "صفحات"
+msgstr "Pages"
+
+#: .\templates\catalog\partials\pagination.html:8
+msgid "السابق"
+msgstr "Previous"
+
+#: .\templates\catalog\partials\pagination.html:11
+#, python-format
+msgid "صفحة %(current)s من %(total)s"
+msgstr "Page %(current)s of %(total)s"
+
+#: .\templates\catalog\partials\pagination.html:14
+msgid "التالي"
+msgstr "Next"
+
+#: .\templates\catalog\partials\search_suggest.html:17
+#, python-format
+msgid "كل النتائج عن «%(q)s»"
+msgstr "All results for “%(q)s”"
+
+#: .\templates\catalog\product_detail.html:65
+#: .\templates\components\product_card.html:19
+#, python-format
+msgid "خصم %(discount)s٪"
+msgstr "%(discount)s%% off"
+
+#: .\templates\catalog\product_detail.html:70
+msgid "البائع:"
+msgstr "Seller:"
+
+#: .\templates\catalog\product_detail.html:76
+msgid "متوفر"
+msgstr "In stock"
+
+#: .\templates\catalog\product_detail.html:78
+#: .\templates\catalog\product_detail.html:96
+#: .\templates\components\product_card.html:45
+msgid "نفدت الكمية"
+msgstr "Out of stock"
+
+#: .\templates\catalog\product_detail.html:80
+#: .\templates\components\product_card.html:16
+msgid "دفع عند الاستلام"
+msgstr "Cash on delivery"
+
+#: .\templates\catalog\product_detail.html:92
+#: .\templates\components\product_card.html:15
+msgid "أضف للسلة"
+msgstr "Add to cart"
+
+#: .\templates\catalog\product_detail.html:103
+msgid "شارك المنتج عالواتساب"
+msgstr "Share on WhatsApp"
+
+#: .\templates\catalog\product_detail.html:108
+msgid "الوصف"
+msgstr "Description"
+
+#: .\templates\catalog\product_detail.html:115
+msgid "المواصفات"
+msgstr "Specifications"
+
+#: .\templates\catalog\product_detail.html:129
+msgid "منتجات مشابهة"
+msgstr "Similar products"
+
+#: .\templates\catalog\search_results.html:4
+#, python-format
+msgid "بحث: %(q)s"
+msgstr "Search: %(q)s"
+
+#: .\templates\catalog\search_results.html:8
+#, python-format
+msgid "نتائج البحث عن «%(q)s»"
+msgstr "Search results for “%(q)s”"
+
+#: .\templates\catalog\search_results.html:10
+#, python-format
+msgid "نتيجة واحدة"
+msgid_plural "%(n)s نتائج"
+msgstr[0] "One result"
+msgstr[1] "%(n)s results"
+
+#: .\templates\catalog\search_results.html:26
+#, python-format
+msgid "ما لقينا شي عن «%(q)s» — جرّب كلمة أبسط أو أقصر."
+msgstr "We couldn't find anything for “%(q)s” — try a simpler or shorter word."
+
+#: .\templates\catalog\search_results.html:27
+msgid "تصفّح التصنيفات"
+msgstr "Browse categories"
+
+#: .\templates\catalog\search_results.html:32
+msgid "البحث"
+msgstr "Search"
+
+#: .\templates\catalog\search_results.html:35
+msgid "اكتب بشريط البحث فوق شو عم تدوّر عليه — ونحن نصطاده لك."
+msgstr "Type what you're looking for in the search bar above — and we'll catch it for you."
+
+#: .\templates\orders\checkout.html:13
+msgid "رجوع للسلة"
+msgstr "Back to cart"
+
+#: .\templates\orders\checkout.html:34
+msgid "منتواصل معك عليه لتأكيد الطلب والتوصيل."
+msgstr "We'll call you on it to confirm your order and arrange delivery."
+
+#: .\templates\orders\checkout.html:45
+msgid "العنوان بالتفصيل"
+msgstr "Detailed address"
+
+#: .\templates\orders\checkout.html:47
+msgid "الحي، الشارع، رقم البناء، طابق…"
+msgstr "Neighborhood, street, building number, floor…"
+
+#: .\templates\orders\checkout.html:52
+msgid "ملاحظات (اختياري)"
+msgstr "Notes (optional)"
+
+#: .\templates\orders\checkout.html:57
+msgid "طريقة الدفع"
+msgstr "Payment method"
+
+#: .\templates\orders\checkout.html:70
+msgid "شام كاش — قريباً"
+msgstr "ShamCash — coming soon"
+
+#: .\templates\orders\checkout.html:74
+msgid "أكّد الطلب"
+msgstr "Confirm order"
+
+#: .\templates\orders\checkout.html:78
+msgid "ملخص طلبك"
+msgstr "Your order summary"
+
+#: .\templates\orders\checkout.html:88 .\templates\orders\confirmation.html:28
+#: .\templates\orders\track.html:58
+msgid "الإجمالي"
+msgstr "Total"
+
+#: .\templates\orders\confirmation.html:4
+msgid "تم استلام طلبك"
+msgstr "Order received"
+
+#: .\templates\orders\confirmation.html:9
+msgid "تم استلام طلبك!"
+msgstr "Order received!"
+
+#: .\templates\orders\confirmation.html:11
+msgid "رقم طلبك"
+msgstr "Your order number is"
+
+#: .\templates\orders\confirmation.html:13
+msgid "احتفظ فيه لأي استفسار."
+msgstr "keep it for any inquiries."
+
+#: .\templates\orders\confirmation.html:15
+#, python-format
+msgid "منتواصل معك على %(phone)s خلال ساعات لتأكيد الطلب وترتيب التوصيل."
+msgstr "We'll contact you on %(phone)s within hours to confirm your order and arrange delivery."
+
+#: .\templates\orders\confirmation.html:18
+msgid "ملخص الطلب"
+msgstr "Order summary"
+
+#: .\templates\orders\confirmation.html:37
+msgid "رجوع للرئيسية"
+msgstr "Back to home"
+
+#: .\templates\orders\track.html:7
+msgid "وين طلبي؟"
+msgstr "Where's my order?"
+
+#: .\templates\orders\track.html:9
+msgid "اكتب رقم الطلب (من صفحة التأكيد) ورقم الموبايل يلي طلبت فيه."
+msgstr "Enter your order number (from the confirmation page) and the mobile number you ordered with."
+
+#: .\templates\orders\track.html:14
+msgid "رقم الطلب"
+msgstr "Order number"
+
+#: .\templates\orders\track.html:23
+msgid "دوّر عالطلب"
+msgstr "Find my order"
+
+#: .\templates\orders\track.html:31
+msgid "طلب"
+msgstr "Order"
+
+#: .\templates\orders\track.html:46
+msgid "هذا الطلب ملغى. إذا في خطأ، تواصل معنا."
+msgstr "This order is cancelled. If that's a mistake, contact us."
+
+#: .\templates\orders\track.html:66
+msgid ""
+"ما لقينا طلباً بهالرقمين — تأكد من رقم الطلب ورقم الموبايل وجرّب مرة ثانية."
+msgstr "No matching order — double-check the order number and mobile number, then try again."
+
+#: .\templates\pages\about.html:10
+msgid "اطلب… ونحن نصطاد لك"
+msgstr "Ask — and we'll catch it for you"
+
+#: .\templates\pages\about.html:15
+msgid ""
+"الصَّيَّاد سوق سوري إلكتروني: قُل ما تبحث عنه — ونُحضِر لك الصيد. سوقٌ موثوق وواسع، "
+"صُمِّم ليكون سهلاً على كل بيت سوري، حتى لو كانت هذه أول مرة تتسوق فيها أونلاين."
+msgstr "Al-Sayyad is a Syrian online marketplace: name what you seek — we bring you the catch. A trusted, abundant marketplace built to feel effortless for every Syrian household, even on your very first online order."
+
+#: .\templates\pages\about.html:21 .\templates\pages\home.html:44
+msgid "موثوق"
+msgstr "Trusted"
+
+#: .\templates\pages\about.html:22
+msgid "ادفع عند الاستلام — ما تدفع شي قبل ما توصلك أغراضك وتشوفها بعينك."
+msgstr "Cash on delivery — pay nothing until your goods arrive and you see them yourself."
+
+#: .\templates\pages\about.html:25 .\templates\pages\home.html:48
+msgid "وافر"
+msgstr "Abundant"
+
+#: .\templates\pages\about.html:26
+msgid "كل احتياجات بيتك بمكان واحد، من الإلكترونيات للمطبخ."
+msgstr "Everything your home needs in one place, from electronics to the kitchen."
+
+#: .\templates\pages\about.html:29 .\templates\pages\home.html:52
+msgid "بسيط"
+msgstr "Effortless"
+
+#: .\templates\pages\about.html:30
+msgid "شاشات واضحة وخطوات قليلة — بلا تسجيل حسابات ولا تعقيد."
+msgstr "Clear screens and few steps — no forced sign-ups, no complexity."
+
+#: .\templates\pages\about.html:33 .\templates\pages\home.html:56
+msgid "قريب"
+msgstr "Local"
+
+#: .\templates\pages\about.html:34
+msgid "سوري بالكامل: باللغة، وبالليرة، وبطرق الدفع، وبالناس."
+msgstr "Fully Syrian: the language, the lira, the payment, the people."
+
+#: .\templates\pages\contact.html:9
+msgid "سؤال عن طلب؟ منتج؟ اقتراح؟ نحن موجودون."
+msgstr "A question about an order? A product? A suggestion? We're here."
+
+#: .\templates\pages\contact.html:14
+msgid "اتصال"
+msgstr "Call"
+
+#: .\templates\pages\contact.html:18
+msgid "واتساب"
+msgstr "WhatsApp"
+
+#: .\templates\pages\contact.html:23
+msgid "إيميل"
+msgstr "Email"
+
+#: .\templates\pages\contact.html:30
+msgid "ولتتبع طلبك بأي وقت:"
+msgstr "And to track your order any time:"
+
+#: .\templates\pages\contact.html:31
+msgid "صفحة طلباتي"
+msgstr "My orders page"
+
+#: .\templates\pages\home.html:4
+msgid "سوقك السوري"
+msgstr "Your Syrian marketplace"
+
+#: .\templates\pages\home.html:8
+msgid "كل شي لبيتك، بمكان واحد."
+msgstr "Everything for your home, in one place."
+
+#: .\templates\pages\home.html:9
+msgid "اطلب… ونحن نصطاد لك."
+msgstr "Ask… and we'll catch it for you."
+
+#: .\templates\pages\home.html:15
+msgid "تسوّق حسب التصنيف"
+msgstr "Shop by category"
+
+#: .\templates\pages\home.html:25
+msgid "وصل حديثاً"
+msgstr "New arrivals"
+
+#: .\templates\pages\home.html:35
+msgid "الشباك فاضية بعد — المنتجات عالطريق!"
+msgstr "The nets are still empty — products are on the way!"
+
+#: .\templates\pages\home.html:41
+msgid "ليش الصَّيَّاد؟"
+msgstr "Why Al-Sayyad?"
+
+#: .\templates\pages\home.html:45
+msgid "دفعك وتوصيلك بأمان."
+msgstr "Safe payment and delivery."
+
+#: .\templates\pages\home.html:49
+msgid "كل شي للبيت بمكان واحد."
+msgstr "Everything for the home in one place."
+
+#: .\templates\pages\home.html:53
+msgid "سهل حتى لأول طلب أونلاين."
+msgstr "Easy even for your first online order."
+
+#: .\templates\pages\home.html:57
+msgid "سوري بالكامل: لغة ودفع وناس."
+msgstr "Fully Syrian: language, payment, people."
+
+#: .\templates\pages\styleguide.html:7
+msgid "دليل المكوّنات"
+msgstr "Component guide"
+
+#: .\templates\pages\styleguide.html:8
+msgid ""
+"كل قطع الواجهة وحالاتها بمكان واحد. أي مكوّن منبنيه مرّة ومنستعمله بكل الصفحات."
+msgstr "Every UI piece and its states in one place. Build a component once, use it on every page."
+
+#: .\templates\pages\styleguide.html:12
+msgid "الألوان (Tokens)"
+msgstr "Colors (tokens)"
+
+#: .\templates\pages\styleguide.html:13
+msgid "كل لون معرّف مرّة وحدة كمتغيّر في tokens.css."
+msgstr "Every color is defined once as a variable in tokens.css."
+
+#: .\templates\pages\styleguide.html:26
+msgid "الطباعة"
+msgstr "Typography"
+
+#: .\templates\pages\styleguide.html:29
+msgid "عنوان رئيسي للصفحة"
+msgstr "Page heading"
+
+#: .\templates\pages\styleguide.html:30
+msgid "عنوان قسم"
+msgstr "Section heading"
+
+#: .\templates\pages\styleguide.html:31
+msgid "عنوان فرعي"
+msgstr "Subheading"
+
+#: .\templates\pages\styleguide.html:32
+msgid "نص أساسي مريح للقراءة على الموبايل والشاشات الكبيرة."
+msgstr "Body text that reads comfortably on mobile and large screens."
+
+#: .\templates\pages\styleguide.html:33
+msgid "نص صغير للملاحظات والتفاصيل."
+msgstr "Small text for notes and details."
+
+#: .\templates\pages\styleguide.html:39
+msgid "الأزرار"
+msgstr "Buttons"
+
+#: .\templates\pages\styleguide.html:40
+msgid "أنواع وحالات (عادي / معطّل / تحميل)."
+msgstr "Variants and states (normal / disabled / loading)."
+
+#: .\templates\pages\styleguide.html:55
+msgid "الشارات"
+msgstr "Badges"
+
+#: .\templates\pages\styleguide.html:56
+msgid "شارات الحالة وشارات الدفع."
+msgstr "Status and payment badges."
+
+#: .\templates\pages\styleguide.html:72
+msgid "الحقول"
+msgstr "Fields"
+
+#: .\templates\pages\styleguide.html:73
+msgid "حقل عادي / مع مساعدة / إلزامي / مع خطأ."
+msgstr "Normal / with help / required / with error."
+
+#: .\templates\pages\styleguide.html:83
+msgid "البطاقة العامة"
+msgstr "Card"
+
+#: .\templates\pages\styleguide.html:84
+msgid "حاوية لأي محتوى."
+msgstr "A container for any content."
+
+#: .\templates\pages\styleguide.html:87
+msgid "عنوان البطاقة"
+msgstr "Card title"
+
+#: .\templates\pages\styleguide.html:88
+msgid "نص توضيحي قصير داخل البطاقة."
+msgstr "Short descriptive text inside the card."
+
+#: .\templates\pages\styleguide.html:95
+msgid "بطاقات المنتجات"
+msgstr "Product cards"
+
+#: .\templates\pages\styleguide.html:96
+msgid ""
+"بيانات تجريبية الآن؛ بالموديول M4 منمرّر منتجات حقيقية من قاعدة البيانات."
+msgstr "Demo data for now; module M4 feeds real products from the database."
