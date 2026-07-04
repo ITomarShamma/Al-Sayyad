@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate 'حساب جديد' %} — الصَّيَّاد{% endblock %}
+
+{% block content %}
+<div class="auth-card card">
+  <h1>{% translate 'حساب جديد' %}</h1>
+  <p class="caption" style="color: var(--text-muted);">
+    {% translate 'بحساب واحد: طلباتك محفوظة، وبياناتك تتعبّى وحدها عند الطلب.' %}
+  </p>
+
+  <form method="post" class="auth-form" novalidate>
+    {% csrf_token %}
+    <div class="field {% if form.full_name.errors %}field--error{% endif %}">
+      <label class="field__label" for="id_full_name">{% translate 'الاسم الكامل' %}</label>
+      <input class="field__input" type="text" id="id_full_name" name="full_name"
+             value="{{ form.full_name.value|default:'' }}" required>
+      {% if form.full_name.errors %}<p class="field__msg field__msg--error">{{ form.full_name.errors.0 }}</p>{% endif %}
+    </div>
+    <div class="field {% if form.phone.errors %}field--error{% endif %}">
+      <label class="field__label" for="id_phone">{% translate 'رقم الموبايل' %}</label>
+      <input class="field__input" type="tel" id="id_phone" name="phone" inputmode="numeric"
+             placeholder="09xxxxxxxx" value="{{ form.phone.value|default:'' }}" required>
+      {% if form.phone.errors %}<p class="field__msg field__msg--error">{{ form.phone.errors.0 }}</p>
+      {% else %}<p class="field__msg">{% translate 'هو نفسه اسم دخولك — منتواصل معك عليه.' %}</p>{% endif %}
+    </div>
+    <div class="field {% if form.password1.errors %}field--error{% endif %}">
+      <label class="field__label" for="id_password1">{% translate 'كلمة السر' %}</label>
+      <input class="field__input" type="password" id="id_password1" name="password1" required>
+      {% if form.password1.errors %}<p class="field__msg field__msg--error">{{ form.password1.errors.0 }}</p>{% endif %}
+    </div>
+    <div class="field {% if form.password2.errors %}field--error{% endif %}">
+      <label class="field__label" for="id_password2">{% translate 'تأكيد كلمة السر' %}</label>
+      <input class="field__input" type="password" id="id_password2" name="password2" required>
+      {% if form.password2.errors %}<p class="field__msg field__msg--error">{{ form.password2.errors.0 }}</p>{% endif %}
+    </div>
+    <button class="btn btn--accent btn--block" type="submit">{% translate 'أنشئ حسابي' %}</button>
+  </form>
+
+  <p class="auth-card__alt">
+    {% translate 'عندك حساب؟' %}
+    <a href="{% url 'accounts:login' %}">{% translate 'سجّل دخول' %}</a>
+  </p>
+</div>
+{% endblock %}

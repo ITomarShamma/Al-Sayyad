@@ -2,16 +2,10 @@
 
 from django import forms
 
+from apps.core.validators import normalize_digits
+
 from .models import Order
 from .payments import available_payment_choices
-
-# المستخدم السوري كثيراً ما يكتب الأرقام بالهندية (٠٩…) — نطبّعها لأسكي
-ARABIC_TO_ASCII_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
-
-
-def normalize_digits(value):
-    """يطبّع الأرقام الهندية ويشيل الفراغات — لأي حقل رقمي يدخله المستخدم."""
-    return (value or "").strip().replace(" ", "").translate(ARABIC_TO_ASCII_DIGITS)
 
 
 class TrackOrderForm(forms.Form):

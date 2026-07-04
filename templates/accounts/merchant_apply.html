@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate 'انضم كتاجر' %} — الصَّيَّاد{% endblock %}
+
+{% block content %}
+<div class="auth-card card">
+  <h1>{% translate 'انضم كتاجر' %} 🏪</h1>
+  <p class="caption" style="color: var(--text-muted);">
+    {% translate 'بيع بضاعتك عالصَّيَّاد: أنت تضيف منتجاتك، ونحن منتكفّل بالواجهة والطلبات والتوصيل.' %}
+  </p>
+
+  <form method="post" class="auth-form" novalidate>
+    {% csrf_token %}
+    <div class="field {% if form.store_name.errors %}field--error{% endif %}">
+      <label class="field__label" for="id_store_name">{% translate 'اسم المتجر' %}</label>
+      <input class="field__input" type="text" id="id_store_name" name="store_name"
+             value="{{ form.store_name.value|default:'' }}" required>
+      {% if form.store_name.errors %}<p class="field__msg field__msg--error">{{ form.store_name.errors.0 }}</p>{% endif %}
+    </div>
+    <div class="field {% if form.phone.errors %}field--error{% endif %}">
+      <label class="field__label" for="id_phone">{% translate 'موبايل التواصل' %}</label>
+      <input class="field__input" type="tel" id="id_phone" name="phone" inputmode="numeric"
+             placeholder="09xxxxxxxx" value="{{ form.phone.value|default:'' }}" required>
+      {% if form.phone.errors %}<p class="field__msg field__msg--error">{{ form.phone.errors.0 }}</p>{% endif %}
+    </div>
+    <div class="field {% if form.city.errors %}field--error{% endif %}">
+      <label class="field__label" for="id_city">{% translate 'المحافظة / المدينة' %}</label>
+      <input class="field__input" type="text" id="id_city" name="city"
+             value="{{ form.city.value|default:'' }}" required>
+      {% if form.city.errors %}<p class="field__msg field__msg--error">{{ form.city.errors.0 }}</p>{% endif %}
+    </div>
+    <div class="field">
+      <label class="field__label" for="id_description">{% translate 'عن المتجر (اختياري)' %}</label>
+      <textarea class="field__input" id="id_description" name="description" rows="3"
+                placeholder="{% translate 'شو بتبيعوا؟ من متى وأنتم شغالين؟' %}">{{ form.description.value|default:'' }}</textarea>
+    </div>
+    <button class="btn btn--accent btn--block" type="submit">{% translate 'قدّم الطلب' %}</button>
+  </form>
+</div>
+{% endblock %}

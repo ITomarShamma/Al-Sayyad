@@ -51,7 +51,7 @@
         <a {% if vn == 'pages:home' %}class="is-active"{% endif %} href="{% url 'pages:home' %}"><span aria-hidden="true">🏠</span>{% translate 'الرئيسية' %}</a>
         <a {% if vn == 'catalog:category_list' or vn == 'catalog:category' %}class="is-active"{% endif %} href="{% url 'catalog:category_list' %}"><span aria-hidden="true">🗂️</span>{% translate 'التصنيفات' %}</a>
         <a {% if vn == 'cart:detail' %}class="is-active"{% endif %} href="{% url 'cart:detail' %}"><span aria-hidden="true">🛒</span>{% translate 'السلة' %} <span class="nav-badge" id="cart-count-top">{{ cart.total_quantity }}</span></a>
-        <a {% if vn == 'orders:track' %}class="is-active"{% endif %} href="{% url 'orders:track' %}"><span aria-hidden="true">📦</span>{% translate 'طلباتي' %}</a>
+        <a {% if 'accounts:' in vn %}class="is-active"{% endif %} href="{% url 'accounts:account' %}"><span aria-hidden="true">👤</span>{% translate 'حسابي' %}</a>
       </nav>
       {% endwith %}
     </div>
@@ -59,6 +59,15 @@
 
   <main class="app__main">
     <div class="container">
+      {# رسائل النظام (نجاح/تنبيه) — تظهر مرة واحدة بعد الفعل ثم تختفي #}
+      {% if messages %}
+        <div class="messages">
+          {% for message in messages %}
+            <div class="messages__item messages__item--{{ message.tags|default:'info' }}" role="status">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
       {% block content %}{% endblock %}
     </div>
   </main>
@@ -89,9 +98,9 @@
       <span class="bottom-nav__icon" aria-hidden="true">🛒<span class="nav-badge nav-badge--float" id="cart-count-bottom">{{ cart.total_quantity }}</span></span>
       <span>{% translate 'السلة' %}</span>
     </a>
-    <a class="bottom-nav__item {% if vn == 'orders:track' %}is-active{% endif %}" href="{% url 'orders:track' %}">
-      <span class="bottom-nav__icon" aria-hidden="true">📦</span>
-      <span>{% translate 'طلباتي' %}</span>
+    <a class="bottom-nav__item {% if 'accounts:' in vn %}is-active{% endif %}" href="{% url 'accounts:account' %}">
+      <span class="bottom-nav__icon" aria-hidden="true">👤</span>
+      <span>{% translate 'حسابي' %}</span>
     </a>
   </nav>
   {% endwith %}

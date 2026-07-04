@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate 'تسجيل الدخول' %} — الصَّيَّاد{% endblock %}
+
+{% block content %}
+<div class="auth-card card">
+  <h1>{% translate 'تسجيل الدخول' %}</h1>
+
+  {% if form.non_field_errors %}
+    <div class="form-alert" role="alert">
+      {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post" class="auth-form" novalidate>
+    {% csrf_token %}
+    <div class="field">
+      <label class="field__label" for="id_username">{% translate 'رقم الموبايل' %}</label>
+      <input class="field__input" type="tel" id="id_username" name="username" inputmode="numeric"
+             placeholder="09xxxxxxxx" value="{{ form.username.value|default:'' }}" required autofocus>
+    </div>
+    <div class="field">
+      <label class="field__label" for="id_password">{% translate 'كلمة السر' %}</label>
+      <input class="field__input" type="password" id="id_password" name="password" required>
+    </div>
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="btn btn--primary btn--block" type="submit">{% translate 'دخول' %}</button>
+  </form>
+
+  <p class="auth-card__alt">
+    {% translate 'ما عندك حساب؟' %}
+    <a href="{% url 'accounts:signup' %}">{% translate 'سجّل جديد' %}</a>
+  </p>
+  <p class="auth-card__alt caption">
+    {% translate 'طلبت كزائر؟ تقدر تتبع طلبك بلا حساب من' %}
+    <a href="{% url 'orders:track' %}">{% translate 'صفحة التتبع' %} 📦</a>
+  </p>
+</div>
+{% endblock %}

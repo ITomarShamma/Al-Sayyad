@@ -5,16 +5,15 @@
 وفاتورة الزبون يجب أن تبقى كما كانت يوم طلب، مهما تعدّل الكاتالوج.
 """
 
-from django.core.validators import RegexValidator
+from django.conf import settings
 from django.db import models
 from django.utils.crypto import get_random_string
 
 from apps.core.models import TimeStampedModel
 
-# رقم موبايل سوري: 09 يتبعها 8 أرقام
-syrian_phone = RegexValidator(
-    r"^09\d{8}$", "أدخل رقم موبايل سوري صحيح: 09 يتبعها 8 أرقام."
-)
+# ملاحظة: التعريف الأصلي انتقل لـ apps/core/validators.py (مشترك بين التطبيقات).
+# نبقي الاسم مستورداً هنا لأن هجرة orders/0001 تشير إليه بهذا المسار.
+from apps.core.validators import syrian_phone  # noqa: E402  (توافق الهجرات)
 
 
 class Order(TimeStampedModel):
@@ -33,6 +32,14 @@ class Order(TimeStampedModel):
 
     # رقم قصير يُقرأ بسهولة عالتلفون — يتولّد تلقائياً (انظر save)
     number = models.CharField("رقم الطلب", max_length=12, unique=True, editable=False)
+
+    # صاحب الطلب إن كان مسجَّلاً — NULL = طلب زائر (guest)، وهذا مسار مدعوم
+    # دائماً. SET_NULL: حذف الحساب لا يمس سجلات الطلبات (تبقى فواتير).
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, verbose_name="المستخدم",
+        null=True, blank=True,
+        on_delete=models.SET_NULL, related_name="orders",
+    )
 
     customer_name = models.CharField("الاسم الكامل", max_length=100)
     phone = models.CharField("رقم الموبايل", max_length=10, validators=[syrian_phone])

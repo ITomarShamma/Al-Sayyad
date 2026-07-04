@@ -52,6 +52,7 @@ DJANGO_APPS = [
 # Our own apps. Each one is a self-contained module of the store.
 LOCAL_APPS = [
     "apps.core",      # shared helpers, base models, context processors
+    "apps.accounts",  # user profiles and roles (customer / merchant)
     "apps.pages",     # homepage and static pages
     "apps.catalog",   # categories and products
     "apps.cart",      # shopping cart
@@ -128,6 +129,12 @@ STATIC_ROOT = BASE_DIR / "staticfiles"        # collected assets for production
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"               # user-uploaded files (product images)
+
+
+# --- Authentication (تسجيل الدخول برقم الموبايل) ---------------------------
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "accounts:account"
+LOGOUT_REDIRECT_URL = "pages:home"
 
 
 # --- Store contact info (صفحة «تواصل معنا» والفوتر) ------------------------

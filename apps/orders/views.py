@@ -19,9 +19,21 @@ def checkout(request):
     if cart.total_quantity == 0:
         return redirect("cart:detail")    # ما في شي يُطلب
 
-    form = CheckoutForm(request.POST or None)
+    # الزبون المسجَّل: نعبّي له بياناته مسبقاً — يأكد ويمشي
+    initial = {}
+    if request.user.is_authenticated:
+        profile = getattr(request.user, "profile", None)
+        initial = {
+            "customer_name": request.user.first_name,
+            "phone": profile.phone if profile else request.user.username,
+            "city": profile.city if profile else "",
+        }
+
+    form = CheckoutForm(request.POST or None, initial=initial)
     if request.method == "POST" and form.is_valid():
         order = form.save(commit=False)   # طلب مُعبَّأ، لسا ما انحفظ
+        if request.user.is_authenticated:
+            order.user = request.user     # يظهر بـ«حسابي»؛ الزائر يبقى بلا user
         try:
             create_order_from_cart(cart, order)
         except OutOfStockError as exc:

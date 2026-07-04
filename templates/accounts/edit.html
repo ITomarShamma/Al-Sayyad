@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate 'تعديل بياناتي' %} — الصَّيَّاد{% endblock %}
+
+{% block content %}
+<div class="auth-card card">
+  <h1>{% translate 'تعديل بياناتي' %}</h1>
+
+  <form method="post" class="auth-form" novalidate>
+    {% csrf_token %}
+    <div class="field {% if form.full_name.errors %}field--error{% endif %}">
+      <label class="field__label" for="id_full_name">{% translate 'الاسم الكامل' %}</label>
+      <input class="field__input" type="text" id="id_full_name" name="full_name"
+             value="{{ form.full_name.value|default:'' }}" required>
+      {% if form.full_name.errors %}<p class="field__msg field__msg--error">{{ form.full_name.errors.0 }}</p>{% endif %}
+    </div>
+    <div class="field">
+      <label class="field__label" for="id_city">{% translate 'المحافظة / المدينة' %}</label>
+      <input class="field__input" type="text" id="id_city" name="city"
+             value="{{ form.city.value|default:'' }}">
+      <p class="field__msg">{% translate 'تتعبّى تلقائياً بصفحة إتمام الطلب.' %}</p>
+    </div>
+    <p class="field__msg">
+      {% translate 'رقم الموبايل هو اسم دخولك — لتغييره تواصل معنا.' %}
+    </p>
+    <button class="btn btn--primary btn--block" type="submit">{% translate 'حفظ' %}</button>
+    <a class="btn btn--secondary btn--block" href="{% url 'accounts:account' %}">{% translate 'رجوع' %}</a>
+  </form>
+</div>
+{% endblock %}

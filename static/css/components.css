@@ -165,6 +165,42 @@
 .cart-summary__row { display: flex; justify-content: space-between; align-items: center; }
 .cart-summary__total { font-size: var(--fs-h3); color: var(--primary-strong); }
 
+/* --- رسائل النظام (Messages) — تأكيدات بعد الأفعال (حفظ/تسجيل/خروج…) -------- */
+.messages { display: flex; flex-direction: column; gap: var(--space-2); margin-block-end: var(--space-4); }
+.messages__item {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-success); background: #E6F4EC; color: #1D6B38;
+}
+.messages__item--info    { border-color: var(--color-info); background: #E4EEFA; color: #1F4E80; }
+.messages__item--warning { border-color: var(--color-warning); background: #FBF0D8; color: #9A6A0A; }
+.messages__item--error   { border-color: var(--color-error); background: #FBE7E3; color: #99301F; }
+
+/* --- صفحات الحساب (Auth + حسابي) --------------------------------------------- */
+.auth-card {
+  max-inline-size: 440px; margin-inline: auto;
+  display: flex; flex-direction: column; gap: var(--space-4);
+  padding: var(--space-6);
+}
+.auth-form { display: flex; flex-direction: column; gap: var(--space-4); }
+.auth-card__alt { text-align: center; }
+.auth-card__alt a { color: var(--primary); font-weight: var(--fw-semibold); }
+
+.account-grid { display: grid; gap: var(--space-4); }
+@media (min-width: 768px) {
+  .account-grid { grid-template-columns: 1fr 1fr; align-items: start; }
+}
+.account-orders { display: flex; flex-direction: column; margin-block-start: var(--space-3); }
+.account-orders__row {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+  min-block-size: var(--tap-min);
+  padding-inline: var(--space-2);
+  border-block-end: 1px solid var(--border);
+}
+.account-orders li:last-child .account-orders__row { border-block-end: none; }
+.account-orders__row:hover { background: var(--color-sea-foam); border-radius: var(--radius-sm); }
+.account-logout { grid-column: 1 / -1; justify-self: center; }
+
 /* --- توست تأكيد (Toast) — يظهر ويختفي وحده بالأنيميشن، بلا JS ---------------- */
 .toast-region {
   position: fixed; inset-inline: 0; z-index: 40;

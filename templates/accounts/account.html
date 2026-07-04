@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate 'حسابي' %} — الصَّيَّاد{% endblock %}
+
+{% block content %}
+<h1>{% translate 'أهلاً' %}{% if request.user.first_name %} {{ request.user.first_name }}{% endif %} 👋</h1>
+
+<div class="account-grid section">
+
+  <div class="card">
+    <h3>{% translate 'بياناتي' %}</h3>
+    <ul class="checkout-summary__list" style="margin-block-start: var(--space-3);">
+      <li><span>{% translate 'الاسم' %}</span><span>{{ request.user.first_name|default:'—' }}</span></li>
+      <li><span>{% translate 'الموبايل' %}</span><span dir="ltr">{{ profile.phone|default:request.user.username }}</span></li>
+      <li><span>{% translate 'المدينة' %}</span><span>{{ profile.city|default:'—' }}</span></li>
+      <li><span>{% translate 'الدور' %}</span><span>{{ profile.get_role_display|default:'زبون' }}</span></li>
+    </ul>
+    <div class="sg-row" style="margin-block-start: var(--space-4);">
+      <a class="btn btn--secondary" href="{% url 'accounts:edit' %}">{% translate 'تعديل البيانات' %} ✏️</a>
+      <a class="btn btn--secondary" href="{% url 'accounts:password_change' %}">{% translate 'تغيير كلمة السر' %} 🔑</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>{% translate 'طلباتي' %}</h3>
+    {% if orders %}
+      <ul class="account-orders">
+        {% for order in orders %}
+          <li>
+            <a class="account-orders__row" href="{% url 'orders:confirmation' order.number %}">
+              <span dir="ltr">#{{ order.number }}</span>
+              <span class="badge">{{ order.get_status_display }}</span>
+              <span class="checkout-summary__line">{{ order.total_display }} <small>{% translate 'ل.س' %}</small></span>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="caption" style="color: var(--text-muted); margin-block-start: var(--space-3);">
+        {% translate 'ما في طلبات بعد — طلباتك الجاية رح تظهر هون.' %}
+      </p>
+      <a class="btn btn--primary" style="margin-block-start: var(--space-3);" href="{% url 'catalog:category_list' %}">{% translate 'ابدأ التسوّق' %}</a>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h3>{% translate 'للتجّار' %}</h3>
+    {% if merchant %}
+      {% if merchant.is_approved %}
+        <p style="margin-block-start: var(--space-2);">
+          {% translate 'متجرك' %} <strong>{{ merchant.store_name }}</strong> —
+          {% include 'components/badge.html' with kind='success' label='مفعّل' only %}
+        </p>
+        <a class="btn btn--primary" style="margin-block-start: var(--space-3);" href="{% url 'admin:index' %}">{% translate 'إدارة منتجاتي' %} ⚙️</a>
+      {% else %}
+        <p style="margin-block-start: var(--space-2);">
+          {% translate 'طلبك لمتجر' %} <strong>{{ merchant.store_name }}</strong>
+          {% include 'components/badge.html' with kind='warning' label='قيد المراجعة' only %}
+        </p>
+        <p class="caption" style="color: var(--text-muted);">{% translate 'منتواصل معك بعد مراجعة الطلب.' %}</p>
+      {% endif %}
+    {% else %}
+      <p class="caption" style="color: var(--text-muted); margin-block-start: var(--space-2);">
+        {% translate 'عندك بضاعة وبدك تبيع عالصَّيَّاد؟ قدّم طلب انضمام كتاجر.' %}
+      </p>
+      <a class="btn btn--accent" style="margin-block-start: var(--space-3);" href="{% url 'accounts:merchant_apply' %}">{% translate 'انضم كتاجر' %} 🏪</a>
+    {% endif %}
+  </div>
+
+  <form method="post" action="{% url 'accounts:logout' %}" class="account-logout">
+    {% csrf_token %}
+    <button class="btn btn--secondary" type="submit">{% translate 'تسجيل الخروج' %} 🚪</button>
+  </form>
+
+</div>
+{% endblock %}
