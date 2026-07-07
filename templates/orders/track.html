@@ -55,6 +55,12 @@
           {% endfor %}
         </ul>
         <ul class="checkout-summary__list checkout-summary__totals">
+          {% if order.discount_amount > 0 %}
+            <li>
+              <span>{% translate 'الخصم' %} ({{ order.coupon_code }})</span>
+              <span class="checkout-summary__line coupon-discount">−{{ order.discount_amount_display }} <small>{% translate 'ل.س' %}</small></span>
+            </li>
+          {% endif %}
           <li>
             <span>{% translate 'التوصيل' %} — {{ order.city }}</span>
             <span class="checkout-summary__line">

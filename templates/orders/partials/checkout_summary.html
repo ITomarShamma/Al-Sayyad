@@ -17,6 +17,12 @@
     <span>{% translate 'مجموع المنتجات' %}</span>
     <span class="checkout-summary__line">{{ cart.total_price_display }} <small>{% translate 'ل.س' %}</small></span>
   </li>
+  {% if coupon %}
+    <li>
+      <span>{% translate 'الخصم' %} ({{ coupon.code }})</span>
+      <span class="checkout-summary__line coupon-discount">−{{ discount_display }} <small>{% translate 'ل.س' %}</small></span>
+    </li>
+  {% endif %}
   <li>
     <span>{% translate 'التوصيل' %}{% if zone %} — {{ zone.name }}{% endif %}</span>
     <span class="checkout-summary__line">

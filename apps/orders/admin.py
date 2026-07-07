@@ -3,8 +3,30 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import DeliveryZone, Order, OrderItem
+from .models import Coupon, DeliveryZone, Order, OrderItem
 from .notifications import customer_whatsapp_url
+
+
+@admin.register(Coupon)
+class CouponAdmin(admin.ModelAdmin):
+    """الكوبونات — أنشئ كوداً وحدّد نوعه وقيوده."""
+
+    list_display = ("code", "kind", "value", "state", "used_count",
+                    "usage_limit", "min_order_total", "expires_at", "is_active")
+    list_filter = ("kind", "is_active")
+    search_fields = ("code",)
+    readonly_fields = ("used_count", "created_at", "updated_at")
+
+    @admin.display(description="الحالة")
+    def state(self, obj):
+        from django.utils import timezone
+        if not obj.is_active:
+            return format_html('<b style="color:#5B6B64;">● موقوف</b>')
+        if obj.expires_at and obj.expires_at < timezone.now():
+            return format_html('<b style="color:#D5402B;">● منتهي</b>')
+        if obj.usage_limit is not None and obj.used_count >= obj.usage_limit:
+            return format_html('<b style="color:#E8A317;">● استُنفد</b>')
+        return format_html('<b style="color:#2E9E54;">● فعّال</b>')
 
 
 @admin.register(DeliveryZone)

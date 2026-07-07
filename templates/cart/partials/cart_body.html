@@ -56,9 +56,46 @@
   </ul>
 
   <div class="card cart-summary">
+    {# ---------- كود الخصم ---------- #}
+    {% if coupon %}
+      <div class="coupon-applied">
+        <span>🎟️ <strong>{{ coupon.code }}</strong> — {% translate 'الخصم' %} {{ discount_display }} {% translate 'ل.س' %}</span>
+        <form method="post" action="{% url 'cart:remove_coupon' %}"
+              hx-post="{% url 'cart:remove_coupon' %}"
+              hx-target="#cart-body" hx-swap="innerHTML">
+          {% csrf_token %}
+          <button class="cart-item__remove" type="submit">{% translate 'إزالة' %}</button>
+        </form>
+      </div>
+    {% else %}
+      <form class="coupon-form" method="post" action="{% url 'cart:apply_coupon' %}"
+            hx-post="{% url 'cart:apply_coupon' %}"
+            hx-target="#cart-body" hx-swap="innerHTML">
+        {% csrf_token %}
+        <input class="field__input" type="text" name="code" autocomplete="off"
+               placeholder="{% translate 'عندك كود خصم؟' %}"
+               aria-label="{% translate 'كود الخصم' %}">
+        <button class="btn btn--secondary" type="submit">{% translate 'تطبيق' %}</button>
+      </form>
+      {% if coupon_error %}<p class="field__msg field__msg--error">{{ coupon_error }}</p>{% endif %}
+    {% endif %}
+
+    {# ---------- المجاميع ---------- #}
+    <ul class="checkout-summary__list checkout-summary__totals">
+      <li>
+        <span>{% blocktranslate count n=cart.total_quantity %}قطعة واحدة{% plural %}{{ n }} قطع{% endblocktranslate %}</span>
+        <span class="checkout-summary__line">{{ cart.total_price_display }} <small>{% translate 'ل.س' %}</small></span>
+      </li>
+      {% if coupon %}
+        <li>
+          <span>{% translate 'الخصم' %} ({{ coupon.code }})</span>
+          <span class="checkout-summary__line coupon-discount">−{{ discount_display }} <small>{% translate 'ل.س' %}</small></span>
+        </li>
+      {% endif %}
+    </ul>
     <div class="cart-summary__row">
-      <span>{% blocktranslate count n=cart.total_quantity %}قطعة واحدة{% plural %}{{ n }} قطع{% endblocktranslate %}</span>
-      <strong class="cart-summary__total">{{ cart.total_price_display }} {% translate 'ل.س' %}</strong>
+      <span>{% translate 'الإجمالي' %}</span>
+      <strong class="cart-summary__total">{{ cart_grand_display }} {% translate 'ل.س' %}</strong>
     </div>
     <p class="caption" style="color: var(--text-muted);">{% translate 'التوصيل يُتفق عليه عند تأكيد الطلب هاتفياً.' %}</p>
     <a class="btn btn--accent" href="{% url 'orders:checkout' %}">{% translate 'إتمام الطلب' %}</a>

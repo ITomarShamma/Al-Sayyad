@@ -5,17 +5,23 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.cart.cart import Cart
 
+from . import coupons as coupon_session
 from .forms import CheckoutForm, TrackOrderForm
-from .models import DeliveryZone, Order
+from .models import Coupon, CouponError, DeliveryZone, Order
 from .services import OutOfStockError, create_order_from_cart
 
 
-def _summary_context(cart, zone):
-    """سياق ملخص الطلب: المنتجات + رسم المنطقة المختارة + الإجمالي الكلي."""
-    grand = cart.total_price + (zone.fee or 0) if zone else cart.total_price
+def _summary_context(request, zone):
+    """سياق ملخص الطلب: المنتجات − الخصم + رسم المنطقة = الإجمالي الكلي."""
+    cart = Cart(request)
+    coupon = coupon_session.get_valid_coupon(request.session, cart.total_price)
+    discount = coupon.discount_for(cart.total_price) if coupon else 0
+    grand = cart.total_price - discount + ((zone.fee or 0) if zone else 0)
     return {
         "cart": cart,
         "zone": zone,
+        "coupon": coupon,
+        "discount_display": f"{discount:,.0f}",
         "grand_total_display": f"{grand:,.0f}",
     }
 
@@ -52,11 +58,24 @@ def checkout(request):
         order.delivery_fee = zone.fee
         if request.user.is_authenticated:
             order.user = request.user     # يظهر بـ«حسابي»؛ الزائر يبقى بلا user
+        # الكوبون يُقرأ خاماً هنا (لا get_valid_coupon الصامتة): لو صار
+        # غير صالح لازم *نوقف* ونخبر الزبون — لا نسحب الخصم بصمت ونفوّت
+        # عليه طلباً بسعر ما توقعه (القاعدة #5: أظهر الحالة دايماً).
+        coupon = None
+        session_code = request.session.get(coupon_session.SESSION_KEY)
+        if session_code:
+            coupon = Coupon.objects.filter(code=session_code).first()
+            if coupon is None:                             # كود انحذف من النظام
+                coupon_session.clear_coupon(request.session)
         try:
-            create_order_from_cart(cart, order)
+            create_order_from_cart(cart, order, coupon=coupon)
         except OutOfStockError as exc:
             form.add_error(None, str(exc))
+        except CouponError as exc:
+            form.add_error(None, str(exc))
+            coupon_session.clear_coupon(request.session)   # أُخبر الزبون؛ نزيله
         else:
+            coupon_session.clear_coupon(request.session)   # الكوبون صار لقطة عالطلب
             return redirect("orders:confirmation", number=order.number)
 
     selected_zone = None
@@ -68,17 +87,16 @@ def checkout(request):
     elif initial.get("zone"):
         selected_zone = initial["zone"]
 
-    context = {"form": form} | _summary_context(cart, selected_zone)
+    context = {"form": form} | _summary_context(request, selected_zone)
     return render(request, "orders/checkout.html", context)
 
 
 def checkout_summary(request):
     """ردّ HTMX: إعادة رسم ملخص الطلب عند تغيير المحافظة (بلا إعادة تحميل)."""
-    cart = Cart(request)
     zone = DeliveryZone.objects.filter(
         pk=request.GET.get("zone") or None, is_active=True).first()
     return render(request, "orders/partials/checkout_summary.html",
-                  _summary_context(cart, zone))
+                  _summary_context(request, zone))
 
 
 def confirmation(request, number):

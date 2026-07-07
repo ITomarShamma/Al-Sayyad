@@ -166,6 +166,20 @@ TRANSLATIONS = {
     "مجاني": "Free",
     "رسم التوصيل لمحافظتك يُتفق عليه عند تأكيد الطلب هاتفياً.": "The delivery fee for your governorate is agreed when we confirm your order by phone.",
 
+    # --- الكوبونات (M23) ---
+    "نسبة مئوية %": "Percentage %",
+    "مبلغ ثابت (ل.س)": "Fixed amount (SYP)",
+    "هذا الكود موقوف حالياً.": "This code is currently disabled.",
+    "انتهت صلاحية هذا الكود.": "This code has expired.",
+    "وصل هذا الكود لحدّه الأقصى من الاستخدام.": "This code has reached its usage limit.",
+    "هذا الكود يشترط مشتريات بقيمة %(min)s ل.س على الأقل.": "This code requires a minimum of %(min)s SYP in items.",
+    "الكود غير صحيح — تأكد منه وجرّب مرة ثانية.": "Invalid code — check it and try again.",
+    "عندك كود خصم؟": "Have a discount code?",
+    "كود الخصم": "Discount code",
+    "تطبيق": "Apply",
+    "إزالة": "Remove",
+    "الخصم": "Discount",
+
     # --- الهيكل العام ---
     "الصَّيَّاد": "Al-Sayyad",
     "دوّر عن أي شي…": "Search for anything…",

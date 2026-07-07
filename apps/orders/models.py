@@ -48,6 +48,81 @@ class DeliveryZone(TimeStampedModel):
         return f"{self.fee:,.0f}" if self.fee is not None else ""
 
 
+class CouponError(Exception):
+    """كوبون غير صالح — الرسالة تُعرض للزبون كما هي."""
+
+
+class Coupon(TimeStampedModel):
+    """كود خصم: نسبة مئوية أو مبلغ ثابت، بقيود اختيارية.
+
+    القيود كلها اختيارية (فارغ = بلا قيد): انتهاء صلاحية، حد استخدامات،
+    حد أدنى لمجموع المنتجات.
+    """
+
+    class Kind(models.TextChoices):
+        PERCENT = "percent", _("نسبة مئوية %")
+        FIXED = "fixed", _("مبلغ ثابت (ل.س)")
+
+    code = models.CharField(
+        "الكود", max_length=20, unique=True,
+        help_text="يُخزَّن بأحرف كبيرة تلقائياً — الزبون يكتبه بأي شكل.",
+    )
+    kind = models.CharField("النوع", max_length=10,
+                            choices=Kind.choices, default=Kind.PERCENT)
+    value = models.DecimalField(
+        "القيمة", max_digits=12, decimal_places=0,
+        help_text="نسبة (1-100) أو مبلغ بالليرة حسب النوع.",
+    )
+    min_order_total = models.DecimalField(
+        "الحد الأدنى للمنتجات (ل.س)", max_digits=12, decimal_places=0,
+        null=True, blank=True,
+    )
+    expires_at = models.DateTimeField("ينتهي في", null=True, blank=True)
+    usage_limit = models.PositiveIntegerField(
+        "حد الاستخدامات", null=True, blank=True,
+        help_text="فارغ = بلا حد.",
+    )
+    used_count = models.PositiveIntegerField("استُخدم", default=0, editable=False)
+    is_active = models.BooleanField("مفعّل", default=True)
+
+    class Meta:
+        verbose_name = "كوبون"
+        verbose_name_plural = "الكوبونات"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.code
+
+    def save(self, *args, **kwargs):
+        self.code = self.code.strip().upper()
+        super().save(*args, **kwargs)
+
+    def ensure_valid(self, items_subtotal):
+        """يرمي CouponError برسالة واضحة إذا الكوبون لا ينطبق الآن."""
+        from django.utils import timezone
+        if not self.is_active:
+            raise CouponError(_("هذا الكود موقوف حالياً."))
+        if self.expires_at and self.expires_at < timezone.now():
+            raise CouponError(_("انتهت صلاحية هذا الكود."))
+        if self.usage_limit is not None and self.used_count >= self.usage_limit:
+            raise CouponError(_("وصل هذا الكود لحدّه الأقصى من الاستخدام."))
+        if self.min_order_total and items_subtotal < self.min_order_total:
+            raise CouponError(
+                _("هذا الكود يشترط مشتريات بقيمة %(min)s ل.س على الأقل.")
+                % {"min": f"{self.min_order_total:,.0f}"}
+            )
+
+    def discount_for(self, items_subtotal):
+        """قيمة الخصم — لا تتجاوز مجموع المنتجات أبداً."""
+        from decimal import ROUND_HALF_UP, Decimal
+        if self.kind == self.Kind.PERCENT:
+            amount = (items_subtotal * self.value / Decimal(100)).quantize(
+                Decimal("1"), rounding=ROUND_HALF_UP)
+        else:
+            amount = self.value
+        return min(amount, items_subtotal)
+
+
 class Order(TimeStampedModel):
     """طلب شراء واحد — من لحظة التأكيد حتى التسليم."""
 
@@ -93,6 +168,11 @@ class Order(TimeStampedModel):
         "رسم التوصيل (ل.س)", max_digits=12, decimal_places=0,
         null=True, blank=True,
     )
+    # لقطة الكوبون وقت الطلب — الكود والمبلغ المخصوم فعلياً
+    coupon_code = models.CharField("كود الخصم", max_length=20, blank=True)
+    discount_amount = models.DecimalField(
+        "قيمة الخصم (ل.س)", max_digits=12, decimal_places=0, default=0,
+    )
     total = models.DecimalField("الإجمالي (ل.س)", max_digits=12, decimal_places=0)
 
     class Meta:
@@ -123,8 +203,8 @@ class Order(TimeStampedModel):
 
     @property
     def items_subtotal(self):
-        """مجموع المنتجات وحدها (الإجمالي مطروحاً منه التوصيل)."""
-        return self.total - (self.delivery_fee or 0)
+        """مجموع المنتجات وحدها: الإجمالي - التوصيل + الخصم المسترجَع."""
+        return self.total - (self.delivery_fee or 0) + self.discount_amount
 
     @property
     def items_subtotal_display(self):
@@ -133,6 +213,10 @@ class Order(TimeStampedModel):
     @property
     def delivery_fee_display(self):
         return f"{self.delivery_fee:,.0f}" if self.delivery_fee is not None else ""
+
+    @property
+    def discount_amount_display(self):
+        return f"{self.discount_amount:,.0f}"
 
     # مسار الطلب الطبيعي بالترتيب — «ملغى» خارجه (حالة خاصة بالعرض)
     STATUS_FLOW = [Status.PENDING, Status.CONFIRMED, Status.SHIPPED, Status.DELIVERED]

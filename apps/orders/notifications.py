@@ -43,7 +43,9 @@ def notify_new_order(order):
         f"\n"
         f"المنتجات:\n{items}\n"
         f"\n"
-        f"التوصيل: {_delivery_line(order)}\n"
+        + (f"الخصم ({order.coupon_code}): -{order.discount_amount_display} ل.س\n"
+           if order.discount_amount else "")
+        + f"التوصيل: {_delivery_line(order)}\n"
         f"الإجمالي: {order.total_display} ل.س\n"
         f"\n"
         f"لوحة التحكم: /admin/orders/order/\n"

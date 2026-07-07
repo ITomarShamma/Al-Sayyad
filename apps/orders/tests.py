@@ -198,6 +198,94 @@ class DeliveryZoneTests(TestCase):
         self.assertEqual(Order.objects.count(), 0)
 
 
+class CouponTests(TestCase):
+    """M23: الكوبونات — الحساب، القيود، السلة، لقطة الطلب، حجز الاستخدام."""
+
+    def setUp(self):
+        from .models import Coupon
+        self.product = make_product(stock=10)               # 250,000
+        self.client.post(reverse("cart:add", args=[self.product.id]), {"quantity": 2})
+        self.coupon = Coupon.objects.create(code="ramadan10", kind="percent",
+                                            value=Decimal("10"))
+
+    def apply(self, code="RAMADAN10"):
+        return self.client.post(reverse("cart:apply_coupon"), {"code": code},
+                                HTTP_HX_REQUEST="true")
+
+    def test_code_normalized_to_uppercase_on_save(self):
+        self.assertEqual(self.coupon.code, "RAMADAN10")
+
+    def test_discount_math_percent_and_fixed_capped(self):
+        from .models import Coupon
+        self.assertEqual(self.coupon.discount_for(Decimal("500000")),
+                         Decimal("50000"))                  # 10%
+        fixed = Coupon.objects.create(code="F", kind="fixed", value=Decimal("900000"))
+        # الخصم الثابت لا يتجاوز مجموع المنتجات أبداً
+        self.assertEqual(fixed.discount_for(Decimal("500000")), Decimal("500000"))
+
+    def test_apply_on_cart_shows_discount_and_new_total(self):
+        resp = self.apply()
+        self.assertContains(resp, "RAMADAN10")
+        self.assertContains(resp, "50,000")                 # الخصم
+        self.assertContains(resp, "450,000")                # الإجمالي بعده
+
+    def test_invalid_code_shows_friendly_error(self):
+        resp = self.apply("مافي")
+        self.assertContains(resp, "الكود غير صحيح")
+
+    def test_expired_coupon_rejected(self):
+        from django.utils import timezone
+        self.coupon.expires_at = timezone.now() - timezone.timedelta(days=1)
+        self.coupon.save()
+        resp = self.apply()
+        self.assertContains(resp, "انتهت صلاحية")
+
+    def test_min_total_enforced_and_auto_removed_when_cart_shrinks(self):
+        self.coupon.min_order_total = Decimal("400000")
+        self.coupon.save()
+        self.apply()                                        # 500,000 ≥ 400,000 ✓
+        # نزّل الكمية لواحدة → 250,000 < الحد → الكوبون يسقط بصمت
+        resp = self.client.post(reverse("cart:update", args=[self.product.id]),
+                                {"quantity": 1}, HTTP_HX_REQUEST="true")
+        self.assertNotContains(resp, "RAMADAN10")
+        self.assertContains(resp, "250,000")                # الإجمالي بلا خصم
+
+    def test_order_snapshots_coupon_and_counts_usage(self):
+        self.apply()
+        with self.captureOnCommitCallbacks(execute=True):
+            self.client.post(reverse("orders:checkout"), valid_form())
+        order = Order.objects.get()
+        self.assertEqual(order.coupon_code, "RAMADAN10")
+        self.assertEqual(order.discount_amount, Decimal("50000"))
+        self.assertEqual(order.total, Decimal("450000"))    # 500,000 − 50,000
+        self.assertEqual(order.items_subtotal, Decimal("500000"))
+        self.coupon.refresh_from_db()
+        self.assertEqual(self.coupon.used_count, 1)         # حُجز الاستخدام
+        # الكوبون خرج من الجلسة — سلة جديدة بلا خصم قديم
+        self.client.post(reverse("cart:add", args=[self.product.id]))
+        resp = self.client.get(reverse("cart:detail"))
+        self.assertNotContains(resp, "RAMADAN10")
+
+    def test_exhausted_coupon_blocks_checkout_without_order(self):
+        self.apply()                                        # بالجلسة الآن
+        self.coupon.usage_limit = 1
+        self.coupon.used_count = 1                          # استُنفد بعد التطبيق
+        self.coupon.save()
+        resp = self.client.post(reverse("orders:checkout"), valid_form())
+        self.assertEqual(resp.status_code, 200)             # رجع للفورم
+        self.assertContains(resp, "حدّه الأقصى")
+        self.assertEqual(Order.objects.count(), 0)          # لا طلب ولا خصم مخزون
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.stock, 10)
+
+    def test_admin_coupon_changelist(self):
+        from django.contrib.auth import get_user_model
+        admin_user = get_user_model().objects.create_superuser("t3", "t@t.t", "x")
+        self.client.force_login(admin_user)
+        resp = self.client.get(reverse("admin:orders_coupon_changelist"))
+        self.assertContains(resp, "RAMADAN10")
+
+
 class OrderNotificationTests(TestCase):
     """M22: بريد المالك عند الطلب + رابط واتساب الزبون باللوحة."""
 
