@@ -11,6 +11,7 @@ from django.utils.translation import gettext as _
 from apps.catalog.models import Product
 
 from .models import Order, OrderItem
+from .notifications import notify_new_order
 
 
 class OutOfStockError(Exception):
@@ -71,4 +72,8 @@ def create_order_from_cart(cart, order):
 
     # 5) تفريغ السلة — الطلب صار هو السجل الرسمي
     cart.clear()
+
+    # 6) إشعار المالك — on_commit: يُرسل فقط بعد نجاح الحفظ الفعلي بالقاعدة.
+    #    لو فشلت المعاملة وانعمل rollback، لا يخرج أي إشعار كاذب.
+    transaction.on_commit(lambda: notify_new_order(order))
     return order

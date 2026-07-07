@@ -143,5 +143,23 @@ STORE_WHATSAPP = env("STORE_WHATSAPP", "963998625984")   # بصيغة دولية
 STORE_EMAIL = env("STORE_EMAIL", "tahashamma222@gmail.com")
 
 
+# --- Email (إشعارات الطلبات للمالك) ----------------------------------------
+# بلا EMAIL_HOST بالـ.env: الرسائل تُطبع بالكونسول (تطوير). مع ضبطه
+# (مثلاً smtp.gmail.com + App Password) تُرسل فعلياً.
+EMAIL_HOST = env("EMAIL_HOST", "")
+EMAIL_PORT = int(env("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", STORE_EMAIL)
+EMAIL_BACKEND = (
+    "django.core.mail.backends.smtp.EmailBackend"
+    if EMAIL_HOST
+    else "django.core.mail.backends.console.EmailBackend"
+)
+# بريد استقبال إشعارات «طلب جديد» — فارغ = بلا إشعارات
+ORDER_NOTIFICATION_EMAIL = env("ORDER_NOTIFICATION_EMAIL", STORE_EMAIL)
+
+
 # --- Misc -----------------------------------------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

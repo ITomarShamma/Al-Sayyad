@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from .models import DeliveryZone, Order, OrderItem
+from .notifications import customer_whatsapp_url
 
 
 @admin.register(DeliveryZone)
@@ -50,8 +51,9 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ("number", "status_display", "customer_name", "phone", "city",
-                    "total_syp", "payment_method", "status", "created_at")
+    list_display = ("number", "status_display", "customer_name", "phone",
+                    "whatsapp_link", "city", "total_syp", "payment_method",
+                    "status", "created_at")
     list_editable = ("status",)          # غيّر حالة الطلب من الجدول مباشرة
     list_filter = ("status", "payment_method", "city", "created_at")
     search_fields = ("number", "customer_name", "phone")
@@ -73,3 +75,11 @@ class OrderAdmin(admin.ModelAdmin):
     @admin.display(description="الإجمالي", ordering="total")
     def total_syp(self, obj):
         return f"{obj.total:,.0f} ل.س"
+
+    @admin.display(description="واتساب")
+    def whatsapp_link(self, obj):
+        """زر مراسلة الزبون برسالة معبّأة برقم طلبه — سير عملك الهاتفي اليومي."""
+        return format_html(
+            '<a href="{}" target="_blank" rel="noopener">💬 راسل الزبون</a>',
+            customer_whatsapp_url(obj),
+        )

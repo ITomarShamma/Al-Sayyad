@@ -198,6 +198,55 @@ class DeliveryZoneTests(TestCase):
         self.assertEqual(Order.objects.count(), 0)
 
 
+class OrderNotificationTests(TestCase):
+    """M22: بريد المالك عند الطلب + رابط واتساب الزبون باللوحة."""
+
+    def setUp(self):
+        self.product = make_product(stock=5)
+        self.client.post(reverse("cart:add", args=[self.product.id]), {"quantity": 2})
+
+    def place_order(self):
+        # captureOnCommitCallbacks: داخل الاختبارات لا يوجد commit حقيقي —
+        # هذا ينفّذ دوال on_commit كأن المعاملة نجحت فعلاً
+        with self.captureOnCommitCallbacks(execute=True):
+            self.client.post(reverse("orders:checkout"), valid_form())
+        return Order.objects.get()
+
+    def test_owner_email_sent_on_new_order(self):
+        from django.core import mail
+        with self.settings(ORDER_NOTIFICATION_EMAIL="omar@example.com"):
+            order = self.place_order()
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(email.to, ["omar@example.com"])
+        self.assertIn(order.number, email.subject)
+        self.assertIn("سماعة لاسلكية × 2", email.body)
+        self.assertIn("500,000", email.body)
+        self.assertIn(order.phone, email.body)
+
+    def test_no_email_when_recipient_not_configured(self):
+        from django.core import mail
+        with self.settings(ORDER_NOTIFICATION_EMAIL=""):
+            self.place_order()
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_whatsapp_url_uses_international_number(self):
+        from .notifications import customer_whatsapp_url
+        order = self.place_order()                      # الهاتف 0998625984
+        url = customer_whatsapp_url(order)
+        self.assertIn("wa.me/963998625984", url)        # 0 ← 963
+        self.assertIn(order.number, url)                # الرسالة فيها رقم الطلب
+
+    def test_admin_changelist_shows_whatsapp_button(self):
+        from django.contrib.auth import get_user_model
+        self.place_order()
+        admin_user = get_user_model().objects.create_superuser("t2", "t@t.t", "x")
+        self.client.force_login(admin_user)
+        resp = self.client.get(reverse("admin:orders_order_changelist"))
+        self.assertContains(resp, "wa.me/963998625984")
+        self.assertContains(resp, "راسل الزبون")
+
+
 class TrackOrderTests(TestCase):
     """صفحة «وين طلبي؟» — البحث برقم الطلب + الموبايل."""
 
