@@ -202,6 +202,54 @@ class Product(TimeStampedModel):
         return img.thumb.url if img.thumb else img.image.url
 
 
+class Review(TimeStampedModel):
+    """تقييم منتج — من مشترٍ موثَّق فقط (عنده طلب فيه هذا المنتج).
+
+    تقييم واحد لكل (مشترٍ، منتج) — إعادة الإرسال تحدّث تقييمه السابق.
+    ينشر فوراً (المقيّمون مشترون حقيقيون) مع إمكانية الإخفاء من اللوحة.
+    """
+
+    product = models.ForeignKey(
+        Product, verbose_name="المنتج",
+        on_delete=models.CASCADE, related_name="reviews",
+    )
+    user = models.ForeignKey(
+        "auth.User", verbose_name="المستخدم",
+        on_delete=models.CASCADE, related_name="reviews",
+    )
+    rating = models.PositiveSmallIntegerField(
+        "التقييم",
+        choices=[(i, "★" * i) for i in range(1, 6)],
+    )
+    comment = models.TextField("التعليق", blank=True)
+    is_approved = models.BooleanField(
+        "منشور", default=True,
+        help_text="أزل التفعيل لإخفاء تقييم مسيء دون حذفه.",
+    )
+
+    class Meta:
+        verbose_name = "تقييم"
+        verbose_name_plural = "التقييمات"
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(fields=["product", "user"],
+                                    name="uniq_review_per_buyer"),
+        ]
+
+    def __str__(self):
+        return f"{self.rating}★ — {self.product}"
+
+    @staticmethod
+    def can_review(user, product):
+        """موثَّق = مسجَّل وعنده طلب غير ملغى يحتوي المنتج."""
+        if not user.is_authenticated:
+            return False
+        from apps.orders.models import Order, OrderItem
+        return OrderItem.objects.filter(
+            order__user=user, product=product,
+        ).exclude(order__status=Order.Status.CANCELLED).exists()
+
+
 class ProductImage(TimeStampedModel):
     """صورة منتج — منتج واحد ممكن يكون له عدة صور مرتّبة."""
 

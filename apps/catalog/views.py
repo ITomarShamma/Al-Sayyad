@@ -4,10 +4,15 @@
 المنتج أو التصنيف غير المفعّل غير موجود من وجهة نظر المتجر (404).
 """
 
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.shortcuts import get_object_or_404, render
+from django.db.models import Avg, Count
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import gettext as _
+from django.views.decorators.http import require_POST
 
-from .models import Category, Product
+from .models import Category, Product, Review
 from .search import normalize
 
 PRODUCTS_PER_PAGE = 24
@@ -133,8 +138,49 @@ def product_detail(request, slug):
         f"{request.build_absolute_uri(product.get_absolute_url())}"
     )
 
+    # التقييمات: المنشورة فقط + متوسطها، وهل الزائر الحالي مشترٍ موثَّق؟
+    reviews = product.reviews.filter(is_approved=True).select_related("user")
+    stats = reviews.aggregate(avg=Avg("rating"), count=Count("id"))
+    can_review = Review.can_review(request.user, product)
+    my_review = None
+    if can_review:
+        my_review = product.reviews.filter(user=request.user).first()
+
     return render(request, "catalog/product_detail.html", {
         "product": product,
         "related": related,
         "share_text": share_text,
+        "reviews": reviews,
+        # نصاً لا رقماً: الرقم العائم يتلوقل (٤٫٠) حسب اللغة — بدنا 4.0 ثابتة
+        "rating_avg": f"{stats['avg']:.1f}" if stats["avg"] else None,
+        "rating_count": stats["count"],
+        "rating_stars": round(stats["avg"]) if stats["avg"] else 0,
+        "can_review": can_review,
+        "my_review": my_review,
     })
+
+
+@login_required
+@require_POST
+def submit_review(request, product_id):
+    """حفظ تقييم مشترٍ موثَّق — إعادة الإرسال تحدّث تقييمه السابق (PRG)."""
+    product = get_object_or_404(Product, id=product_id, is_active=True)
+    if not Review.can_review(request.user, product):
+        messages.error(request, _("التقييم متاح لمن اشترى المنتج من الصَّيَّاد."))
+        return redirect(product.get_absolute_url())
+
+    try:
+        rating = int(request.POST.get("rating", 0))
+    except (TypeError, ValueError):
+        rating = 0
+    if not 1 <= rating <= 5:
+        messages.error(request, _("اختر تقييماً من 1 إلى 5 نجوم."))
+        return redirect(product.get_absolute_url())
+
+    Review.objects.update_or_create(
+        product=product, user=request.user,
+        defaults={"rating": rating,
+                  "comment": request.POST.get("comment", "").strip()},
+    )
+    messages.success(request, _("شكراً لتقييمك ✓"))
+    return redirect(product.get_absolute_url())

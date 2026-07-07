@@ -180,6 +180,20 @@ TRANSLATIONS = {
     "إزالة": "Remove",
     "الخصم": "Discount",
 
+    # --- التقييمات (M24) ---
+    "التقييمات": "Reviews",
+    "التقييم": "Rating",
+    "قيّم شراءك": "Rate your purchase",
+    "عدّل تقييمك": "Edit your review",
+    "انشر التقييم": "Post review",
+    "شو رأيك فيه؟ (اختياري)": "What did you think? (optional)",
+    "مشترٍ موثَّق": "Verified buyer",
+    "التقييم لمن اشترى المنتج —": "Reviews are for verified buyers —",
+    "ما في تقييمات بعد — كن أول من يقيّمه.": "No reviews yet — be the first.",
+    "التقييم متاح لمن اشترى المنتج من الصَّيَّاد.": "Reviews are available to customers who bought this product on Al-Sayyad.",
+    "اختر تقييماً من 1 إلى 5 نجوم.": "Choose a rating from 1 to 5 stars.",
+    "شكراً لتقييمك ✓": "Thanks for your review ✓",
+
     # --- الهيكل العام ---
     "الصَّيَّاد": "Al-Sayyad",
     "دوّر عن أي شي…": "Search for anything…",
@@ -262,6 +276,7 @@ PLURALS = {
     "قطعة واحدة": ("One item", "%(n)s items"),
     "منتج واحد": ("One product", "%(n)s products"),
     "نتيجة واحدة": ("One result", "%(n)s results"),
+    "تقييم واحد": ("1 review", "%(n)s reviews"),
 }
 
 HEADER_FIXES = {

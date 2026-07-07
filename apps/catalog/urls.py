@@ -13,4 +13,5 @@ urlpatterns = [
     path("search/suggest/", views.search_suggest, name="search_suggest"),
     path("c/<str:slug>/", views.category_detail, name="category"),
     path("p/<str:slug>/", views.product_detail, name="product"),
+    path("p/<int:product_id>/review/", views.submit_review, name="submit_review"),
 ]

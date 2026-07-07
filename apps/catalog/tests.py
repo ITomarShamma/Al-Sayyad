@@ -275,6 +275,82 @@ class ProductPageExtrasTests(TestCase):
         self.assertNotContains(resp, "منتجات مشابهة")
 
 
+class ReviewTests(TestCase):
+    """M24: التقييمات — مشترون موثَّقون فقط، متوسط، إشراف."""
+
+    def setUp(self):
+        from django.contrib.auth import get_user_model
+        from apps.orders.models import Order, OrderItem
+
+        self.product = make_product(name="سماعة مُقيَّمة")
+        User = get_user_model()
+        # مشترٍ موثَّق: عنده طلب فيه المنتج
+        self.buyer = User.objects.create_user("0911111111", password="x",
+                                              first_name="أبو التقييم")
+        order = Order.objects.create(
+            customer_name="أبو التقييم", phone="0911111111", city="دمشق",
+            address="ع", total=self.product.price, user=self.buyer)
+        OrderItem.objects.create(order=order, product=self.product,
+                                 product_name=self.product.name,
+                                 unit_price=self.product.price, quantity=1)
+        # مسجَّل بلا شراء
+        self.visitor = User.objects.create_user("0922222222", password="x")
+        self.url = reverse("catalog:submit_review", args=[self.product.id])
+
+    def post_review(self, rating=5, comment="ممتازة"):
+        return self.client.post(self.url, {"rating": rating, "comment": comment})
+
+    def test_guest_sees_login_prompt_not_form(self):
+        resp = self.client.get(self.product.get_absolute_url())
+        self.assertNotContains(resp, "rating-input")
+        self.assertContains(resp, "التقييم لمن اشترى المنتج")
+
+    def test_non_buyer_cannot_review(self):
+        self.client.force_login(self.visitor)
+        resp = self.client.get(self.product.get_absolute_url())
+        self.assertNotContains(resp, "rating-input")     # لا فورم
+        self.post_review()                               # ولا حتى POST مباشر
+        self.assertEqual(self.product.reviews.count(), 0)
+
+    def test_buyer_can_review_and_it_shows_with_average(self):
+        self.client.force_login(self.buyer)
+        resp = self.client.get(self.product.get_absolute_url())
+        self.assertContains(resp, "rating-input")        # الفورم ظاهر
+        self.post_review(rating=4, comment="سماعة نظيفة")
+        resp = self.client.get(self.product.get_absolute_url())
+        self.assertContains(resp, "سماعة نظيفة")
+        self.assertContains(resp, "مشترٍ موثَّق")
+        self.assertContains(resp, "4.0")                 # المتوسط
+
+    def test_resubmit_updates_not_duplicates(self):
+        self.client.force_login(self.buyer)
+        self.post_review(rating=2)
+        self.post_review(rating=5, comment="غيّرت رأيي")
+        self.assertEqual(self.product.reviews.count(), 1)
+        self.assertEqual(self.product.reviews.get().rating, 5)
+
+    def test_cancelled_order_buyer_not_verified(self):
+        from apps.orders.models import Order
+        Order.objects.filter(user=self.buyer).update(status=Order.Status.CANCELLED)
+        self.client.force_login(self.buyer)
+        self.post_review()
+        self.assertEqual(self.product.reviews.count(), 0)
+
+    def test_unapproved_review_hidden_from_public(self):
+        from .models import Review
+        self.client.force_login(self.buyer)
+        self.post_review(comment="تعليق مخفي")
+        Review.objects.update(is_approved=False)
+        self.client.logout()          # كزائر: صاحبه يظل يراه بفورم التعديل
+        resp = self.client.get(self.product.get_absolute_url())
+        self.assertNotContains(resp, "تعليق مخفي")
+
+    def test_invalid_rating_rejected(self):
+        self.client.force_login(self.buyer)
+        self.post_review(rating=9)
+        self.assertEqual(self.product.reviews.count(), 0)
+
+
 class SearchNormalizeTests(TestCase):
     """قواعد تطبيع العربية — قلب البحث كله."""
 

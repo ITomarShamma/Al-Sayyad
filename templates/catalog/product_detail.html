@@ -58,6 +58,13 @@
   <div class="buybox">
     <h1 class="buybox__title">{{ product.name }}</h1>
 
+    {% if rating_count %}
+      <a class="rating-summary" href="#reviews">
+        <span class="rating-stars" aria-hidden="true">{% for _ in "12345"|make_list %}{% if forloop.counter <= rating_stars %}★{% else %}☆{% endif %}{% endfor %}</span>
+        <span class="caption">{{ rating_avg }} — {% blocktranslate count n=rating_count %}تقييم واحد{% plural %}{{ n }} تقييمات{% endblocktranslate %}</span>
+      </a>
+    {% endif %}
+
     <div class="buybox__price">
       {{ product.price_display }} <span class="buybox__currency">{% translate 'ل.س' %}</span>
       {% if product.on_sale %}
@@ -123,6 +130,52 @@
   </div>
 
 </div>
+
+<section class="section" id="reviews">
+  <h2>{% translate 'التقييمات' %}</h2>
+
+  {% if can_review %}
+    <form class="card review-form" method="post"
+          action="{% url 'catalog:submit_review' product.id %}">
+      {% csrf_token %}
+      <strong>{% if my_review %}{% translate 'عدّل تقييمك' %}{% else %}{% translate 'قيّم شراءك' %}{% endif %} 🎣</strong>
+      <div class="rating-input" role="radiogroup" aria-label="{% translate 'التقييم' %}">
+        {% for i in "54321"|make_list %}
+          <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}"
+                 {% if my_review and my_review.rating|stringformat:'s' == i %}checked{% endif %} required>
+          <label for="star{{ i }}" title="{{ i }}">★</label>
+        {% endfor %}
+      </div>
+      <textarea class="field__input" name="comment" rows="2"
+                placeholder="{% translate 'شو رأيك فيه؟ (اختياري)' %}">{{ my_review.comment|default:'' }}</textarea>
+      <button class="btn btn--primary" type="submit">{% translate 'انشر التقييم' %}</button>
+    </form>
+  {% elif not request.user.is_authenticated %}
+    <p class="caption" style="color: var(--text-muted);">
+      {% translate 'التقييم لمن اشترى المنتج —' %}
+      <a href="{% url 'accounts:login' %}" style="color: var(--primary); font-weight: var(--fw-medium);">{% translate 'سجّل دخول' %}</a>
+    </p>
+  {% endif %}
+
+  {% if reviews %}
+    <ul class="review-list">
+      {% for review in reviews %}
+        <li class="card review-card">
+          <div class="review-card__head">
+            <strong>{{ review.user.first_name|default:'زبون الصَّيَّاد' }}</strong>
+            <span class="rating-stars" aria-label="{{ review.rating }}/5">{% for _ in "12345"|make_list %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}</span>
+          </div>
+          {% if review.comment %}<p class="review-card__text">{{ review.comment }}</p>{% endif %}
+          <span class="caption" style="color: var(--text-muted);">
+            ✓ {% translate 'مشترٍ موثَّق' %} · {{ review.created_at|date:"Y/m/d" }}
+          </span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="caption" style="color: var(--text-muted);">{% translate 'ما في تقييمات بعد — كن أول من يقيّمه.' %}</p>
+  {% endif %}
+</section>
 
 {% if related %}
 <section class="section">

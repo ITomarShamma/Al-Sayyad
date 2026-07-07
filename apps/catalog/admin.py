@@ -3,7 +3,23 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Category, Product, ProductImage
+from .models import Category, Product, ProductImage, Review
+
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    """التقييمات — أخفِ المسيء بإزالة «منشور» بدل الحذف."""
+
+    list_display = ("product", "user", "rating", "comment_short",
+                    "is_approved", "created_at")
+    list_editable = ("is_approved",)
+    list_filter = ("rating", "is_approved")
+    search_fields = ("product__name", "user__username", "comment")
+    readonly_fields = ("created_at", "updated_at")
+
+    @admin.display(description="التعليق")
+    def comment_short(self, obj):
+        return (obj.comment[:60] + "…") if len(obj.comment) > 60 else obj.comment
 
 LOW_STOCK_THRESHOLD = 3
 
