@@ -206,11 +206,26 @@ erDiagram
 | `is_approved` | Boolean | يبدأ False «قيد المراجعة» — الموافقة من لوحة التحكم تمنح دخول اللوحة بمجموعة «تاجر» |
 | `created_at` / `updated_at` | DateTime | تلقائي |
 
+### 8) `orders_deliveryzone` — مناطق التوصيل ورسومها
+
+| الحقل | النوع | ملاحظات |
+|---|---|---|
+| `id` | BigAuto | مفتاح أساسي |
+| `name` | VarChar(50) | **فريد** — اسم المحافظة (الـ14 مزروعة بهجرة بيانات) |
+| `fee` | Decimal(12,0)، NULL | **NULL = «يُتفق هاتفياً»** · 0 = توصيل مجاني · >0 = رسم يُضاف على إجمالي الطلب |
+| `is_active` | Boolean | إخفاء منطقة من صفحة إتمام الطلب |
+| `sort_order` | SmallInt | ترتيب الظهور بالقائمة |
+| `created_at` / `updated_at` | DateTime | تلقائي |
+
+**اللقطة:** عند الطلب يُنسخ اسم المنطقة إلى `order.city` ورسمها إلى
+`order.delivery_fee` — تعديل الرسوم لاحقاً لا يمس الطلبات القديمة.
+
 ### أعمدة انضافت لجداول سابقة
 
 | الجدول | العمود | ملاحظات |
 |---|---|---|
 | `orders_order` | `user_id` FK → auth_user، NULL | صاحب الطلب إن كان مسجَّلاً؛ **NULL = طلب زائر** (مسار مدعوم دائماً). SET_NULL: حذف الحساب لا يمس الفواتير |
+| `orders_order` | `delivery_fee` Decimal(12,0)، NULL | لقطة رسم التوصيل وقت الطلب (نفس دلالات `deliveryzone.fee`)؛ `total` يشمله |
 | `catalog_product` | `merchant_id` FK → merchantprofile، NULL | البائع؛ **NULL = بضاعة الصَّيَّاد نفسه**. PROTECT: تاجر له منتجات يُعطَّل ولا يُحذف |
 
 ### مجموعات الأدوار (auth_group — تُنشأ بهجرة بيانات)

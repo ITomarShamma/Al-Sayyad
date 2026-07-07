@@ -3,7 +3,24 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Order, OrderItem
+from .models import DeliveryZone, Order, OrderItem
+
+
+@admin.register(DeliveryZone)
+class DeliveryZoneAdmin(admin.ModelAdmin):
+    """رسوم التوصيل حسب المحافظة — عدّلها من الجدول مباشرة."""
+
+    list_display = ("name", "fee_state", "fee", "is_active", "sort_order")
+    list_editable = ("fee", "is_active", "sort_order")
+    readonly_fields = ("created_at", "updated_at")
+
+    @admin.display(description="الحالة")
+    def fee_state(self, obj):
+        if obj.fee is None:
+            return format_html('<b style="color:#E8A317;">● يُتفق هاتفياً</b>')
+        if obj.fee == 0:
+            return format_html('<b style="color:#2E9E54;">● توصيل مجاني</b>')
+        return format_html('<span style="color:#0E6B5E;">● {} ل.س</span>', obj.fee_display)
 
 # لون كل حالة — نفس ألوان الهوية الدلالية
 STATUS_COLORS = {

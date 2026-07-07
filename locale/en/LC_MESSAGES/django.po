@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Al-Sayyad\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-04 18:58+0300\n"
+"POT-Creation-Date: 2026-07-07 09:33+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en\n"
@@ -63,36 +63,38 @@ msgstr "Password changed ✓"
 #: .\apps\accounts\views.py:103
 msgid "وصلنا طلبك 🏪 — منراجعه ومنتواصل معك خلال يوم عمل."
 msgstr "We received your application 🏪 — we'll review it and contact you within one business day."
+"We received your application 🏪 — we'll review it and contact you within one "
+"business day."
 
 #: .\apps\core\validators.py:8
 msgid "أدخل رقم موبايل سوري صحيح: 09 يتبعها 8 أرقام."
 msgstr "Enter a valid Syrian mobile number: 09 followed by 8 digits."
 
-#: .\apps\orders\models.py:24
+#: .\apps\orders\models.py:55
 msgid "بانتظار التأكيد"
 msgstr "Awaiting confirmation"
 
-#: .\apps\orders\models.py:25
+#: .\apps\orders\models.py:56
 msgid "مؤكّد"
 msgstr "Confirmed"
 
-#: .\apps\orders\models.py:26
+#: .\apps\orders\models.py:57
 msgid "قيد التوصيل"
 msgstr "Out for delivery"
 
-#: .\apps\orders\models.py:27
+#: .\apps\orders\models.py:58
 msgid "مُسلَّم"
 msgstr "Delivered"
 
-#: .\apps\orders\models.py:28
+#: .\apps\orders\models.py:59
 msgid "ملغى"
 msgstr "Cancelled"
 
-#: .\apps\orders\models.py:31
+#: .\apps\orders\models.py:62
 msgid "الدفع عند الاستلام"
 msgstr "Cash on delivery"
 
-#: .\apps\orders\models.py:32
+#: .\apps\orders\models.py:63
 msgid "شام كاش"
 msgstr "ShamCash"
 
@@ -100,6 +102,7 @@ msgstr "ShamCash"
 #, python-format
 msgid "الكمية المتوفرة تغيّرت لهالمنتجات: %(names)s — حدّث سلتك وجرّب مرة ثانية."
 msgstr "Available stock changed for: %(names)s — update your cart and try again."
+"Available stock changed for: %(names)s — update your cart and try again."
 
 #: .\templates\404.html:4
 msgid "الصفحة غير موجودة"
@@ -113,21 +116,23 @@ msgstr "Nothing here!"
 msgid ""
 "الصفحة يلي بتدوّر عليها غير موجودة أو انتقلت — جرّب البحث أو ارجع للرئيسية."
 msgstr "The page you're looking for doesn't exist or has moved — try searching or go back home."
+"The page you're looking for doesn't exist or has moved — try searching or go "
+"back home."
 
-#: .\templates\404.html:14 .\templates\base.html:52 .\templates\base.html:92
+#: .\templates\404.html:14 .\templates\base.html:52 .\templates\base.html:103
 #: .\templates\catalog\category_detail.html:9
 #: .\templates\catalog\product_detail.html:20
 msgid "الرئيسية"
 msgstr "Home"
 
-#: .\templates\404.html:15 .\templates\base.html:53 .\templates\base.html:96
+#: .\templates\404.html:15 .\templates\base.html:53 .\templates\base.html:107
 #: .\templates\catalog\category_list.html:4
 #: .\templates\catalog\category_list.html:7
 msgid "التصنيفات"
 msgstr "Categories"
 
 #: .\templates\accounts\account.html:4 .\templates\base.html:55
-#: .\templates\base.html:104
+#: .\templates\base.html:115
 msgid "حسابي"
 msgstr "My account"
 
@@ -176,10 +181,16 @@ msgstr "My orders"
 #: .\templates\catalog\partials\search_suggest.html:11
 #: .\templates\catalog\product_detail.html:62
 #: .\templates\components\product_card.html:26
-#: .\templates\orders\checkout.html:83 .\templates\orders\checkout.html:89
-#: .\templates\orders\confirmation.html:23
-#: .\templates\orders\confirmation.html:29 .\templates\orders\track.html:53
-#: .\templates\orders\track.html:59
+#: .\templates\orders\checkout.html:48 .\templates\orders\confirmation.html:23
+#: .\templates\orders\confirmation.html:30
+#: .\templates\orders\confirmation.html:37
+#: .\templates\orders\confirmation.html:43
+#: .\templates\orders\partials\checkout_summary.html:10
+#: .\templates\orders\partials\checkout_summary.html:18
+#: .\templates\orders\partials\checkout_summary.html:26
+#: .\templates\orders\partials\checkout_summary.html:36
+#: .\templates\orders\track.html:53 .\templates\orders\track.html:63
+#: .\templates\orders\track.html:69
 msgid "ل.س"
 msgstr "SYP"
 
@@ -287,6 +298,8 @@ msgstr "tracking page"
 msgid ""
 "بيع بضاعتك عالصَّيَّاد: أنت تضيف منتجاتك، ونحن منتكفّل بالواجهة والطلبات والتوصيل."
 msgstr "Sell your goods on Al-Sayyad: you add your products, we handle the storefront, orders and delivery."
+"Sell your goods on Al-Sayyad: you add your products, we handle the "
+"storefront, orders and delivery."
 
 #: .\templates\accounts\merchant_apply.html:16
 msgid "اسم المتجر"
@@ -331,6 +344,8 @@ msgstr "New account"
 #: .\templates\accounts\signup.html:10
 msgid "بحساب واحد: طلباتك محفوظة، وبياناتك تتعبّى وحدها عند الطلب."
 msgstr "With one account your orders are saved and your details fill in automatically at checkout."
+"With one account your orders are saved and your details fill in "
+"automatically at checkout."
 
 #: .\templates\accounts\signup.html:26
 msgid "هو نفسه اسم دخولك — منتواصل معك عليه."
@@ -368,7 +383,7 @@ msgstr "Search"
 msgid "القائمة الرئيسية"
 msgstr "Main menu"
 
-#: .\templates\base.html:54 .\templates\base.html:100
+#: .\templates\base.html:54 .\templates\base.html:111
 msgid "السلة"
 msgstr "Cart"
 
@@ -386,16 +401,16 @@ msgstr "About Al-Sayyad"
 msgid "تواصل معنا"
 msgstr "Contact us"
 
-#: .\templates\base.html:81 .\templates\orders\confirmation.html:38
+#: .\templates\base.html:81 .\templates\orders\confirmation.html:52
 #: .\templates\orders\track.html:4
 msgid "تتبع طلبك"
 msgstr "Track your order"
 
-#: .\templates\base.html:83
+#: .\templates\base.html:94
 msgid "سوقك السوري الموثوق"
 msgstr "Your trusted Syrian marketplace"
 
-#: .\templates\base.html:89
+#: .\templates\base.html:100
 msgid "التنقّل الأساسي"
 msgstr "Primary navigation"
 
@@ -439,7 +454,6 @@ msgstr[0] "One item"
 msgstr[1] "%(n)s items"
 
 #: .\templates\cart\partials\cart_body.html:63
-#: .\templates\orders\checkout.html:91
 msgid "التوصيل يُتفق عليه عند تأكيد الطلب هاتفياً."
 msgstr "Delivery is arranged when we confirm your order by phone."
 
@@ -601,6 +615,8 @@ msgstr "Search"
 #: .\templates\catalog\search_results.html:35
 msgid "اكتب بشريط البحث فوق شو عم تدوّر عليه — ونحن نصطاده لك."
 msgstr "Type what you're looking for in the search bar above — and we'll catch it for you."
+"Type what you're looking for in the search bar above — and we'll catch it "
+"for you."
 
 #: .\templates\orders\checkout.html:13
 msgid "رجوع للسلة"
@@ -610,38 +626,43 @@ msgstr "Back to cart"
 msgid "منتواصل معك عليه لتأكيد الطلب والتوصيل."
 msgstr "We'll call you on it to confirm your order and arrange delivery."
 
-#: .\templates\orders\checkout.html:45
+#: .\templates\orders\checkout.html:43
+msgid "اختر محافظتك…"
+msgstr "Choose your governorate…"
+
+#: .\templates\orders\checkout.html:48
+#| msgid "التوصيل يُتفق عليه عند تأكيد الطلب هاتفياً."
+msgid "التوصيل يُتفق هاتفياً"
+msgstr "delivery arranged by phone"
+
+#: .\templates\orders\checkout.html:48
+#| msgid "دفعك وتوصيلك بأمان."
+msgid "توصيل مجاني"
+msgstr "free delivery"
+
+#: .\templates\orders\checkout.html:56
 msgid "العنوان بالتفصيل"
 msgstr "Detailed address"
 
-#: .\templates\orders\checkout.html:47
+#: .\templates\orders\checkout.html:58
 msgid "الحي، الشارع، رقم البناء، طابق…"
 msgstr "Neighborhood, street, building number, floor…"
 
-#: .\templates\orders\checkout.html:52
+#: .\templates\orders\checkout.html:63
 msgid "ملاحظات (اختياري)"
 msgstr "Notes (optional)"
 
-#: .\templates\orders\checkout.html:57
+#: .\templates\orders\checkout.html:68
 msgid "طريقة الدفع"
 msgstr "Payment method"
 
-#: .\templates\orders\checkout.html:70
+#: .\templates\orders\checkout.html:81
 msgid "شام كاش — قريباً"
 msgstr "ShamCash — coming soon"
 
-#: .\templates\orders\checkout.html:74
+#: .\templates\orders\checkout.html:85
 msgid "أكّد الطلب"
 msgstr "Confirm order"
-
-#: .\templates\orders\checkout.html:78
-msgid "ملخص طلبك"
-msgstr "Your order summary"
-
-#: .\templates\orders\checkout.html:88 .\templates\orders\confirmation.html:28
-#: .\templates\orders\track.html:58
-msgid "الإجمالي"
-msgstr "Total"
 
 #: .\templates\orders\confirmation.html:4
 msgid "تم استلام طلبك"
@@ -663,14 +684,60 @@ msgstr "keep it for any inquiries."
 #, python-format
 msgid "منتواصل معك على %(phone)s خلال ساعات لتأكيد الطلب وترتيب التوصيل."
 msgstr "We'll contact you on %(phone)s within hours to confirm your order and arrange delivery."
+"We'll contact you on %(phone)s within hours to confirm your order and "
+"arrange delivery."
 
 #: .\templates\orders\confirmation.html:18
 msgid "ملخص الطلب"
 msgstr "Order summary"
 
-#: .\templates\orders\confirmation.html:37
+#: .\templates\orders\confirmation.html:29
+#: .\templates\orders\partials\checkout_summary.html:17
+#| msgid "بطاقات المنتجات"
+msgid "مجموع المنتجات"
+msgstr "Items subtotal"
+
+#: .\templates\orders\confirmation.html:33
+#: .\templates\orders\partials\checkout_summary.html:21
+#: .\templates\orders\track.html:59
+#| msgid "قيد التوصيل"
+msgid "التوصيل"
+msgstr "Delivery"
+
+#: .\templates\orders\confirmation.html:35
+#: .\templates\orders\partials\checkout_summary.html:24
+#: .\templates\orders\track.html:61
+msgid "يُتفق هاتفياً"
+msgstr "Arranged by phone"
+
+#: .\templates\orders\confirmation.html:36
+#: .\templates\orders\partials\checkout_summary.html:25
+#: .\templates\orders\track.html:62
+msgid "مجاني"
+msgstr "Free"
+
+#: .\templates\orders\confirmation.html:42
+#: .\templates\orders\partials\checkout_summary.html:35
+#: .\templates\orders\track.html:68
+msgid "الإجمالي"
+msgstr "Total"
+
+#: .\templates\orders\confirmation.html:51
 msgid "رجوع للرئيسية"
 msgstr "Back to home"
+
+#: .\templates\orders\partials\checkout_summary.html:5
+msgid "ملخص طلبك"
+msgstr "Your order summary"
+
+#: .\templates\orders\partials\checkout_summary.html:28
+msgid "اختر محافظتك"
+msgstr "Choose your governorate"
+
+#: .\templates\orders\partials\checkout_summary.html:39
+#| msgid "التوصيل يُتفق عليه عند تأكيد الطلب هاتفياً."
+msgid "رسم التوصيل لمحافظتك يُتفق عليه عند تأكيد الطلب هاتفياً."
+msgstr "The delivery fee for your governorate is agreed when we confirm your order by phone."
 
 #: .\templates\orders\track.html:7
 msgid "وين طلبي؟"
@@ -679,6 +746,8 @@ msgstr "Where's my order?"
 #: .\templates\orders\track.html:9
 msgid "اكتب رقم الطلب (من صفحة التأكيد) ورقم الموبايل يلي طلبت فيه."
 msgstr "Enter your order number (from the confirmation page) and the mobile number you ordered with."
+"Enter your order number (from the confirmation page) and the mobile number "
+"you ordered with."
 
 #: .\templates\orders\track.html:14
 msgid "رقم الطلب"
@@ -696,10 +765,12 @@ msgstr "Order"
 msgid "هذا الطلب ملغى. إذا في خطأ، تواصل معنا."
 msgstr "This order is cancelled. If that's a mistake, contact us."
 
-#: .\templates\orders\track.html:66
+#: .\templates\orders\track.html:76
 msgid ""
 "ما لقينا طلباً بهالرقمين — تأكد من رقم الطلب ورقم الموبايل وجرّب مرة ثانية."
 msgstr "No matching order — double-check the order number and mobile number, then try again."
+"No matching order — double-check the order number and mobile number, then "
+"try again."
 
 #: .\templates\pages\about.html:10
 msgid "اطلب… ونحن نصطاد لك"
@@ -710,6 +781,9 @@ msgid ""
 "الصَّيَّاد سوق سوري إلكتروني: قُل ما تبحث عنه — ونُحضِر لك الصيد. سوقٌ موثوق وواسع، "
 "صُمِّم ليكون سهلاً على كل بيت سوري، حتى لو كانت هذه أول مرة تتسوق فيها أونلاين."
 msgstr "Al-Sayyad is a Syrian online marketplace: name what you seek — we bring you the catch. A trusted, abundant marketplace built to feel effortless for every Syrian household, even on your very first online order."
+"Al-Sayyad is a Syrian online marketplace: name what you seek — we bring you "
+"the catch. A trusted, abundant marketplace built to feel effortless for "
+"every Syrian household, even on your very first online order."
 
 #: .\templates\pages\about.html:21 .\templates\pages\home.html:44
 msgid "موثوق"
@@ -718,6 +792,8 @@ msgstr "Trusted"
 #: .\templates\pages\about.html:22
 msgid "ادفع عند الاستلام — ما تدفع شي قبل ما توصلك أغراضك وتشوفها بعينك."
 msgstr "Cash on delivery — pay nothing until your goods arrive and you see them yourself."
+"Cash on delivery — pay nothing until your goods arrive and you see them "
+"yourself."
 
 #: .\templates\pages\about.html:25 .\templates\pages\home.html:48
 msgid "وافر"
@@ -726,6 +802,7 @@ msgstr "Abundant"
 #: .\templates\pages\about.html:26
 msgid "كل احتياجات بيتك بمكان واحد، من الإلكترونيات للمطبخ."
 msgstr "Everything your home needs in one place, from electronics to the kitchen."
+"Everything your home needs in one place, from electronics to the kitchen."
 
 #: .\templates\pages\about.html:29 .\templates\pages\home.html:52
 msgid "بسيط"
@@ -819,6 +896,8 @@ msgstr "Component guide"
 msgid ""
 "كل قطع الواجهة وحالاتها بمكان واحد. أي مكوّن منبنيه مرّة ومنستعمله بكل الصفحات."
 msgstr "Every UI piece and its states in one place. Build a component once, use it on every page."
+"Every UI piece and its states in one place. Build a component once, use it "
+"on every page."
 
 #: .\templates\pages\styleguide.html:12
 msgid "الألوان (Tokens)"

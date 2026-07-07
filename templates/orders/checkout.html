@@ -34,11 +34,22 @@
       {% else %}<p class="field__msg">{% translate 'منتواصل معك عليه لتأكيد الطلب والتوصيل.' %}</p>{% endif %}
     </div>
 
-    <div class="field {% if form.city.errors %}field--error{% endif %}">
-      <label class="field__label" for="id_city">{% translate 'المحافظة / المدينة' %} <span class="field__req">*</span></label>
-      <input class="field__input" type="text" id="id_city" name="city"
-             value="{{ form.city.value|default:'' }}" required>
-      {% if form.city.errors %}<p class="field__msg field__msg--error">{{ form.city.errors.0 }}</p>{% endif %}
+    <div class="field {% if form.zone.errors %}field--error{% endif %}">
+      <label class="field__label" for="id_zone">{% translate 'المحافظة / المدينة' %} <span class="field__req">*</span></label>
+      {# تغيير المحافظة يحدّث ملخص الطلب (رسم التوصيل والإجمالي) عبر HTMX #}
+      <select class="field__input" id="id_zone" name="zone" required
+              hx-get="{% url 'orders:checkout_summary' %}"
+              hx-target="#checkout-summary" hx-include="this">
+        <option value="">{% translate 'اختر محافظتك…' %}</option>
+        {% for z in form.fields.zone.queryset %}
+          <option value="{{ z.pk }}"
+                  {% if form.zone.value|stringformat:'s' == z.pk|stringformat:'s' %}selected{% endif %}>
+            {{ z.name }} —
+            {% if z.fee is None %}{% translate 'التوصيل يُتفق هاتفياً' %}{% elif z.fee == 0 %}{% translate 'توصيل مجاني' %}{% else %}{{ z.fee_display }} {% translate 'ل.س' %}{% endif %}
+          </option>
+        {% endfor %}
+      </select>
+      {% if form.zone.errors %}<p class="field__msg field__msg--error">{{ form.zone.errors.0 }}</p>{% endif %}
     </div>
 
     <div class="field {% if form.address.errors %}field--error{% endif %}">
@@ -74,21 +85,8 @@
     <button class="btn btn--accent btn--block" type="submit">{% translate 'أكّد الطلب' %}</button>
   </form>
 
-  <aside class="card checkout-summary">
-    <h3>{% translate 'ملخص طلبك' %}</h3>
-    <ul class="checkout-summary__list">
-      {% for item in cart.items %}
-        <li>
-          <span>{{ item.product.name }} × {{ item.quantity }}</span>
-          <span class="checkout-summary__line">{{ item.line_total_display }} <small>{% translate 'ل.س' %}</small></span>
-        </li>
-      {% endfor %}
-    </ul>
-    <div class="cart-summary__row">
-      <span>{% translate 'الإجمالي' %}</span>
-      <strong class="cart-summary__total">{{ cart.total_price_display }} {% translate 'ل.س' %}</strong>
-    </div>
-    <p class="caption" style="color: var(--text-muted);">{% translate 'التوصيل يُتفق عليه عند تأكيد الطلب هاتفياً.' %}</p>
+  <aside class="card checkout-summary" id="checkout-summary">
+    {% include 'orders/partials/checkout_summary.html' %}
   </aside>
 
 </div>

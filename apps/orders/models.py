@@ -17,6 +17,37 @@ from apps.core.models import TimeStampedModel
 from apps.core.validators import syrian_phone  # noqa: E402  (توافق الهجرات)
 
 
+class DeliveryZone(TimeStampedModel):
+    """منطقة توصيل (محافظة) برسمها.
+
+    fee بثلاث حالات مقصودة:
+      NULL  = «يُتفق هاتفياً» (لسا ما انحدد الرسم)
+      0     = توصيل مجاني
+      > 0   = رسم ثابت يُضاف على إجمالي الطلب
+    """
+
+    name = models.CharField("المحافظة", max_length=50, unique=True)
+    fee = models.DecimalField(
+        "رسم التوصيل (ل.س)", max_digits=12, decimal_places=0,
+        null=True, blank=True,
+        help_text="اتركه فارغاً = «يُتفق هاتفياً». صفر = توصيل مجاني.",
+    )
+    is_active = models.BooleanField("مفعّلة", default=True)
+    sort_order = models.PositiveSmallIntegerField("الترتيب", default=0)
+
+    class Meta:
+        verbose_name = "منطقة توصيل"
+        verbose_name_plural = "مناطق التوصيل"
+        ordering = ["sort_order", "name"]
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def fee_display(self):
+        return f"{self.fee:,.0f}" if self.fee is not None else ""
+
+
 class Order(TimeStampedModel):
     """طلب شراء واحد — من لحظة التأكيد حتى التسليم."""
 
@@ -56,6 +87,12 @@ class Order(TimeStampedModel):
         "الحالة", max_length=10,
         choices=Status.choices, default=Status.PENDING,
     )
+    # لقطة رسم التوصيل وقت الطلب (نفس دلالات DeliveryZone.fee):
+    # NULL = يُتفق هاتفياً · 0 = مجاني · >0 = مبلغ مُضاف على الإجمالي
+    delivery_fee = models.DecimalField(
+        "رسم التوصيل (ل.س)", max_digits=12, decimal_places=0,
+        null=True, blank=True,
+    )
     total = models.DecimalField("الإجمالي (ل.س)", max_digits=12, decimal_places=0)
 
     class Meta:
@@ -83,6 +120,19 @@ class Order(TimeStampedModel):
     @property
     def total_display(self):
         return f"{self.total:,.0f}"
+
+    @property
+    def items_subtotal(self):
+        """مجموع المنتجات وحدها (الإجمالي مطروحاً منه التوصيل)."""
+        return self.total - (self.delivery_fee or 0)
+
+    @property
+    def items_subtotal_display(self):
+        return f"{self.items_subtotal:,.0f}"
+
+    @property
+    def delivery_fee_display(self):
+        return f"{self.delivery_fee:,.0f}" if self.delivery_fee is not None else ""
 
     # مسار الطلب الطبيعي بالترتيب — «ملغى» خارجه (حالة خاصة بالعرض)
     STATUS_FLOW = [Status.PENDING, Status.CONFIRMED, Status.SHIPPED, Status.DELIVERED]

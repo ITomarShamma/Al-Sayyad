@@ -1,0 +1,40 @@
+{% load i18n %}{% comment %}
+ملخص الطلب بصفحة إتمام الشراء — يُعاد رسمه عبر HTMX عند تغيير المحافظة
+(الهدف #checkout-summary). يعرض: الأسطر، مجموع المنتجات، التوصيل، الإجمالي.
+{% endcomment %}
+<h3>{% translate 'ملخص طلبك' %}</h3>
+<ul class="checkout-summary__list">
+  {% for item in cart.items %}
+    <li>
+      <span>{{ item.product.name }} × {{ item.quantity }}</span>
+      <span class="checkout-summary__line">{{ item.line_total_display }} <small>{% translate 'ل.س' %}</small></span>
+    </li>
+  {% endfor %}
+</ul>
+
+<ul class="checkout-summary__list checkout-summary__totals">
+  <li>
+    <span>{% translate 'مجموع المنتجات' %}</span>
+    <span class="checkout-summary__line">{{ cart.total_price_display }} <small>{% translate 'ل.س' %}</small></span>
+  </li>
+  <li>
+    <span>{% translate 'التوصيل' %}{% if zone %} — {{ zone.name }}{% endif %}</span>
+    <span class="checkout-summary__line">
+      {% if zone %}
+        {% if zone.fee is None %}{% translate 'يُتفق هاتفياً' %}
+        {% elif zone.fee == 0 %}{% translate 'مجاني' %}
+        {% else %}{{ zone.fee_display }} <small>{% translate 'ل.س' %}</small>{% endif %}
+      {% else %}
+        {% translate 'اختر محافظتك' %}
+      {% endif %}
+    </span>
+  </li>
+</ul>
+
+<div class="cart-summary__row">
+  <span>{% translate 'الإجمالي' %}</span>
+  <strong class="cart-summary__total">{{ grand_total_display }} {% translate 'ل.س' %}</strong>
+</div>
+{% if zone and zone.fee is None %}
+  <p class="caption" style="color: var(--text-muted);">{% translate 'رسم التوصيل لمحافظتك يُتفق عليه عند تأكيد الطلب هاتفياً.' %}</p>
+{% endif %}

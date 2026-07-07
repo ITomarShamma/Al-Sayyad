@@ -1,12 +1,23 @@
 """واجهات الطلب: صفحة إتمام الطلب + صفحة التأكيد."""
 
+from django import forms
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.cart.cart import Cart
 
 from .forms import CheckoutForm, TrackOrderForm
-from .models import Order
+from .models import DeliveryZone, Order
 from .services import OutOfStockError, create_order_from_cart
+
+
+def _summary_context(cart, zone):
+    """سياق ملخص الطلب: المنتجات + رسم المنطقة المختارة + الإجمالي الكلي."""
+    grand = cart.total_price + (zone.fee or 0) if zone else cart.total_price
+    return {
+        "cart": cart,
+        "zone": zone,
+        "grand_total_display": f"{grand:,.0f}",
+    }
 
 
 def checkout(request):
@@ -26,12 +37,19 @@ def checkout(request):
         initial = {
             "customer_name": request.user.first_name,
             "phone": profile.phone if profile else request.user.username,
-            "city": profile.city if profile else "",
         }
+        if profile and profile.city:      # مدينته المحفوظة تختار منطقتها
+            initial["zone"] = DeliveryZone.objects.filter(
+                name=profile.city, is_active=True).first()
 
     form = CheckoutForm(request.POST or None, initial=initial)
     if request.method == "POST" and form.is_valid():
         order = form.save(commit=False)   # طلب مُعبَّأ، لسا ما انحفظ
+        # لقطة منطقة التوصيل: الاسم والرسم كما هما لحظة الطلب —
+        # تغيير الرسوم لاحقاً لا يلمس الطلبات القديمة (نفس فلسفة الأسعار)
+        zone = form.cleaned_data["zone"]
+        order.city = zone.name
+        order.delivery_fee = zone.fee
         if request.user.is_authenticated:
             order.user = request.user     # يظهر بـ«حسابي»؛ الزائر يبقى بلا user
         try:
@@ -41,7 +59,26 @@ def checkout(request):
         else:
             return redirect("orders:confirmation", number=order.number)
 
-    return render(request, "orders/checkout.html", {"form": form})
+    selected_zone = None
+    if form.is_bound:
+        try:
+            selected_zone = form.fields["zone"].clean(form.data.get("zone"))
+        except forms.ValidationError:
+            selected_zone = None
+    elif initial.get("zone"):
+        selected_zone = initial["zone"]
+
+    context = {"form": form} | _summary_context(cart, selected_zone)
+    return render(request, "orders/checkout.html", context)
+
+
+def checkout_summary(request):
+    """ردّ HTMX: إعادة رسم ملخص الطلب عند تغيير المحافظة (بلا إعادة تحميل)."""
+    cart = Cart(request)
+    zone = DeliveryZone.objects.filter(
+        pk=request.GET.get("zone") or None, is_active=True).first()
+    return render(request, "orders/partials/checkout_summary.html",
+                  _summary_context(cart, zone))
 
 
 def confirmation(request, number):

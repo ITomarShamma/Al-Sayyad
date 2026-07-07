@@ -155,6 +155,17 @@ TRANSLATIONS = {
     "البحث": "Search",
     "اكتب بشريط البحث فوق شو عم تدوّر عليه — ونحن نصطاده لك.": "Type what you're looking for in the search bar above — and we'll catch it for you.",
 
+    # --- مناطق التوصيل (M21) ---
+    "اختر محافظتك…": "Choose your governorate…",
+    "اختر محافظتك": "Choose your governorate",
+    "التوصيل يُتفق هاتفياً": "delivery arranged by phone",
+    "توصيل مجاني": "free delivery",
+    "مجموع المنتجات": "Items subtotal",
+    "التوصيل": "Delivery",
+    "يُتفق هاتفياً": "Arranged by phone",
+    "مجاني": "Free",
+    "رسم التوصيل لمحافظتك يُتفق عليه عند تأكيد الطلب هاتفياً.": "The delivery fee for your governorate is agreed when we confirm your order by phone.",
+
     # --- الهيكل العام ---
     "الصَّيَّاد": "Al-Sayyad",
     "دوّر عن أي شي…": "Search for anything…",

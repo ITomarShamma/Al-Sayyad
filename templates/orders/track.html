@@ -54,6 +54,16 @@
             </li>
           {% endfor %}
         </ul>
+        <ul class="checkout-summary__list checkout-summary__totals">
+          <li>
+            <span>{% translate 'التوصيل' %} — {{ order.city }}</span>
+            <span class="checkout-summary__line">
+              {% if order.delivery_fee is None %}{% translate 'يُتفق هاتفياً' %}
+              {% elif order.delivery_fee == 0 %}{% translate 'مجاني' %}
+              {% else %}{{ order.delivery_fee_display }} <small>{% translate 'ل.س' %}</small>{% endif %}
+            </span>
+          </li>
+        </ul>
         <div class="cart-summary__row">
           <span>{% translate 'الإجمالي' %}</span>
           <strong class="cart-summary__total">{{ order.total_display }} {% translate 'ل.س' %}</strong>

@@ -213,8 +213,10 @@ class OrderLinkingTests(TestCase):
         cat = Category.objects.create(name="إلكترونيات")
         self.product = Product.objects.create(
             category=cat, name="سماعة", price=Decimal("250000"), stock=5)
+        from apps.orders.models import DeliveryZone
         self.checkout_data = {
-            "customer_name": "زبون", "phone": "0912345678", "city": "دمشق",
+            "customer_name": "زبون", "phone": "0912345678",
+            "zone": DeliveryZone.objects.get(name="دمشق").pk,
             "address": "العنوان", "notes": "", "payment_method": "cod",
         }
 

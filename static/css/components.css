@@ -288,6 +288,11 @@
 .checkout-summary__list { display: flex; flex-direction: column; gap: var(--space-2); margin-block-end: var(--space-3); }
 .checkout-summary__list li { display: flex; justify-content: space-between; gap: var(--space-3); }
 .checkout-summary__line { white-space: nowrap; font-weight: var(--fw-semibold); color: var(--primary-strong); }
+/* كتلة المجاميع (منتجات/توصيل) — مفصولة بخط عن الأسطر */
+.checkout-summary__totals {
+  border-block-start: 1px solid var(--border);
+  padding-block-start: var(--space-3);
+}
 .checkout-summary__line small { color: var(--text-muted); font-weight: var(--fw-regular); }
 
 /* --- شريط أدوات التصفح (فرز + فلترة) ---------------------------------------- */

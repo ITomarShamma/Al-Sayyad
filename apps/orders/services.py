@@ -49,7 +49,8 @@ def create_order_from_cart(cart, order):
         )
 
     # 3) إنشاء الطلب وأسطره — الاسم والسعر لقطة لحظة الشراء
-    order.total = sum(i["line_total"] for i in items)
+    # الإجمالي = المنتجات + رسم التوصيل (إن كان محدداً؛ NULL = يُتفق هاتفياً)
+    order.total = sum(i["line_total"] for i in items) + (order.delivery_fee or 0)
     order.save()
     OrderItem.objects.bulk_create(
         OrderItem(

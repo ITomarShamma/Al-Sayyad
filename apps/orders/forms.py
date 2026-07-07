@@ -4,7 +4,7 @@ from django import forms
 
 from apps.core.validators import normalize_digits
 
-from .models import Order
+from .models import DeliveryZone, Order
 from .payments import available_payment_choices
 
 
@@ -22,9 +22,16 @@ class TrackOrderForm(forms.Form):
 
 
 class CheckoutForm(forms.ModelForm):
+    # المحافظة صارت اختياراً من مناطق التوصيل (بدل نص حر) — منها يُلتقط
+    # رسم التوصيل. تُحفظ بالطلب كلقطة (اسم + رسم) في view الـcheckout.
+    zone = forms.ModelChoiceField(
+        queryset=DeliveryZone.objects.filter(is_active=True),
+        label="المحافظة / المدينة",
+    )
+
     class Meta:
         model = Order
-        fields = ["customer_name", "phone", "city", "address", "notes", "payment_method"]
+        fields = ["customer_name", "phone", "address", "notes", "payment_method"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

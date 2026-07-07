@@ -21,30 +21,37 @@ def make_product(name="سماعة لاسلكية", price="250000", stock=5, **kw
 VALID_FORM = {
     "customer_name": "عمر شمّه",
     "phone": "0998625984",
-    "city": "دمشق",
     "address": "المزة، شارع الجلاء، بناء 12",
     "notes": "",
     "payment_method": "cod",
 }
 
 
+def valid_form(**overrides):
+    """بيانات فورم صالحة + منطقة توصيل (دمشق) — تُجلب وقت النداء لأن
+    المناطق تُزرع بهجرة بيانات ولا pk لها وقت استيراد الملف."""
+    from .models import DeliveryZone
+    zone = DeliveryZone.objects.get(name="دمشق")
+    return VALID_FORM | {"zone": zone.pk} | overrides
+
+
 class CheckoutFormTests(TestCase):
     def test_valid_data_passes(self):
-        self.assertTrue(CheckoutForm(VALID_FORM).is_valid())
+        self.assertTrue(CheckoutForm(valid_form()).is_valid())
 
     def test_arabic_digits_in_phone_are_normalized(self):
-        data = VALID_FORM | {"phone": "٠٩٩٨٦٢٥٩٨٤"}
+        data = valid_form(phone="٠٩٩٨٦٢٥٩٨٤")
         form = CheckoutForm(data)
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data["phone"], "0998625984")
 
     def test_bad_phone_rejected(self):
         for bad in ("12345", "0898625984", "099862598", "09986259845"):
-            form = CheckoutForm(VALID_FORM | {"phone": bad})
+            form = CheckoutForm(valid_form(phone=bad))
             self.assertFalse(form.is_valid(), f"قبل رقماً خاطئاً: {bad}")
 
     def test_shamcash_not_offered_yet(self):
-        form = CheckoutForm(VALID_FORM | {"payment_method": "shamcash"})
+        form = CheckoutForm(valid_form(payment_method="shamcash"))
         self.assertFalse(form.is_valid())     # مو من الخيارات المفعّلة
 
 
@@ -68,7 +75,7 @@ class CheckoutFlowTests(TestCase):
         self.assertContains(resp, "500,000")       # 2 × 250,000
 
     def test_successful_order(self):
-        resp = self.client.post(reverse("orders:checkout"), VALID_FORM)
+        resp = self.client.post(reverse("orders:checkout"), valid_form())
 
         order = Order.objects.get()
         # PRG: تحويل لصفحة التأكيد
@@ -88,7 +95,7 @@ class CheckoutFlowTests(TestCase):
 
     def test_snapshot_survives_price_change(self):
         """غيّرنا سعر المنتج بعد الطلب؟ الفاتورة القديمة لا تتأثر."""
-        self.client.post(reverse("orders:checkout"), VALID_FORM)
+        self.client.post(reverse("orders:checkout"), valid_form())
         self.product.price = Decimal("999999")
         self.product.save()
         item = Order.objects.get().items.get()
@@ -98,7 +105,7 @@ class CheckoutFlowTests(TestCase):
         """المخزون نزل تحت المطلوب بعد تعبئة السلة → رسالة، بلا طلب ولا خصم."""
         self.product.stock = 1                    # بالسلة 2
         self.product.save()
-        resp = self.client.post(reverse("orders:checkout"), VALID_FORM)
+        resp = self.client.post(reverse("orders:checkout"), valid_form())
         self.assertEqual(resp.status_code, 200)   # رجعنا للفورم
         self.assertContains(resp, "الكمية المتوفرة تغيّرت")
         self.assertEqual(Order.objects.count(), 0)
@@ -106,16 +113,89 @@ class CheckoutFlowTests(TestCase):
         self.assertEqual(self.product.stock, 1)   # ما انخصم شي
 
     def test_invalid_form_creates_nothing(self):
-        resp = self.client.post(reverse("orders:checkout"), VALID_FORM | {"phone": "123"})
+        resp = self.client.post(reverse("orders:checkout"), valid_form(phone="123"))
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(Order.objects.count(), 0)
 
     def test_confirmation_page(self):
-        self.client.post(reverse("orders:checkout"), VALID_FORM)
+        self.client.post(reverse("orders:checkout"), valid_form())
         order = Order.objects.get()
         resp = self.client.get(reverse("orders:confirmation", args=[order.number]))
         self.assertContains(resp, order.number)
         self.assertContains(resp, "الدفع عند الاستلام")
+
+
+class DeliveryZoneTests(TestCase):
+    """M21: مناطق التوصيل — الزرع، اللقطة، الإجمالي، الملخص الحي."""
+
+    def setUp(self):
+        from .models import DeliveryZone
+        self.product = make_product(stock=5)          # 250,000
+        self.client.post(reverse("cart:add", args=[self.product.id]), {"quantity": 2})
+        self.damascus = DeliveryZone.objects.get(name="دمشق")
+
+    def test_fourteen_governorates_seeded_with_null_fee(self):
+        from .models import DeliveryZone
+        self.assertEqual(DeliveryZone.objects.count(), 14)
+        self.assertIsNone(self.damascus.fee)           # «يُتفق هاتفياً» افتراضياً
+
+    def test_checkout_shows_zone_select(self):
+        resp = self.client.get(reverse("orders:checkout"))
+        self.assertContains(resp, 'name="zone"')
+        self.assertContains(resp, "دمشق")
+        self.assertContains(resp, "حلب")
+        self.assertContains(resp, "التوصيل يُتفق هاتفياً")
+
+    def test_order_snapshots_zone_fee_into_total(self):
+        self.damascus.fee = Decimal("50000")
+        self.damascus.save()
+        self.client.post(reverse("orders:checkout"), valid_form())
+        order = Order.objects.get()
+        self.assertEqual(order.city, "دمشق")           # لقطة الاسم
+        self.assertEqual(order.delivery_fee, Decimal("50000"))
+        self.assertEqual(order.total, Decimal("550000"))   # 2×250,000 + 50,000
+        self.assertEqual(order.items_subtotal, Decimal("500000"))
+        # تغيير الرسم لاحقاً لا يمس الطلب القديم
+        self.damascus.fee = Decimal("999999")
+        self.damascus.save()
+        order.refresh_from_db()
+        self.assertEqual(order.delivery_fee, Decimal("50000"))
+
+    def test_null_fee_zone_keeps_total_and_notes_phone_agreement(self):
+        self.client.post(reverse("orders:checkout"), valid_form())
+        order = Order.objects.get()
+        self.assertIsNone(order.delivery_fee)
+        self.assertEqual(order.total, Decimal("500000"))   # المنتجات فقط
+        resp = self.client.get(reverse("orders:confirmation", args=[order.number]))
+        self.assertContains(resp, "يُتفق هاتفياً")
+
+    def test_free_delivery_zone_shows_free(self):
+        self.damascus.fee = Decimal("0")
+        self.damascus.save()
+        self.client.post(reverse("orders:checkout"), valid_form())
+        order = Order.objects.get()
+        self.assertEqual(order.delivery_fee, Decimal("0"))
+        resp = self.client.get(reverse("orders:confirmation", args=[order.number]))
+        self.assertContains(resp, "مجاني")
+
+    def test_live_summary_endpoint_returns_fee_and_grand_total(self):
+        self.damascus.fee = Decimal("50000")
+        self.damascus.save()
+        resp = self.client.get(reverse("orders:checkout_summary"),
+                               {"zone": self.damascus.pk})
+        self.assertContains(resp, "50,000")
+        self.assertContains(resp, "550,000")           # الإجمالي الكلي حي
+
+    def test_inactive_zone_not_offered(self):
+        self.damascus.is_active = False
+        self.damascus.save()
+        resp = self.client.get(reverse("orders:checkout"))
+        # ملاحظة: لا نفحص النص «دمشق» — «ريف دمشق» يحتويه؛ نفحص خيار الـpk
+        self.assertNotContains(resp, f'<option value="{self.damascus.pk}"')
+        # ولا تُقبل بالفورم حتى لو أُرسلت يدوياً
+        resp = self.client.post(reverse("orders:checkout"),
+                                VALID_FORM | {"zone": self.damascus.pk})
+        self.assertEqual(Order.objects.count(), 0)
 
 
 class TrackOrderTests(TestCase):
@@ -125,7 +205,7 @@ class TrackOrderTests(TestCase):
         make_product(stock=5)
         product = Product.objects.get()
         self.client.post(reverse("cart:add", args=[product.id]), {"quantity": 1})
-        self.client.post(reverse("orders:checkout"), VALID_FORM)
+        self.client.post(reverse("orders:checkout"), valid_form())
         self.order = Order.objects.get()
         self.url = reverse("orders:track")
 
