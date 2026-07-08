@@ -135,6 +135,11 @@ LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "accounts:account"
 LOGOUT_REDIRECT_URL = "pages:home"
 
+# حماية الدخول من التخمين (apps/accounts/ratelimit.py):
+# هذا العدد من المحاولات الفاشلة خلال النافذة = قفل مؤقت حتى نهايتها.
+LOGIN_MAX_ATTEMPTS = int(env("LOGIN_MAX_ATTEMPTS", "5"))
+LOGIN_LOCKOUT_SECONDS = int(env("LOGIN_LOCKOUT_SECONDS", str(15 * 60)))
+
 
 # --- Store contact info (صفحة «تواصل معنا» والفوتر) ------------------------
 # عدّل القيم من .env أو مباشرة هنا — تُعرض كما هي للزبائن.

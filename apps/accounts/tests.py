@@ -1,9 +1,11 @@
 """اختبارات الحسابات: التسجيل، الدخول بالموبايل، حسابي، ربط الطلبات."""
 
+import time
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.core.cache import cache
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from apps.catalog.models import Category, Product
@@ -74,6 +76,85 @@ class LoginTests(TestCase):
         resp = self.client.get(reverse("accounts:account"))
         self.assertEqual(resp.status_code, 302)
         self.assertIn(reverse("accounts:login"), resp.url)
+
+
+@override_settings(LOGIN_MAX_ATTEMPTS=3)
+class LoginRateLimitTests(TestCase):
+    """M25: قفل الدخول المؤقت بعد محاولات فاشلة (بالرقم وبالـIP)."""
+
+    def setUp(self):
+        signup(self.client)
+        self.client.post(reverse("accounts:logout"))
+        cache.clear()                     # عدّادات نظيفة لكل اختبار
+
+    def tearDown(self):
+        cache.clear()                     # لا نسرّب قفلاً لبقية الاختبارات
+
+    def attempt(self, password="غلط", username="0998625984", **extra):
+        return self.client.post(reverse("accounts:login"),
+                                {"username": username, "password": password},
+                                **extra)
+
+    def test_locked_after_max_failures_even_with_correct_password(self):
+        for _ in range(3):
+            self.attempt()
+        resp = self.attempt(password="sayyad-secret-9")
+        self.assertContains(resp, "مقفول")            # مرفوض رغم صحة كلمة السر
+        self.assertContains(resp, "دقيقة")            # ومع مدة الانتظار
+
+    def test_success_before_threshold_resets_counters(self):
+        self.attempt()
+        self.attempt()
+        resp = self.attempt(password="sayyad-secret-9")
+        self.assertRedirects(resp, reverse("accounts:account"))
+        self.client.post(reverse("accounts:logout"))
+        # العدّاد صفّر بالنجاح: غلطتان جديدتان لا تقفلان
+        self.attempt()
+        self.attempt()
+        resp = self.attempt(password="sayyad-secret-9")
+        self.assertRedirects(resp, reverse("accounts:account"))
+
+    def test_lock_expires_after_window(self):
+        from . import ratelimit
+        for _ in range(3):
+            self.attempt()
+        # نرجّع بداية النافذة للماضي بدل الانتظار ربع ساعة حقيقية
+        for key in ("login:fail:user:0998625984", "login:fail:ip:127.0.0.1"):
+            entry = cache.get(key)
+            entry["first"] = time.time() - ratelimit._window_seconds() - 1
+            cache.set(key, entry, 60)
+        resp = self.attempt(password="sayyad-secret-9")
+        self.assertRedirects(resp, reverse("accounts:account"))
+
+    def test_ip_counter_covers_other_usernames(self):
+        # مهاجم من IP واحد يجرّب أرقاماً مختلفة — عدّاد الـIP يصطاده
+        for n in range(3):
+            self.attempt(username=f"091111111{n}")
+        resp = self.attempt(username="0998625984", password="sayyad-secret-9")
+        self.assertContains(resp, "مقفول")
+
+    def test_arabic_digit_attempts_share_username_counter(self):
+        # نغيّر الـIP بكل محاولة لعزل عدّاد الرقم — التطبيع يوحّد المفتاح
+        self.attempt(username="٠٩٩٨٦٢٥٩٨٤", REMOTE_ADDR="10.0.0.1")
+        self.attempt(username="0998625984", REMOTE_ADDR="10.0.0.2")
+        self.attempt(username="٠٩٩٨٦٢٥٩٨٤", REMOTE_ADDR="10.0.0.3")
+        resp = self.attempt(password="sayyad-secret-9", REMOTE_ADDR="10.0.0.4")
+        self.assertContains(resp, "مقفول")
+
+    def test_admin_login_rate_limited_too(self):
+        User.objects.create_superuser("boss", "b@b.b", "sayyad-secret-9")
+        for _ in range(3):
+            self.client.post(reverse("admin:login"),
+                             {"username": "boss", "password": "غلط"})
+        resp = self.client.post(reverse("admin:login"),
+                                {"username": "boss", "password": "sayyad-secret-9"})
+        self.assertContains(resp, "مقفول")
+
+    def test_empty_password_not_counted_as_attempt(self):
+        for _ in range(5):
+            self.attempt(password="")     # خطأ «حقل مطلوب» — ليس محاولة تخمين
+        resp = self.attempt(password="sayyad-secret-9")
+        self.assertRedirects(resp, reverse("accounts:account"))
 
 
 class AccountAreaTests(TestCase):

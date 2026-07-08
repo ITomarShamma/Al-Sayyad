@@ -4,9 +4,13 @@ from django.contrib import admin, messages
 from django.contrib.auth.models import Group
 from django.utils.html import format_html
 
+from .forms import RateLimitedAdminLoginForm
 from .models import MerchantProfile, Profile
 
 MERCHANT_GROUP_NAME = "تاجر"
+
+# دخول لوحة التحكم بنفس حماية التخمين (M25) — انظر accounts/ratelimit.py
+admin.site.login_form = RateLimitedAdminLoginForm
 
 
 @admin.register(Profile)

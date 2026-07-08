@@ -1,12 +1,15 @@
 """فورمات الحسابات: تسجيل جديد، دخول بالموبايل، تعديل البيانات، طلب تاجر."""
 
 from django import forms
+from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import AuthenticationForm
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.validators import normalize_digits, syrian_phone
 
+from . import ratelimit
 from .models import MerchantProfile
 
 User = get_user_model()
@@ -41,7 +44,35 @@ class SignupForm(forms.Form):
         return cleaned
 
 
-class PhoneLoginForm(AuthenticationForm):
+class LoginRateLimitMixin:
+    """يحرس أي فورم دخول من التخمين (يُركَّب قبل AuthenticationForm).
+
+    الترتيب بكل محاولة: مقفول؟ ارفض فوراً بلا مصادقة أصلاً.
+    فشلت المصادقة؟ سجّل الفشل بالعدّادات ثم مرّر الخطأ.
+    نجحت؟ صفّر العدّادات وكمّل.
+    """
+
+    def clean(self):
+        username = self.cleaned_data.get("username", "")
+        request = getattr(self, "request", None)
+        remaining = ratelimit.seconds_locked(username, request)
+        if remaining:
+            minutes = remaining // 60 + 1              # تقريب لفوق: 61 ثانية = دقيقتان
+            raise forms.ValidationError(
+                gettext("محاولات خاطئة كتير — الدخول مقفول مؤقتاً. "
+                        "جرّب بعد %(minutes)d دقيقة.") % {"minutes": minutes})
+        try:
+            cleaned = super().clean()
+        except forms.ValidationError:
+            # نعدّ محاولات المصادقة الحقيقية فقط (لا «نسيت تعبّي الحقل»)
+            if self.cleaned_data.get("password"):
+                ratelimit.register_failure(username, request)
+            raise
+        ratelimit.reset(username, request)
+        return cleaned
+
+
+class PhoneLoginForm(LoginRateLimitMixin, AuthenticationForm):
     """دخول برقم الموبايل — نطبّع الأرقام الهندية قبل المطابقة."""
 
     def __init__(self, *args, **kwargs):
@@ -55,6 +86,10 @@ class PhoneLoginForm(AuthenticationForm):
 
     def clean_username(self):
         return normalize_digits(self.cleaned_data.get("username"))
+
+
+class RateLimitedAdminLoginForm(LoginRateLimitMixin, AdminAuthenticationForm):
+    """نفس الحماية على دخول لوحة التحكم — أهم باب يجب أن يُقفل بوجه التخمين."""
 
 
 class ProfileEditForm(forms.Form):

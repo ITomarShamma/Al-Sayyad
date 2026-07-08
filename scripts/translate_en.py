@@ -19,6 +19,7 @@ TRANSLATIONS = {
     "رقم الموبايل": "Mobile number",
     "كلمة السر": "Password",
     "الرقم أو كلمة السر غير صحيحة — تأكد وجرّب مرة ثانية.": "Wrong number or password — check and try again.",
+    "محاولات خاطئة كتير — الدخول مقفول مؤقتاً. جرّب بعد %(minutes)d دقيقة.": "Too many failed attempts — login is temporarily locked. Try again in %(minutes)d minutes.",
     "زبون": "Customer",
     "تاجر": "Merchant",
     "أهلاً فيك بالصَّيَّاد! حسابك جاهز 🎣": "Welcome to Al-Sayyad! Your account is ready 🎣",
