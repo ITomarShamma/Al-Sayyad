@@ -22,7 +22,7 @@
   </a>
   <div class="product-card__body">
     <h3 class="product-card__name"><a href="{{ href|default:'#' }}">{{ name }}</a></h3>
-    <div class="product-card__price">
+    <div class="product-card__price{% if old_price %} product-card__price--sale{% endif %}">
       {{ price }} <span class="product-card__currency">{% translate 'ل.س' %}</span>
       {% if old_price %}<s class="product-card__old-price">{{ old_price }}</s>{% endif %}
     </div>

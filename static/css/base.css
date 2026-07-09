@@ -19,11 +19,21 @@ body {
   color: var(--text);
   background: var(--bg);
   min-block-size: 100vh;
+  -webkit-font-smoothing: antialiased;   /* حواف حروف أنعم على الشاشات */
+  text-rendering: optimizeLegibility;
 }
 img, svg { display: block; max-inline-size: 100%; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; cursor: pointer; }
 ul { list-style: none; padding: 0; }
+::selection { background: var(--color-sea-foam); color: var(--primary-strong); }
+
+/* حلقة تركيز موحّدة لكل ما يُتنقّل إليه بالكيبورد — بلا حلقة عند النقر بالفأرة */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
 
 h1 { font-size: var(--fs-h1); font-weight: var(--fw-bold); line-height: var(--lh-tight); }
 h2 { font-size: var(--fs-h2); font-weight: var(--fw-semibold); line-height: var(--lh-tight); }
@@ -38,10 +48,13 @@ h3 { font-size: var(--fs-h3); font-weight: var(--fw-semibold); }
   padding-inline: var(--space-4);
 }
 
-/* --- الهيدر (شريط علوي بعرض كامل، محتواه داخل حاوية) --- */
+/* --- الهيدر (شريط علوي بعرض كامل، محتواه داخل حاوية) ---
+   Deep Sea بدل Tide: الغامق يعطي حضوراً أرسخ ويترك Tide للأزرار والتفاعل،
+   وهو نفس رأس لوحة التحكم — هوية واحدة بكل مكان. */
 .site-header {
   position: sticky; inset-block-start: 0; z-index: 20;
-  background: var(--primary); color: var(--on-primary);
+  background: var(--primary-strong); color: var(--on-primary);
+  box-shadow: var(--shadow-sm);
 }
 .site-header__inner {
   display: flex; align-items: center; flex-wrap: wrap;
@@ -51,24 +64,31 @@ h3 { font-size: var(--fs-h3); font-weight: var(--fw-semibold); }
 }
 .brand { display: flex; align-items: center; gap: var(--space-2); font-weight: var(--fw-bold); }
 .brand__mark {            /* علامة مؤقتة — تُستبدل باللوغو لاحقاً */
-  inline-size: 34px; block-size: 34px;
+  inline-size: 36px; block-size: 36px;
   display: grid; place-items: center;
   background: var(--surface); color: var(--primary);
-  border-radius: var(--radius-sm); font-weight: var(--fw-bold);
+  border-radius: 10px; font-weight: var(--fw-bold); font-size: 1.1rem;
+  box-shadow: var(--shadow-sm);
 }
-.brand__name { font-size: 1.25rem; }
+.brand__name { font-size: 1.25rem; letter-spacing: 0; }
 
 /* شريط البحث: سطر كامل على الموبايل، يندمج بالهيدر على سطح المكتب.
    position: relative ليتموضع صندوق الاقتراحات الحية تحته مباشرة. */
 .searchbar { flex: 1 1 100%; position: relative; }
 .searchbar input {
-  inline-size: 100%; block-size: 44px;
+  inline-size: 100%; block-size: 46px;
   padding-inline: var(--space-4);
-  border: none; border-radius: var(--radius-pill);
+  border: 2px solid transparent; border-radius: var(--radius-pill);
   background: var(--surface); color: var(--text);
   font-size: var(--fs-body);
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
 }
 .searchbar input::placeholder { color: var(--text-muted); }
+.searchbar input:focus-visible {
+  outline: none;                          /* الحلقة هنا بالحدود والظل — أنسب لحقل داخل هيدر غامق */
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md);
+}
 
 /* تنقّل علوي (سطح المكتب فقط) */
 .top-nav { display: none; }
@@ -78,40 +98,69 @@ h3 { font-size: var(--fs-h3); font-weight: var(--fw-semibold); }
   border-radius: var(--radius-pill);
   color: var(--on-primary); font-weight: var(--fw-medium);
   white-space: nowrap;
+  transition: background var(--transition-fast);
 }
 .top-nav a:hover { background: rgba(255, 255, 255, 0.12); }
-.top-nav a.is-active { background: rgba(255, 255, 255, 0.18); font-weight: var(--fw-semibold); }
+.top-nav a.is-active { background: var(--primary); font-weight: var(--fw-semibold); }
 
 /* --- المحتوى --- */
 .app__main { padding-block: var(--space-5); }
+@media (min-width: 768px) { .app__main { padding-block: var(--space-6) var(--space-8); } }
 
-/* --- الفوتر --- */
+/* --- الفوتر: أعمدة منظّمة (هوية/روابط/دفع) فوق سطر خفيف ------------------- */
 .site-footer {
   margin-block-start: var(--space-8);
-  padding-block: var(--space-5);
-  text-align: center; color: var(--text-muted); font-size: var(--fs-caption);
+  padding-block: var(--space-6) var(--space-5);
+  background: var(--surface);
+  border-block-start: 1px solid var(--border);
+  color: var(--text-muted); font-size: var(--fs-caption);
+}
+.site-footer__grid {
+  display: grid; gap: var(--space-5);
+  text-align: center;
+  margin-block-end: var(--space-5);
+}
+@media (min-width: 768px) {
+  .site-footer__grid { grid-template-columns: 1.4fr 1fr 1fr; text-align: start; }
+}
+.site-footer__brand { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
+@media (min-width: 768px) { .site-footer__brand { align-items: flex-start; } }
+.site-footer__brand .brand__mark { background: var(--primary); color: var(--color-white); }
+.site-footer__brand-name { color: var(--text); font-weight: var(--fw-bold); font-size: var(--fs-h3); }
+.site-footer h3 {
+  color: var(--text); font-size: var(--fs-body);
+  margin-block-end: var(--space-2);
+}
+.site-footer__links { display: flex; flex-direction: column; gap: var(--space-2); align-items: center; }
+@media (min-width: 768px) { .site-footer__links { align-items: flex-start; } }
+.site-footer__links a { color: var(--text-muted); min-block-size: 24px; transition: color var(--transition-fast); }
+.site-footer__links a:hover { color: var(--primary); }
+.site-footer__pay { display: flex; gap: var(--space-2); flex-wrap: wrap; justify-content: center; }
+@media (min-width: 768px) { .site-footer__pay { justify-content: flex-start; } }
+.site-footer__bottom {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: var(--space-3) var(--space-4);
+  padding-block-start: var(--space-4);
   border-block-start: 1px solid var(--border);
 }
-.site-footer__links {
-  display: flex; justify-content: center; flex-wrap: wrap;
-  gap: var(--space-4); margin-block-end: var(--space-3);
-}
-.site-footer__links a { color: var(--text); }
-.site-footer__links a:hover { color: var(--primary); }
-.lang-switch { display: flex; justify-content: center; margin-block-end: var(--space-3); }
+.lang-switch { display: flex; justify-content: center; }
 
 /* --- شريط التنقّل السفلي (موبايل فقط — كل أيقونة معها كلمة، القاعدة #3) --- */
 .bottom-nav {
   position: fixed; inset-block-end: 0; inset-inline: 0; z-index: 20;
   block-size: var(--bottomnav-h);
   display: flex; justify-content: space-around; align-items: stretch;
-  background: var(--surface); border-block-start: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.92);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border-block-start: 1px solid var(--border);
+  box-shadow: 0 -2px 12px rgba(22, 38, 31, 0.06);
 }
 .bottom-nav__item {
   flex: 1;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
   min-block-size: var(--tap-min);
   color: var(--text-muted); font-size: var(--fs-caption);
+  transition: color var(--transition-fast);
 }
 .bottom-nav__item.is-active { color: var(--primary); font-weight: var(--fw-semibold); }
 .bottom-nav__icon { font-size: 1.25rem; line-height: 1; }
@@ -120,17 +169,41 @@ h3 { font-size: var(--fs-h3); font-weight: var(--fw-semibold); }
 
 /* --- مقاطع الرئيسية --- */
 .hero {
+  position: relative; overflow: clip;   /* يقصّ توهّجات الزينة عند الحواف */
   background: linear-gradient(135deg, var(--primary-strong), var(--primary));
   color: var(--on-primary);
   padding: var(--space-8) var(--space-6);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
 }
+/* توهّجان خفيفان بزاويتين متقابلتين — عمق بلا صور ولا ثقل */
+.hero::before, .hero::after {
+  content: ""; position: absolute; border-radius: 50%; pointer-events: none;
+}
+.hero::before {
+  inline-size: 340px; block-size: 340px;
+  inset-block-start: -170px; inset-inline-end: -110px;
+  background: radial-gradient(circle, rgba(217, 154, 43, 0.28), transparent 65%);
+}
+.hero::after {
+  inline-size: 420px; block-size: 420px;
+  inset-block-end: -260px; inset-inline-start: -140px;
+  background: radial-gradient(circle, rgba(228, 241, 237, 0.14), transparent 65%);
+}
+.hero > * { position: relative; }        /* المحتوى فوق الزينة */
 .hero h1 { max-inline-size: 18ch; }
-.hero__tagline { color: var(--color-sea-foam); margin-block: var(--space-2) var(--space-5); }
+.hero__tagline {
+  color: var(--color-sea-foam); font-size: var(--fs-h3);
+  margin-block: var(--space-3) var(--space-5);
+}
 
-.section { margin-block-start: var(--space-6); }
-.section > h2 { margin-block-end: var(--space-4); }
+.section { margin-block-start: var(--space-8); }
+/* عنوان مقطع بعلامة ذهبية جانبية — إيقاع بصري موحّد لكل المقاطع */
+.section > h2 {
+  margin-block-end: var(--space-4);
+  padding-inline-start: var(--space-3);
+  border-inline-start: 4px solid var(--accent);
+}
 
 /* شبكة تتكيّف تلقائياً: عمودان على الموبايل، أكثر على الشاشات الأوسع.
    كل عنصر داخلها يستعمل مكوّن .card (انظر components.css). */
@@ -145,8 +218,17 @@ h3 { font-size: var(--fs-h3); font-weight: var(--fw-semibold); }
   .searchbar { flex: 1 1 auto; max-inline-size: 460px; }
   .top-nav { display: flex; gap: var(--space-1); margin-inline-start: auto; }
   .bottom-nav { display: none; }
-  .hero { padding: var(--space-8); }
-  .hero h1 { font-size: 2.5rem; }
+  .hero { padding: calc(var(--space-8) + var(--space-4)) var(--space-8); }
+  .hero h1 { font-size: var(--fs-display); }
+}
+
+/* من يطلب حركة أقل (دوار/تشتّت) يحصل على واجهة ساكنة — بلا انزلاق ولا تكبير */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
 
 /* مساحة سفلية على الموبايل حتى لا يغطّي الشريطُ السفلي المحتوى/الفوتر */

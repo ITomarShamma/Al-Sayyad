@@ -76,6 +76,11 @@ TRANSLATIONS = {
     "عندك حساب؟": "Already have an account?",
     "سجّل دخول": "Log in",
 
+    # --- الفوتر المنظّم (M29) ---
+    "روابط تهمك": "Useful links",
+    "طرق الدفع": "Payment methods",
+    "كل الحقوق محفوظة.": "All rights reserved.",
+
     # --- PWA / بلا اتصال ---
     "ما في اتصال بالإنترنت": "No internet connection",
     "تأكد من الشبكة وجرّب مرة ثانية — سلّتك وطلباتك بأمان.": "Check your connection and try again — your cart and orders are safe.",

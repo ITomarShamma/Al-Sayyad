@@ -24,6 +24,13 @@
   --color-warning: #E8A317;
   --color-info:    #2D6FB3;
 
+  /* خلفيات فاتحة للدلالات (tints) + نص داكن يقرأ فوقها —
+     كانت مبعثرة كأرقام hex بالمكوّنات؛ الآن مصدرها واحد */
+  --tint-success: #E6F4EC;  --on-tint-success: #1D6B38;
+  --tint-error:   #FBE7E3;  --on-tint-error:   #99301F;
+  --tint-warning: #FBF0D8;  --on-tint-warning: #9A6A0A;
+  --tint-info:    #E4EEFA;  --on-tint-info:    #1F4E80;
+
   /* --- ألوان الدفع --- */
   --color-shamcash: #1FA37A;
   --color-cod:      #7A5B2A;
@@ -41,6 +48,7 @@
 
   /* --- الطباعة --- */
   --font-base: "IBM Plex Sans Arabic", system-ui, "Segoe UI", Tahoma, sans-serif;
+  --fs-display: 2.75rem;    /* 44px — عنوان الـhero على الشاشات الكبيرة */
   --fs-h1:      2rem;       /* 32px */
   --fs-h2:      1.5rem;     /* 24px */
   --fs-h3:      1.125rem;   /* 18px */
@@ -68,9 +76,15 @@
   --radius-lg:   20px;
   --radius-pill: 999px;
 
-  /* --- ظلال --- */
-  --shadow-sm: 0 1px 2px rgba(22, 38, 31, 0.06);
-  --shadow-md: 0 4px 16px rgba(22, 38, 31, 0.08);
+  /* --- ظلال (طبقتان لكل ظل = عمق أنعم وأصدق) --- */
+  --shadow-sm: 0 1px 2px rgba(22, 38, 31, 0.05), 0 1px 6px rgba(22, 38, 31, 0.04);
+  --shadow-md: 0 2px 6px rgba(22, 38, 31, 0.06), 0 8px 24px rgba(22, 38, 31, 0.08);
+  --shadow-lg: 0 4px 12px rgba(22, 38, 31, 0.08), 0 16px 48px rgba(22, 38, 31, 0.14);
+
+  /* --- حركة وتركيز --- */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+  --focus-ring: 0 0 0 3px rgba(14, 107, 94, 0.30);   /* Tide بشفافية */
 
   /* --- تخطيط (Layout) --- */
   --tap-min:       48px;     /* أصغر هدف نقر (القاعدة #1) */

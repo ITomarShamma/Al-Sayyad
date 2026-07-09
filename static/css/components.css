@@ -11,13 +11,21 @@
   padding-inline: var(--space-5);
   border: 1px solid transparent; border-radius: var(--radius-pill);
   font-weight: var(--fw-semibold); font-size: var(--fs-body);
-  transition: filter .15s ease, opacity .15s ease;
+  transition: background var(--transition-fast), color var(--transition-fast),
+              border-color var(--transition-fast), box-shadow var(--transition-fast),
+              transform var(--transition-fast), opacity var(--transition-fast);
 }
-.btn:hover { filter: brightness(0.96); }
-.btn:disabled, .btn[aria-disabled="true"] { opacity: .55; cursor: not-allowed; filter: none; }
+.btn:active { transform: translateY(1px); }              /* إحساس «كبسة» ملموس */
+.btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: .55; cursor: not-allowed; }
+/* لكل نوع لون hover مقصود (لا فلتر عام) — الأساسي يغمق، الذهبي يدفّى */
 .btn--primary   { background: var(--primary); color: var(--on-primary); }
+.btn--primary:hover   { background: var(--primary-strong); }
 .btn--accent    { background: var(--accent);  color: var(--color-ink); }
+.btn--accent:hover    { background: #C6891F; box-shadow: var(--shadow-sm); }
 .btn--secondary { background: var(--surface); color: var(--primary); border-color: var(--border); }
+.btn--secondary:hover { border-color: var(--primary); background: var(--color-sea-foam); }
+.btn:disabled:hover, .btn[aria-disabled="true"]:hover { transform: none; }
 
 /* حالة التحميل: نخفي النص ونُظهر دوّارة في المنتصف */
 .btn.is-loading { color: transparent; position: relative; pointer-events: none; }
@@ -39,10 +47,10 @@
   font-size: var(--fs-caption); font-weight: var(--fw-medium);
   background: var(--color-sea-foam); color: var(--primary-strong);
 }
-.badge--success  { background: #E6F4EC; color: var(--color-success); }
-.badge--warning  { background: #FBF0D8; color: #9A6A0A; }
-.badge--error    { background: #FBE7E3; color: var(--color-error); }
-.badge--info     { background: #E4EEFA; color: var(--color-info); }
+.badge--success  { background: var(--tint-success); color: var(--on-tint-success); }
+.badge--warning  { background: var(--tint-warning); color: var(--on-tint-warning); }
+.badge--error    { background: var(--tint-error);   color: var(--on-tint-error); }
+.badge--info     { background: var(--tint-info);    color: var(--on-tint-info); }
 .badge--cod      { background: #F1E9DA; color: var(--color-cod); }
 .badge--shamcash { background: #DEF0E9; color: var(--color-shamcash); }
 
@@ -55,8 +63,9 @@
   padding-inline: var(--space-4);
   border: 1px solid var(--border); border-radius: var(--radius-md);
   background: var(--surface); color: var(--text); font-size: var(--fs-body);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
-.field__input:focus { outline: 2px solid var(--primary); outline-offset: 1px; border-color: var(--primary); }
+.field__input:focus { outline: none; border-color: var(--primary); box-shadow: var(--focus-ring); }
 .field__input::placeholder { color: var(--text-muted); }
 .field__msg { font-size: var(--fs-caption); color: var(--text-muted); }
 .field__msg--error { color: var(--color-error); }
@@ -66,6 +75,7 @@
 .card {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius-md); padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
 }
 .card__title { color: var(--primary-strong); font-weight: var(--fw-semibold); }
 .card__text  { color: var(--text-muted); font-size: var(--fs-caption); margin-block-start: var(--space-1); }
@@ -75,13 +85,34 @@
   display: flex; flex-direction: column;
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius-md); overflow: clip;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-base), border-color var(--transition-base),
+              transform var(--transition-base);
+}
+/* رفعة خفيفة عند التمرير + تكبير الصورة — البطاقة «تستجيب» قبل النقر */
+.product-card:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
 }
 .product-card__media { display: block; aspect-ratio: 1 / 1; background: var(--color-sea-foam); }
-.product-card__media img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+.product-card__media img {
+  inline-size: 100%; block-size: 100%; object-fit: cover;
+  transition: transform var(--transition-base);
+}
+.product-card:hover .product-card__media img { transform: scale(1.05); }
 .product-card__placeholder { block-size: 100%; display: grid; place-items: center; font-size: 2rem; color: var(--text-muted); }
 .product-card__body { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); }
-.product-card__name { font-size: var(--fs-body); font-weight: var(--fw-semibold); line-height: var(--lh-tight); }
-.product-card__price { color: var(--primary-strong); font-weight: var(--fw-bold); font-size: 1.05rem; }
+/* سطران كحد أقصى لاسم المنتج — البطاقات تتساوى مهما طالت الأسماء */
+.product-card__name {
+  font-size: var(--fs-body); font-weight: var(--fw-semibold); line-height: var(--lh-tight);
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  overflow: hidden;
+  min-block-size: calc(2 * var(--lh-tight) * 1em);
+}
+.product-card__name a:hover { color: var(--primary); }
+.product-card__price { color: var(--primary-strong); font-weight: var(--fw-bold); font-size: 1.1rem; }
+.product-card__price--sale { color: var(--color-error); }   /* سعر التخفيض أحمر — يُقرأ كفرصة */
 .product-card__currency { font-size: var(--fs-caption); font-weight: var(--fw-medium); color: var(--text-muted); }
 .product-card__badges { display: flex; flex-wrap: wrap; gap: 6px; }
 .product-card__old-price { color: var(--text-muted); font-weight: var(--fw-regular); font-size: var(--fs-caption); margin-inline-start: var(--space-1); }
@@ -145,8 +176,9 @@
 .cart-item__remove {
   border: none; background: none; padding: var(--space-1) var(--space-2);
   color: var(--color-error); font-size: var(--fs-caption); border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
 }
-.cart-item__remove:hover { background: #FBE7E3; }
+.cart-item__remove:hover { background: var(--tint-error); }
 
 /* عدّاد الكمية (Quantity stepper) — أزرار بهدف نقر مريح */
 .qty { display: flex; align-items: center; gap: var(--space-2); margin-block-start: var(--space-1); }
@@ -182,11 +214,13 @@
 .messages__item {
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
-  border: 1px solid var(--color-success); background: #E6F4EC; color: #1D6B38;
+  border: 1px solid var(--color-success);
+  background: var(--tint-success); color: var(--on-tint-success);
+  box-shadow: var(--shadow-sm);
 }
-.messages__item--info    { border-color: var(--color-info); background: #E4EEFA; color: #1F4E80; }
-.messages__item--warning { border-color: var(--color-warning); background: #FBF0D8; color: #9A6A0A; }
-.messages__item--error   { border-color: var(--color-error); background: #FBE7E3; color: #99301F; }
+.messages__item--info    { border-color: var(--color-info);    background: var(--tint-info);    color: var(--on-tint-info); }
+.messages__item--warning { border-color: var(--color-warning); background: var(--tint-warning); color: var(--on-tint-warning); }
+.messages__item--error   { border-color: var(--color-error);   background: var(--tint-error);   color: var(--on-tint-error); }
 
 /* --- صفحات الحساب (Auth + حسابي) --------------------------------------------- */
 .auth-card {
@@ -226,7 +260,7 @@
   display: inline-flex; align-items: center; gap: var(--space-3);
   background: var(--color-ink); color: var(--color-white);
   padding: var(--space-3) var(--space-5);
-  border-radius: var(--radius-pill); box-shadow: var(--shadow-md);
+  border-radius: var(--radius-pill); box-shadow: var(--shadow-lg);
   animation: toast-in-out 3.5s ease forwards;
 }
 .toast__link { color: var(--accent); font-weight: var(--fw-semibold); }
@@ -245,7 +279,7 @@
 .search-suggest__list {
   background: var(--surface); color: var(--text);
   border: 1px solid var(--border); border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md); overflow: clip;
+  box-shadow: var(--shadow-lg); overflow: clip;   /* أعلى طبقة = أعمق ظل */
 }
 .search-suggest__item {
   display: flex; justify-content: space-between; align-items: center; gap: var(--space-3);
@@ -280,8 +314,14 @@
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--border); border-radius: var(--radius-md);
   background: var(--surface); cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast),
+              box-shadow var(--transition-fast);
 }
-.pay-option:has(input:checked) { border-color: var(--primary); background: var(--color-sea-foam); }
+.pay-option:hover { border-color: var(--primary); }
+.pay-option:has(input:checked) {
+  border-color: var(--primary); background: var(--color-sea-foam);
+  box-shadow: inset 0 0 0 1px var(--primary);   /* حد مضاعف = اختيار واضح بلا قفزة */
+}
 .pay-option input { accent-color: var(--primary); inline-size: 20px; block-size: 20px; }
 .pay-option--disabled { opacity: .55; cursor: not-allowed; }
 .pay-option__label { font-weight: var(--fw-medium); }
@@ -289,7 +329,7 @@
 /* تنبيه أخطاء الفورم العامة */
 .form-alert {
   display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-start;
-  background: #FBE7E3; border: 1px solid var(--color-error); color: #99301F;
+  background: var(--tint-error); border: 1px solid var(--color-error); color: var(--on-tint-error);
   border-radius: var(--radius-md); padding: var(--space-4);
   margin-block-start: var(--space-4);
 }
@@ -402,12 +442,23 @@
   min-block-size: 44px; padding-inline: var(--space-4);
   border: 1px solid var(--border); border-radius: var(--radius-pill);
   background: var(--surface); font-weight: var(--fw-medium);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--transition-fast), color var(--transition-fast),
+              background var(--transition-fast);
 }
-.chip:hover { border-color: var(--primary); color: var(--primary); }
+.chip:hover { border-color: var(--primary); color: var(--primary-strong); background: var(--color-sea-foam); }
 
 /* --- بطاقة قابلة للنقر (رابط) ---------------------------------------------- */
-.card--link { display: block; transition: border-color .15s ease; }
-.card--link:hover { border-color: var(--primary); }
+.card--link {
+  display: block;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base),
+              transform var(--transition-base);
+}
+.card--link:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
 .card--link:hover .card__title { color: var(--primary); }
 
 /* --- مسار التنقّل (Breadcrumbs) -------------------------------------------- */
@@ -424,7 +475,12 @@
   text-align: center; color: var(--text-muted);
   padding-block: var(--space-8);
 }
-.empty__icon { font-size: 2.5rem; margin-block-end: var(--space-2); }
+.empty__icon {
+  font-size: 2.25rem; margin-block-end: var(--space-3);
+  inline-size: 88px; block-size: 88px; margin-inline: auto;
+  display: grid; place-items: center;
+  background: var(--color-sea-foam); border-radius: 50%;
+}
 
 /* --- ترقيم الصفحات (Pagination) -------------------------------------------- */
 .pagination {
@@ -455,8 +511,9 @@
   inline-size: 72px; block-size: 72px; padding: 0; overflow: clip;
   border: 1px solid var(--border); border-radius: var(--radius-md);
   background: var(--color-sea-foam);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
-.gallery__thumb:hover { border-color: var(--primary); }
+.gallery__thumb:hover { border-color: var(--primary); box-shadow: var(--shadow-sm); }
 .gallery__thumb img { inline-size: 100%; block-size: 100%; object-fit: cover; }
 
 /* صندوق الشراء */
