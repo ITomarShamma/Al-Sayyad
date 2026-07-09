@@ -42,9 +42,29 @@ def robots_txt(request):
         "Disallow: /cart/",
         "Disallow: /checkout/",
         "Disallow: /track/",
+        "Disallow: /offline/",
         f"Sitemap: {sitemap_url}",
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain")
+
+
+def webmanifest(request):
+    """بيان الـPWA — عبر view (لا ملف static) لضمان نوع المحتوى الصحيح
+    ولاستعمال {% static %} بمسارات الأيقونات."""
+    return render(request, "pages/manifest.webmanifest",
+                  content_type="application/manifest+json")
+
+
+def service_worker(request):
+    """عامل الخدمة — يُقدَّم من الجذر (/sw.js) ليشمل نطاقُه الموقعَ كله؛
+    لو قُدِّم من /static/js/ لاقتصر نطاقه على /static/js/."""
+    return render(request, "pages/sw.js",
+                  content_type="application/javascript")
+
+
+def offline(request):
+    """صفحة «ما في اتصال» — يخزّنها عامل الخدمة ويعرضها عند انقطاع النت."""
+    return render(request, "pages/offline.html")
 
 
 def styleguide(request):

@@ -76,6 +76,11 @@ TRANSLATIONS = {
     "عندك حساب؟": "Already have an account?",
     "سجّل دخول": "Log in",
 
+    # --- PWA / بلا اتصال ---
+    "ما في اتصال بالإنترنت": "No internet connection",
+    "تأكد من الشبكة وجرّب مرة ثانية — سلّتك وطلباتك بأمان.": "Check your connection and try again — your cart and orders are safe.",
+    "جرّب مجدداً": "Try again",
+
     # --- الطلبات ---
     "بانتظار التأكيد": "Awaiting confirmation",
     "مؤكّد": "Confirmed",

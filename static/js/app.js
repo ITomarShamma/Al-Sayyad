@@ -1,6 +1,11 @@
 /* الصَّيَّاد — سلوكيات صغيرة لا تغطيها HTMX.
    نبقيه بأصغر حجم ممكن: كل التفاعل الأساسي بالسيرفر (HTMX). */
 
+// PWA: تسجيل عامل الخدمة (صفحة «ما في اتصال» + قابلية التنصيب)
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js");
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   var box = document.getElementById("search-suggest");
   if (!box) return;

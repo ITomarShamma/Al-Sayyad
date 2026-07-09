@@ -145,6 +145,49 @@ class TrustAndSeoTests(TestCase):
         self.assertContains(resp, 'content="product"')
 
 
+class PwaTests(TestCase):
+    """M27: التطبيق قابل للتنصيب — البيان وعامل الخدمة وصفحة الانقطاع."""
+
+    def test_manifest_served_with_correct_type(self):
+        resp = self.client.get("/manifest.webmanifest")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp["Content-Type"], "application/manifest+json")
+
+    def test_manifest_is_valid_json_with_brand(self):
+        import json
+        data = json.loads(self.client.get("/manifest.webmanifest").content)
+        self.assertEqual(data["short_name"], "الصَّيَّاد")
+        self.assertEqual(data["dir"], "rtl")
+        self.assertEqual(data["start_url"], "/")
+        self.assertEqual(len(data["icons"]), 3)
+
+    def test_manifest_icons_exist_as_static_files(self):
+        """روابط الأيقونات ليست وعوداً فارغة — الملفات موجودة فعلاً."""
+        from django.contrib.staticfiles import finders
+        for path in ("img/pwa/icon-192.png", "img/pwa/icon-512.png",
+                     "img/pwa/apple-touch-icon.png"):
+            self.assertIsNotNone(finders.find(path), path)
+
+    def test_service_worker_served_from_root_scope(self):
+        resp = self.client.get("/sw.js")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp["Content-Type"], "application/javascript")
+        self.assertContains(resp, "/offline/")
+        self.assertContains(resp, 'mode === "navigate"')
+
+    def test_offline_page_is_self_contained(self):
+        resp = self.client.get(reverse("pages:offline"))
+        self.assertContains(resp, "ما في اتصال بالإنترنت")
+        self.assertContains(resp, "<style>")               # الأنماط داخلية
+        self.assertNotContains(resp, 'rel="stylesheet"')   # لا CSS خارجي
+
+    def test_base_template_wires_pwa(self):
+        resp = self.client.get(reverse("pages:home"))
+        self.assertContains(resp, 'rel="manifest"')
+        self.assertContains(resp, 'name="theme-color"')
+        self.assertContains(resp, "apple-touch-icon")
+
+
 class AdminThemeTests(TestCase):
     """M19: لوحة التحكم بهوية الصَّيَّاد."""
 
