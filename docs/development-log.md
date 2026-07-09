@@ -52,8 +52,12 @@ green — so `main` never held broken code. Chat in English, product in Arabic
 | M22 | Notifications | `2a91021` | Owner email on_commit + fail_silently, «راسل الزبون» WhatsApp button in admin |
 | M23 | Coupons | `1139590` | Percent/fixed codes with constraints, session apply via HTMX, row-locked usage counting |
 | M24 | Reviews | `2a98869` | Verified-buyer reviews, star average, CSS-only star input, moderation |
+| M25 | Login rate-limiting | `23cc63a` | Cache counters per phone + per IP, 5 fails = 15-min lock, site + admin logins |
+| M26 | Sales dashboard | `14ffd8a` | /admin/dashboard/: period cards, 14-day CSS chart, top sellers, low stock; `orders.view_order` gate keeps merchants out |
+| M27 | PWA | `f120d53` | Manifest + root-scoped service worker (offline page only — never caches store pages), generated placeholder icons |
+| M28 | Backups | `98545d4` | `manage.py backup`: dumpdata JSON + media in one zip, `--keep` rotation, restore round-trip tested |
 
-**Test suite: 0 → 143 tests, green at every merge.**
+**Test suite: 0 → 167 tests, green at every merge.**
 
 ## Key decisions (and why)
 
@@ -113,19 +117,23 @@ manage.py compilemessages -l en
 gettext lives at `%LOCALAPPDATA%\Programs\gettext-iconv\bin` (installed via
 `winget install mlocati.GetText`, user scope — prefix PATH when running).
 
-## Current state (2026-07-07)
+## Current state (2026-07-09)
 
 Fully functional COD marketplace: catalog with sales & reviews & thumbnails,
 Arabic search with live suggestions, session cart with coupons, zone-based
 delivery fees, checkout with live totals, order tracking, accounts
 (customer/merchant/staff roles), owner notifications, branded bilingual UI
-and admin, sitemap/SEO, 143-test suite, docs for the company.
+and admin, sitemap/SEO — plus, since Tier 2 (M25–M28): login rate-limiting,
+an admin sales dashboard, an installable PWA with an offline page, and
+one-command rotating backups. 167-test suite, docs for the company.
 
 **Waiting on Omar:** ShamCash API + visual identity (hook ready in
 `apps/orders/payments.py`) · real delivery fees per governorate (admin →
-مناطق التوصيل) · final logo from Figma (swap one asset) · deployment decision
-(VPS; prod settings ready).
+مناطق التوصيل) · final logo from Figma (swap one asset + regenerate PWA icons
+with `scripts/make_pwa_icons.py`) · deployment decision (VPS; prod settings
+ready) · scheduling `manage.py backup` (Task Scheduler / cron one-liners are
+in the command help).
 
-**Suggested Tier 2 backlog:** login rate-limiting, admin sales dashboard,
-PWA install support, automated backups; later: PostgreSQL full-text search,
-translatable product fields, wishlist.
+**Suggested Tier 3 backlog:** PostgreSQL full-text search, translatable
+product fields, wishlist, sales CSV export; in prod, a shared cache (Redis /
+DatabaseCache) so rate-limit counters stay exact across Gunicorn workers.
