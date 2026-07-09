@@ -21,6 +21,7 @@ from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
 
 from apps.catalog.sitemaps import CategorySitemap, ProductSitemap
+from apps.orders.dashboard import sales_dashboard
 from apps.pages.sitemaps import StaticPagesSitemap
 from apps.pages.views import robots_txt
 
@@ -31,6 +32,8 @@ sitemaps = {
 }
 
 urlpatterns = [
+    # قبل admin/ إجبارياً — قوس الأدمن يلتقط كل ما تحته بما فيه dashboard/
+    path("admin/dashboard/", sales_dashboard, name="sales_dashboard"),
     path("admin/", admin.site.urls),
     path("i18n/", include("django.conf.urls.i18n")),   # مبدّل اللغة (set_language)
     path("cart/", include("apps.cart.urls")),

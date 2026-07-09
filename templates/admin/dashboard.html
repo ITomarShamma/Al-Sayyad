@@ -1,0 +1,112 @@
+{% extends "admin/base_site.html" %}
+{% comment %}
+لوحة المبيعات (M26) — تُرسم بالسيرفر بالكامل: بطاقات الفترات، مخطط أعمدة
+CSS للأيام، جدول الحالات، الأكثر مبيعاً، وتنبيه المخزون المنخفض.
+البيانات من apps/orders/dashboard.py — القالب يعرض فقط.
+{% endcomment %}
+
+{% block title %}لوحة المبيعات | لوحة تحكم الصَّيَّاد{% endblock %}
+
+{% block content %}
+<div class="sales-dash">
+
+  {# ——— بطاقات الفترات ——— #}
+  <section class="dash-cards">
+    {% for label, data in cards %}
+    <div class="dash-card">
+      <span class="dash-card__label">{{ label }}</span>
+      <b class="dash-card__value">{{ data.revenue }} <small>ل.س</small></b>
+      <span class="dash-card__meta">{{ data.count_display }}</span>
+    </div>
+    {% endfor %}
+  </section>
+
+  {# ——— مبيعات آخر ١٤ يوماً ——— #}
+  <section class="module dash-module">
+    <h2>المبيعات اليومية — آخر 14 يوم</h2>
+    <div class="dash-chart">
+      {% for day in days %}
+      <div class="dash-chart__col" title="{{ day.label }} — {{ day.revenue }} ل.س ({{ day.count }} طلب)">
+        <div class="dash-chart__track">
+          <div class="dash-chart__bar" style="block-size: {{ day.bar }}%;"></div>
+        </div>
+        <span class="dash-chart__x">{{ day.label }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <div class="dash-grid">
+
+    {# ——— الطلبات بالحالة ——— #}
+    <section class="module dash-module">
+      <h2>الطلبات بالحالة (منذ البداية)</h2>
+      <table class="dash-table">
+        <thead>
+          <tr><th>الحالة</th><th>العدد</th><th>القيمة (ل.س)</th></tr>
+        </thead>
+        <tbody>
+          {% for row in statuses %}
+          <tr>
+            <td><b style="color:{{ row.color }};">● {{ row.label }}</b></td>
+            <td>{{ row.count }}</td>
+            <td>{{ row.revenue }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    {# ——— الأكثر مبيعاً ——— #}
+    <section class="module dash-module">
+      <h2>الأكثر مبيعاً — آخر 30 يوم</h2>
+      {% if top_products %}
+      <table class="dash-table">
+        <thead>
+          <tr><th>المنتج</th><th>قطع</th><th>القيمة (ل.س)</th></tr>
+        </thead>
+        <tbody>
+          {% for row in top_products %}
+          <tr>
+            <td>
+              {{ row.product_name }}
+              <div class="dash-bar"><div class="dash-bar__fill" style="inline-size: {{ row.bar }}%;"></div></div>
+            </td>
+            <td>{{ row.qty }}</td>
+            <td>{{ row.revenue }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="dash-empty">ما في مبيعات بهالفترة بعد.</p>
+      {% endif %}
+    </section>
+
+  </div>
+
+  {# ——— مخزون منخفض ——— #}
+  <section class="module dash-module">
+    <h2>مخزون منخفض (≤ {{ low_stock_threshold }} قطع)</h2>
+    {% if low_stock %}
+    <table class="dash-table">
+      <thead>
+        <tr><th>المنتج</th><th>المتبقي</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for product in low_stock %}
+        <tr>
+          <td>{{ product.name }}</td>
+          <td><b style="color:{% if product.stock == 0 %}#D5402B{% else %}#E8A317{% endif %};">{{ product.stock }}</b></td>
+          <td><a href="{% url 'admin:catalog_product_change' product.pk %}">تعديل ←</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="dash-empty">كل المنتجات المفعّلة مخزونها بخير ✓</p>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock %}

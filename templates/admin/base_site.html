@@ -23,4 +23,9 @@
 </div>
 {% endblock %}
 
-{% block nav-global %}{% endblock %}
+{% block nav-global %}
+  {# لوحة المبيعات لمن يرى الطلبات فقط — التاجر لا يرى أرقام المتجر كله #}
+  {% if user.is_active and perms.orders.view_order %}
+    <a class="dash-link" href="{% url 'sales_dashboard' %}">📊 لوحة المبيعات</a>
+  {% endif %}
+{% endblock %}

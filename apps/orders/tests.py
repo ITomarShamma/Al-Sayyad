@@ -395,3 +395,69 @@ class OrdersAdminTests(TestCase):
         self.client.force_login(admin_user)
         resp = self.client.get(reverse("admin:orders_order_changelist"))
         self.assertEqual(resp.status_code, 200)
+
+
+class SalesDashboardTests(TestCase):
+    """M26: لوحة المبيعات — الأرقام صحيحة والوصول محكوم بالصلاحية."""
+
+    def setUp(self):
+        from django.contrib.auth import get_user_model
+        self.boss = get_user_model().objects.create_superuser("boss", "b@b.b", "x")
+        self.product = make_product(stock=2)          # ≤ 3 = يظهر بتنبيه المخزون
+        self.url = reverse("sales_dashboard")
+
+    def order(self, status=Order.Status.PENDING, qty=1, total="250000"):
+        order = Order.objects.create(
+            customer_name="زبون", phone="0911111111", city="دمشق",
+            address="عنوان", total=Decimal(total), status=status)
+        order.items.create(product=self.product, product_name=self.product.name,
+                           unit_price=self.product.price, quantity=qty)
+        return order
+
+    def test_anonymous_redirected_to_admin_login(self):
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 302)
+        self.assertIn("/admin/login/", resp.url)
+
+    def test_staff_without_order_permission_denied(self):
+        """التاجر staff لكن بلا صلاحية طلبات — أرقام المتجر ليست له."""
+        from django.contrib.auth import get_user_model
+        merchant = get_user_model().objects.create_user("0922222222",
+                                                        password="x", is_staff=True)
+        self.client.force_login(merchant)
+        self.assertEqual(self.client.get(self.url).status_code, 403)
+
+    def test_totals_exclude_cancelled(self):
+        self.order(total="100000")
+        self.order(total="50000", status=Order.Status.DELIVERED)
+        self.order(total="999999", status=Order.Status.CANCELLED)   # يسقط
+        self.client.force_login(self.boss)
+        resp = self.client.get(self.url)
+        self.assertContains(resp, "150,000")          # 100+50 ألف، بلا الملغى
+        self.assertContains(resp, "طلبان")            # والعدّ بجمع عربي سليم
+
+    def test_top_products_and_low_stock_listed(self):
+        self.order(qty=3)
+        self.client.force_login(self.boss)
+        resp = self.client.get(self.url)
+        self.assertContains(resp, self.product.name)  # الأكثر مبيعاً
+        self.assertContains(resp, "مخزون منخفض")      # وقسم التنبيه موجود
+
+    def test_empty_store_renders_fine(self):
+        """متجر بلا أي طلب — اللوحة تفتح بأصفار بلا قسمة على صفر."""
+        Order.objects.all().delete()
+        self.client.force_login(self.boss)
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "ما في مبيعات")
+
+    def test_dashboard_link_shown_only_with_permission(self):
+        self.client.force_login(self.boss)
+        self.assertContains(self.client.get(reverse("admin:index")),
+                            "لوحة المبيعات")
+        from django.contrib.auth import get_user_model
+        merchant = get_user_model().objects.create_user("0933333333",
+                                                        password="x", is_staff=True)
+        self.client.force_login(merchant)
+        self.assertNotContains(self.client.get(reverse("admin:index")),
+                               "لوحة المبيعات")
