@@ -13,6 +13,9 @@ db.sqlite3-journal
 /staticfiles/
 /media/
 
+# Backups (manage.py backup)
+/backups/
+
 # Secrets / environment
 .env
 

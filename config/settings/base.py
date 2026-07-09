@@ -166,5 +166,10 @@ EMAIL_BACKEND = (
 ORDER_NOTIFICATION_EMAIL = env("ORDER_NOTIFICATION_EMAIL", STORE_EMAIL)
 
 
+# --- Backups (manage.py backup) --------------------------------------------
+# وجهة النسخ الاحتياطية — خارج git. على السيرفر يُفضَّل قرص/مسار منفصل.
+BACKUP_DIR = Path(env("BACKUP_DIR", BASE_DIR / "backups"))
+
+
 # --- Misc -----------------------------------------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
