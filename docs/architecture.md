@@ -1,7 +1,8 @@
 # معمارية متجر الصَّيَّاد
 
-> وثيقة مرجعية للشركة: كيف مبني المشروع ولماذا. ترافق `database-schema.md`.
-> آخر تحديث: 2026-07-09 (بعد Tier 2: الموديولات M25–M28).
+> وثيقة مرجعية للشركة: كيف مبني المشروع ولماذا.
+> ترافقها: `database-schema.md` · `design.md` (الهوية والتجربة) · `deployment.md` (النشر).
+> آخر تحديث: 2026-07-10 (بعد M29 وخطة النشر).
 
 ## الأساس التقني (ولماذا)
 
@@ -115,8 +116,6 @@ apps/
   عند إضافة نصوص جديدة: `manage.py makemessages -l en` ثم
   `python scripts/translate_en.py` (يملأ الترجمات ويكشف الناقص) ثم
   `manage.py compilemessages`. (gettext منصّب عبر winget: mlocati.GetText)
-- **النشر:** VPS + Gunicorn/Nginx + PostgreSQL (`config/settings/prod.py`
-  جاهزة وتُقرأ من `.env`). بعض المزوّدين يحجبون IP سوري — يُختار المزوّد وفق ذلك.
-  عند النشر: جدولة `manage.py backup` (سطر cron جاهز بمساعدة الأمر)، وكاش
-  مشترك (Redis أو DatabaseCache) لتكون عدّادات حماية الدخول دقيقة مع أكثر من
-  Gunicorn worker، وتمرير real_ip من Nginx كي لا يتشارك الزوار عنواناً واحداً.
+- **النشر:** القرار والخطة الكاملة في `deployment.md` — التوصية Hetzner CX22،
+  والكود جاهز (`prod.py` + `requirements-prod.txt` + كاش مشترك لعدّادات
+  حماية الدخول). التنفيذ ينتظر شراء السيرفر والدومين.

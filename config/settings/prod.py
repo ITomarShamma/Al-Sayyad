@@ -20,6 +20,19 @@ DATABASES = {
     }
 }
 
+# Shared cache: login rate-limit counters (M25) must be shared across all
+# Gunicorn workers — the default LocMem cache is per-process, which would
+# multiply the allowed attempts by the worker count. DatabaseCache is exact,
+# needs no extra service, and requires a one-time:
+#   python manage.py createcachetable
+# (Upgrade to Redis later only if cache traffic ever becomes a bottleneck.)
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "django_cache",
+    }
+}
+
 # Security hardening — assumes the site runs behind HTTPS in production.
 SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", True)
 SESSION_COOKIE_SECURE = True

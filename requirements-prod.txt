@@ -1,0 +1,6 @@
+# متطلبات الإنتاج — على السيرفر فقط:  pip install -r requirements-prod.txt
+# (تتضمن متطلبات التطوير + ما يلزم السيرفر حصراً)
+-r requirements.txt
+
+psycopg[binary]>=3.2     # PostgreSQL driver
+gunicorn>=23.0           # WSGI application server (خلف Nginx)
