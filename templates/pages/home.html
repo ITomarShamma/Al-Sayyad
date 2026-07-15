@@ -5,9 +5,19 @@
 
 {% block content %}
 <section class="hero">
+  <p class="hero__kicker"><span aria-hidden="true">🎣</span> {% translate 'سوقك السوري الموثوق' %}</p>
   <h1>{% translate 'كل شي لبيتك، بمكان واحد.' %}</h1>
   <p class="hero__tagline">{% translate 'اطلب… ونحن نصطاد لك.' %}</p>
-  <a class="btn btn--accent" href="{% url 'catalog:category_list' %}">{% translate 'ابدأ التسوّق' %}</a>
+  <div class="hero__actions">
+    <a class="btn btn--accent" href="{% url 'catalog:category_list' %}">{% translate 'ابدأ التسوّق' %}</a>
+    <a class="btn btn--ghost" href="{% url 'orders:track' %}">{% translate 'تتبع طلبك' %}</a>
+  </div>
+  {# نقاط ثقة سريعة — تطمئن من يشتري أونلاين لأول مرة قبل أي نقرة #}
+  <ul class="hero__points">
+    <li>{% translate 'دفع عند الاستلام' %}</li>
+    <li>{% translate 'توصيل لباب بيتك' %}</li>
+    <li>{% translate 'دعم سريع عالواتساب' %}</li>
+  </ul>
 </section>
 
 {% if categories %}
