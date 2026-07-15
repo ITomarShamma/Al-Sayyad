@@ -1220,3 +1220,11 @@ msgstr "Product cards"
 msgid ""
 "بيانات تجريبية الآن؛ بالموديول M4 منمرّر منتجات حقيقية من قاعدة البيانات."
 msgstr "Demo data for now; module M4 feeds real products from the database."
+
+#: .\templates\pages\home.html:15
+msgid "توصيل لباب بيتك"
+msgstr "Delivery to your door"
+
+#: .\templates\pages\home.html:16
+msgid "دعم سريع عالواتساب"
+msgstr "Fast support on WhatsApp"

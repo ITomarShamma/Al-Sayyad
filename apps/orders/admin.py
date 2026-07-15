@@ -21,12 +21,12 @@ class CouponAdmin(admin.ModelAdmin):
     def state(self, obj):
         from django.utils import timezone
         if not obj.is_active:
-            return format_html('<b style="color:#5B6B64;">● موقوف</b>')
+            return format_html('<b style="color:#51637A;">● موقوف</b>')
         if obj.expires_at and obj.expires_at < timezone.now():
-            return format_html('<b style="color:#D5402B;">● منتهي</b>')
+            return format_html('<b style="color:#D93526;">● منتهي</b>')
         if obj.usage_limit is not None and obj.used_count >= obj.usage_limit:
-            return format_html('<b style="color:#E8A317;">● استُنفد</b>')
-        return format_html('<b style="color:#2E9E54;">● فعّال</b>')
+            return format_html('<b style="color:#B45309;">● استُنفد</b>')
+        return format_html('<b style="color:#15803D;">● فعّال</b>')
 
 
 @admin.register(DeliveryZone)
@@ -40,18 +40,18 @@ class DeliveryZoneAdmin(admin.ModelAdmin):
     @admin.display(description="الحالة")
     def fee_state(self, obj):
         if obj.fee is None:
-            return format_html('<b style="color:#E8A317;">● يُتفق هاتفياً</b>')
+            return format_html('<b style="color:#B45309;">● يُتفق هاتفياً</b>')
         if obj.fee == 0:
-            return format_html('<b style="color:#2E9E54;">● توصيل مجاني</b>')
-        return format_html('<span style="color:#0E6B5E;">● {} ل.س</span>', obj.fee_display)
+            return format_html('<b style="color:#15803D;">● توصيل مجاني</b>')
+        return format_html('<span style="color:#0F62B0;">● {} ل.س</span>', obj.fee_display)
 
 # لون كل حالة — نفس ألوان الهوية الدلالية
 STATUS_COLORS = {
-    Order.Status.PENDING: "#E8A317",     # بانتظار التأكيد — تنبيه
-    Order.Status.CONFIRMED: "#2D6FB3",   # مؤكّد — معلومة
-    Order.Status.SHIPPED: "#0E6B5E",     # قيد التوصيل — أساسي
-    Order.Status.DELIVERED: "#2E9E54",   # مُسلَّم — نجاح
-    Order.Status.CANCELLED: "#D5402B",   # ملغى — خطأ
+    Order.Status.PENDING: "#B45309",     # بانتظار التأكيد — تنبيه
+    Order.Status.CONFIRMED: "#1D6FC2",   # مؤكّد — معلومة
+    Order.Status.SHIPPED: "#0F62B0",     # قيد التوصيل — أساسي
+    Order.Status.DELIVERED: "#15803D",   # مُسلَّم — نجاح
+    Order.Status.CANCELLED: "#D93526",   # ملغى — خطأ
 }
 
 
@@ -84,7 +84,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     @admin.display(description="الحالة", ordering="status")
     def status_display(self, obj):
-        color = STATUS_COLORS.get(obj.status, "#5B6B64")
+        color = STATUS_COLORS.get(obj.status, "#51637A")
         return format_html('<b style="color:{};">● {}</b>', color, obj.get_status_display())
     inlines = [OrderItemInline]
     readonly_fields = ("number", "total", "created_at", "updated_at")

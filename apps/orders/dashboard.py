@@ -76,7 +76,7 @@ def _status_rows(orders):
         row = raw.get(status.value, {})
         rows.append({
             "label": status.label,
-            "color": STATUS_COLORS.get(status, "#5B6B64"),
+            "color": STATUS_COLORS.get(status, "#51637A"),
             "count": row.get("count", 0),
             "revenue": fmt(row.get("revenue")),
         })
