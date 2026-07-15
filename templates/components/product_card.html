@@ -14,7 +14,7 @@
 {% load i18n %}
 {% translate 'أضف للسلة' as add_label %}
 {% translate 'دفع عند الاستلام' as cod_label %}
-<article class="product-card">
+<article class="product-card reveal" data-tilt>
   <a class="product-card__media" href="{{ href|default:'#' }}">
     {% if old_price %}<span class="sale-flag">{% blocktranslate %}خصم {{ discount }}٪{% endblocktranslate %}</span>{% endif %}
     {% if image_url %}<img src="{{ image_url }}" alt="{{ name }}" loading="lazy">

@@ -70,20 +70,24 @@ def offline(request):
 def styleguide(request):
     """دليل المكوّنات — يعرض كل مكوّنات الواجهة وحالاتها (صفحة تطوير)."""
     # قائمة الألوان نمرّرها للقالب ليبني عيّنات (swatches) منها.
+    # أدوار تشير للثيم النشط — العيّنات تُرسم حيّة، فتتبدّل مع الوضع الليلي.
+    # الـhex المطبوع للثيم الفاتح (مرجعي).
     colors = [
-        ("Tide — أساسي", "--color-tide", "#0E6B5E"),
-        ("Deep Sea", "--color-deep-sea", "#0B4A41"),
-        ("Catch Gold — تمييز", "--color-gold", "#D99A2B"),
-        ("Sea Foam", "--color-sea-foam", "#E4F1ED"),
-        ("Ink — نص", "--color-ink", "#16261F"),
-        ("Slate — نص ثانوي", "--color-slate", "#5B6B64"),
-        ("Line — حدود", "--color-line", "#E6E1D3"),
-        ("Paper — خلفية", "--color-paper", "#FAF8F2"),
-        ("Success", "--color-success", "#2E9E54"),
-        ("Error", "--color-error", "#D5402B"),
-        ("Warning", "--color-warning", "#E8A317"),
-        ("Info", "--color-info", "#2D6FB3"),
-        ("ShamCash", "--color-shamcash", "#1FA37A"),
+        ("Primary — فيروزي البحر", "--primary", "#0E7C90"),
+        ("Primary strong", "--primary-strong", "#0A5F70"),
+        ("Accent — مرجاني", "--accent", "#CC3D1C"),
+        ("Violet — بنفسجي السماء", "--color-violet", "#6D4AFF"),
+        ("Surface", "--surface", "#FFFFFF"),
+        ("Surface-2 — سطح غائر", "--surface-2", "#EEF2F8"),
+        ("Ink — نص", "--text", "#131722"),
+        ("Slate — نص ثانوي", "--text-muted", "#5A6472"),
+        ("Line — حدود", "--border", "#E2E7F0"),
+        ("BG — خلفية", "--bg", "#F5F7FB"),
+        ("Success", "--color-success", "#15803D"),
+        ("Error", "--color-error", "#D93526"),
+        ("Warning", "--color-warning", "#B45309"),
+        ("Info", "--color-info", "#1D6FC2"),
+        ("ShamCash", "--color-shamcash", "#0A7A55"),
         ("COD", "--color-cod", "#7A5B2A"),
     ]
     return render(request, "pages/styleguide.html", {"colors": colors})

@@ -3,12 +3,29 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  {% comment %}
+    الثيم بلا وميض: نضبط data-theme قبل أول رسم من اختيار المستخدم المحفوظ،
+    ونعلّم html بـ«js» ليأخذ CSS بحسبانه (بدونه يبقى كل شيء ظاهراً).
+  {% endcomment %}
+  <script>
+    (function () {
+      var d = document.documentElement;
+      d.classList.add("js");
+      try {
+        var t = localStorage.getItem("sayyad-theme");
+        if (t === "light" || t === "dark") d.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+
   <title>{% block title %}الصَّيَّاد{% endblock %}</title>
   <meta name="description" content="{% block description %}الصَّيَّاد — سوق سوري موثوق. اطلب… ونحن نصطاد لك.{% endblock %}">
 
   {# PWA (M27): قابل للتنصيب على الشاشة الرئيسية — عامل الخدمة يُسجَّل من app.js #}
   <link rel="manifest" href="{% url 'pages:webmanifest' %}">
-  <meta name="theme-color" content="#0B4A41">
+  {# theme-color يتزامن مع الثيم عبر app.js؛ القيمة الأولية للفاتح #}
+  <meta name="theme-color" content="#F5F7FB">
   <link rel="apple-touch-icon" href="{% static 'img/pwa/apple-touch-icon.png' %}">
 
   {# بطاقات المشاركة (OpenGraph): كيف يظهر الرابط بالواتساب وفيسبوك #}
@@ -60,6 +77,12 @@
         <a {% if 'accounts:' in vn %}class="is-active"{% endif %} href="{% url 'accounts:account' %}"><span aria-hidden="true">👤</span>{% translate 'حسابي' %}</a>
       </nav>
       {% endwith %}
+
+      {# زر تبديل الثيم (فاتح/داكن) — يعمل بالـJS فقط، لذا لا يظهر بدونه #}
+      <button class="theme-toggle" type="button" data-theme-toggle
+              aria-pressed="false" aria-label="{% translate 'تبديل الوضع الليلي' %}">
+        <span data-theme-icon aria-hidden="true">🌙</span>
+      </button>
     </div>
   </header>
 

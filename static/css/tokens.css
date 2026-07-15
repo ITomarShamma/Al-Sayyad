@@ -1,56 +1,28 @@
 /* ==========================================================================
-   الصَّيَّاد — Design Tokens (المصدر الوحيد للهوية البصرية)
-   كل لون/مقاس/مسافة يُعرّف هنا مرة واحدة فقط. لا تكتب قيمة لون أو حجم
-   مباشرةً في أي ملف آخر — استعمل متغيّراً من هنا.
-   (القاعدة الذهبية #2: tokens & components فقط، لا تكرار)
+   الصَّيَّاد — Design Tokens · هوية «شفق» (Aurora)
+   المصدر الوحيد للهوية البصرية. لا تكتب لوناً أو مقاساً خارج هذا الملف.
+
+   جديد في هذه الهوية:
+   • نظام ثيمين كاملين (فاتح + داكن) — المكوّنات تستعمل «الأدوار» فقط،
+     فتنقلب تلقائياً. الثيم يُحسم من تفضيل النظام أو زر التبديل (data-theme).
+   • ألوان الشفق: فيروزي البحر (أساسي) + مرجاني دافئ (فعل) + بنفسجي السماء
+     (توهّج/وسم). كل أزواج النص/الخلفية مدقَّقة WCAG AA في الثيمين.
+   • رموز حركة (مدد + منحنيات) لطبقة التحسين التدريجي.
    ========================================================================== */
+
 :root {
-  /* --- البراند: أساسي وثانوي --- */
-  --color-deep-sea: #0B4A41;
-  --color-tide:     #0E6B5E;   /* اللون الأساسي */
-  --color-gold:     #D99A2B;   /* لون التمييز */
-  --color-sea-foam: #E4F1ED;   /* خلفية فاتحة هادئة */
+  /* ===== ثوابت لا تتبع الثيم ===== */
 
-  /* --- محايدة --- */
-  --color-ink:   #16261F;      /* النص الأساسي */
-  --color-slate: #5B6B64;      /* نص ثانوي */
-  --color-line:  #E6E1D3;      /* حدود وفواصل */
-  --color-paper: #FAF8F2;      /* خلفية الصفحة */
-  --color-white: #FFFFFF;
+  /* ثلاثية الشفق الخام (للتدرّجات والتوهّج — لا تُستعمل كنص مباشرة) */
+  --aurora-teal:   #16B8C6;
+  --aurora-coral:  #FF6A47;
+  --aurora-violet: #7C5CFF;
 
-  /* --- دلالية (Semantic) --- */
-  --color-success: #2E9E54;
-  --color-error:   #D5402B;
-  --color-warning: #E8A317;
-  --color-info:    #2D6FB3;
-
-  /* خلفيات فاتحة للدلالات (tints) + نص داكن يقرأ فوقها —
-     كانت مبعثرة كأرقام hex بالمكوّنات؛ الآن مصدرها واحد */
-  --tint-success: #E6F4EC;  --on-tint-success: #1D6B38;
-  --tint-error:   #FBE7E3;  --on-tint-error:   #99301F;
-  --tint-warning: #FBF0D8;  --on-tint-warning: #9A6A0A;
-  --tint-info:    #E4EEFA;  --on-tint-info:    #1F4E80;
-
-  /* --- ألوان الدفع --- */
-  --color-shamcash: #1FA37A;
-  --color-cod:      #7A5B2A;
-
-  /* --- أدوار الألوان (نستعمل هدول بالواجهة، مو أسماء الألوان مباشرة) --- */
-  --bg:             var(--color-paper);
-  --surface:        var(--color-white);
-  --text:           var(--color-ink);
-  --text-muted:     var(--color-slate);
-  --border:         var(--color-line);
-  --primary:        var(--color-tide);
-  --primary-strong: var(--color-deep-sea);
-  --accent:         var(--color-gold);
-  --on-primary:     var(--color-white);
-
-  /* --- الطباعة --- */
+  /* الطباعة */
   --font-base: "IBM Plex Sans Arabic", system-ui, "Segoe UI", Tahoma, sans-serif;
-  --fs-display: 2.75rem;    /* 44px — عنوان الـhero على الشاشات الكبيرة */
-  --fs-h1:      2rem;       /* 32px */
-  --fs-h2:      1.5rem;     /* 24px */
+  --fs-display: 3.5rem;     /* 56px — عنوان الـhero على الشاشات الكبيرة */
+  --fs-h1:      2.25rem;    /* 36px */
+  --fs-h2:      1.625rem;   /* 26px */
   --fs-h3:      1.125rem;   /* 18px */
   --fs-body:    1rem;       /* 16px — أبداً تحت 13px */
   --fs-caption: 0.8125rem;  /* 13px */
@@ -58,39 +30,193 @@
   --fw-medium:   500;
   --fw-semibold: 600;
   --fw-bold:     700;
-  --lh-base:  1.75;   /* line-height مريح (1.7–1.8) */
-  --lh-tight: 1.3;
+  --lh-base:  1.75;
+  --lh-tight: 1.2;
 
-  /* --- سلّم المسافات (أساسه 4px) --- */
-  --space-1: 0.25rem;  /*  4 */
-  --space-2: 0.5rem;   /*  8 */
-  --space-3: 0.75rem;  /* 12 */
-  --space-4: 1rem;     /* 16 */
-  --space-5: 1.5rem;   /* 24 */
-  --space-6: 2rem;     /* 32 */
-  --space-8: 3rem;     /* 48 */
+  /* سلّم المسافات (أساسه 4px) */
+  --space-1: 0.25rem;  --space-2: 0.5rem;  --space-3: 0.75rem;
+  --space-4: 1rem;     --space-5: 1.5rem;  --space-6: 2rem;
+  --space-7: 2.5rem;   --space-8: 3rem;    --space-10: 4rem;  --space-12: 6rem;
 
-  /* --- نصف القطر (Radius) --- */
-  --radius-sm:   6px;
-  --radius-md:   12px;
-  --radius-lg:   20px;
+  /* نصف القطر */
+  --radius-sm:   8px;
+  --radius-md:   14px;
+  --radius-lg:   22px;
+  --radius-xl:   32px;
   --radius-pill: 999px;
 
-  /* --- ظلال (طبقتان لكل ظل = عمق أنعم وأصدق) --- */
-  --shadow-sm: 0 1px 2px rgba(22, 38, 31, 0.05), 0 1px 6px rgba(22, 38, 31, 0.04);
-  --shadow-md: 0 2px 6px rgba(22, 38, 31, 0.06), 0 8px 24px rgba(22, 38, 31, 0.08);
-  --shadow-lg: 0 4px 12px rgba(22, 38, 31, 0.08), 0 16px 48px rgba(22, 38, 31, 0.14);
+  /* حركة — مدد ومنحنيات */
+  --dur-1: 0.14s;   /* ألوان/حدود */
+  --dur-2: 0.28s;   /* رفعة/تكبير */
+  --dur-3: 0.5s;    /* دخول العناصر (reveal) */
+  --dur-4: 0.8s;    /* أنيميشن الخلفية */
+  --ease-out:   cubic-bezier(0.22, 0.8, 0.28, 1);   /* خروج ناعم (الافتراضي) */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* ارتداد خفيف (نطّة) */
+  --transition-fast: color var(--dur-1) var(--ease-out), background var(--dur-1) var(--ease-out), border-color var(--dur-1) var(--ease-out), box-shadow var(--dur-1) var(--ease-out);
+  --transition-base: var(--dur-2) var(--ease-out);
 
-  /* --- حركة وتركيز --- */
-  --transition-fast: 0.15s ease;
-  --transition-base: 0.25s ease;
-  --focus-ring: 0 0 0 3px rgba(14, 107, 94, 0.30);   /* Tide بشفافية */
+  /* تخطيط */
+  --tap-min:        48px;
+  --container-max:  1200px;
+  --content-narrow: 720px;
+  --bp-desktop:     768px;
+  --header-h:       68px;
+  --bottomnav-h:    64px;
+  --bottomnav-gap:  12px;
 
-  /* --- تخطيط (Layout) --- */
-  --tap-min:       48px;     /* أصغر هدف نقر (القاعدة #1) */
-  --container-max: 1200px;   /* أقصى عرض للمحتوى على الشاشات الكبيرة */
-  --content-narrow: 720px;   /* عرض مريح للقراءة (نصوص/نماذج) */
-  --bp-desktop:    768px;    /* نقطة التحوّل: موبايل ↔ سطح المكتب (مرجعية) */
-  --header-h:      60px;
-  --bottomnav-h:   64px;
+  /* ===== الثيم الفاتح (الافتراضي) ===== */
+  --color-bg:        #F5F7FB;
+  --color-surface:   #FFFFFF;
+  --color-surface-2: #EEF2F8;
+  --color-ink:       #131722;
+  --color-slate:     #5A6472;
+  --color-line:      #E2E7F0;
+
+  --color-primary:        #0E7C90;
+  --color-primary-strong: #0A5F70;
+  --on-primary:           #FFFFFF;
+  --color-accent:         #CC3D1C;
+  --color-accent-strong:  #AE3318;
+  --on-accent:            #FFFFFF;
+  --color-violet:         #6D4AFF;
+
+  --color-success: #15803D;  --color-error: #D93526;
+  --color-warning: #B45309;  --color-info:  #1D6FC2;
+  --tint-success: #E3F5EA;  --on-tint-success: #0F6236;
+  --tint-error:   #FCE9E6;  --on-tint-error:   #A02418;
+  --tint-warning: #FBF0DA;  --on-tint-warning: #7A5200;
+  --tint-info:    #E5F0FB;  --on-tint-info:    #154F8C;
+
+  --color-shamcash: #0A7A55;
+  --color-cod:      #7A5B2A;
+
+  /* أسطح خاصة (هيدر/فوتر) — زجاجية تتكيّف مع الثيم */
+  --glass-bg:     rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(19, 23, 34, 0.08);
+  --scrim:        rgba(19, 23, 34, 0.55);   /* حجاب فوق الصور الداكنة */
+  --on-dark:      #FFFFFF;                   /* نص فوق الأسطح الشفقية الداكنة (hero) */
+  --on-dark-muted: rgba(255, 255, 255, 0.76);
+
+  /* الظلال (ملوّنة قليلاً بالفيروزي = عمق ينتمي للهوية) */
+  --shadow-sm: 0 1px 2px rgba(16, 30, 45, 0.06), 0 2px 8px rgba(16, 30, 45, 0.05);
+  --shadow-md: 0 4px 10px rgba(16, 30, 45, 0.08), 0 14px 34px rgba(16, 30, 45, 0.10);
+  --shadow-lg: 0 10px 26px rgba(16, 30, 45, 0.12), 0 30px 64px rgba(16, 30, 45, 0.18);
+  --glow-primary: 0 8px 26px rgba(14, 124, 144, 0.34);
+  --glow-accent:  0 8px 26px rgba(204, 61, 28, 0.34);
+
+  --focus-ring:        0 0 0 3px rgba(14, 124, 144, 0.40);
+  --focus-ring-accent: 0 0 0 3px rgba(255, 200, 120, 0.55);
+
+  /* ===== أدوار عامة تشير للثيم النشط (المكوّنات تستعمل هذه) ===== */
+  --bg:             var(--color-bg);
+  --surface:        var(--color-surface);
+  --surface-2:      var(--color-surface-2);
+  --text:           var(--color-ink);
+  --text-muted:     var(--color-slate);
+  --border:         var(--color-line);
+  --primary:        var(--color-primary);
+  --primary-strong: var(--color-primary-strong);
+  --accent:         var(--color-accent);
+  --accent-strong:  var(--color-accent-strong);
+  --tint:           var(--color-surface-2);
+
+  /* تدرّجات الهوية (جاهزة) */
+  --grad-primary: linear-gradient(180deg, color-mix(in srgb, var(--color-primary) 88%, white) 0%, var(--color-primary) 100%);
+  --grad-accent:  linear-gradient(180deg, color-mix(in srgb, var(--color-accent) 86%, white) 0%, var(--color-accent) 100%);
+  --grad-mark:    linear-gradient(135deg, var(--aurora-teal) 0%, var(--aurora-violet) 100%);
+  --grad-underline: linear-gradient(90deg, var(--aurora-teal), var(--aurora-violet));
+  /* شفق الـhero: ثلاث بقع تتحرك ببطء (انظر base.css) */
+  --aurora-1: rgba(22, 184, 198, 0.55);
+  --aurora-2: rgba(124, 92, 255, 0.50);
+  --aurora-3: rgba(255, 106, 71, 0.45);
+  --hero-base: #0B1622;   /* قاعدة داكنة يطفو فوقها الشفق (ثابتة بين الثيمين) */
+
+  color-scheme: light;
+}
+
+/* ==========================================================================
+   الثيم الداكن — يُطبَّق تلقائياً مع تفضيل النظام، ما لم يفرض المستخدم الفاتح.
+   ثم يُطبَّق يدوياً عبر [data-theme="dark"]. نُبقي التعريف مرّة ونعيد استعماله.
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg:        #0A0E16;
+    --color-surface:   #121824;
+    --color-surface-2: #1A2130;
+    --color-ink:       #EAEEF6;
+    --color-slate:     #98A3B5;
+    --color-line:      #28313F;
+
+    --color-primary:        #2CC2CE;
+    --color-primary-strong: #54D3DD;
+    --on-primary:           #04222A;
+    --color-accent:         #FF6A47;
+    --color-accent-strong:  #FF8266;
+    --on-accent:            #2A0C05;
+    --color-violet:         #9B84FF;
+
+    --color-success: #3DD07F;  --color-error: #FF6A5A;
+    --color-warning: #F0B24B;  --color-info:  #5AA9F0;
+    --tint-success: #123726;  --on-tint-success: #9FE9C0;
+    --tint-error:   #3A1A18;  --on-tint-error:   #FFB3A8;
+    --tint-warning: #3A2C12;  --on-tint-warning: #F3CD8C;
+    --tint-info:    #122A40;  --on-tint-info:    #A8D2FA;
+
+    --color-shamcash: #37C79B;
+    --color-cod:      #C8A46A;
+
+    --glass-bg:     rgba(18, 24, 36, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.10);
+    --scrim:        rgba(6, 10, 18, 0.62);
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.40), 0 2px 10px rgba(0, 0, 0, 0.36);
+    --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.46), 0 18px 42px rgba(0, 0, 0, 0.42);
+    --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.52), 0 34px 70px rgba(0, 0, 0, 0.55);
+    --glow-primary: 0 8px 30px rgba(44, 194, 206, 0.40);
+    --glow-accent:  0 8px 30px rgba(255, 106, 71, 0.42);
+    --focus-ring:        0 0 0 3px rgba(44, 194, 206, 0.55);
+
+    color-scheme: dark;
+  }
+}
+
+/* اختيار المستخدم الصريح للداكن (يتجاوز تفضيل النظام) */
+:root[data-theme="dark"] {
+  --color-bg:        #0A0E16;
+  --color-surface:   #121824;
+  --color-surface-2: #1A2130;
+  --color-ink:       #EAEEF6;
+  --color-slate:     #98A3B5;
+  --color-line:      #28313F;
+
+  --color-primary:        #2CC2CE;
+  --color-primary-strong: #54D3DD;
+  --on-primary:           #04222A;
+  --color-accent:         #FF6A47;
+  --color-accent-strong:  #FF8266;
+  --on-accent:            #2A0C05;
+  --color-violet:         #9B84FF;
+
+  --color-success: #3DD07F;  --color-error: #FF6A5A;
+  --color-warning: #F0B24B;  --color-info:  #5AA9F0;
+  --tint-success: #123726;  --on-tint-success: #9FE9C0;
+  --tint-error:   #3A1A18;  --on-tint-error:   #FFB3A8;
+  --tint-warning: #3A2C12;  --on-tint-warning: #F3CD8C;
+  --tint-info:    #122A40;  --on-tint-info:    #A8D2FA;
+
+  --color-shamcash: #37C79B;
+  --color-cod:      #C8A46A;
+
+  --glass-bg:     rgba(18, 24, 36, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --scrim:        rgba(6, 10, 18, 0.62);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.40), 0 2px 10px rgba(0, 0, 0, 0.36);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.46), 0 18px 42px rgba(0, 0, 0, 0.42);
+  --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.52), 0 34px 70px rgba(0, 0, 0, 0.55);
+  --glow-primary: 0 8px 30px rgba(44, 194, 206, 0.40);
+  --glow-accent:  0 8px 30px rgba(255, 106, 71, 0.42);
+  --focus-ring:        0 0 0 3px rgba(44, 194, 206, 0.55);
+
+  color-scheme: dark;
 }
