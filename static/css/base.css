@@ -1,17 +1,14 @@
 /* ==========================================================================
-   الصَّيَّاد — Base styles
-   إعادة ضبط + أساسيات + تخطيط متجاوب (responsive) متعدّد المنصّات:
-   موبايل → تابلت → سطح مكتب. يعتمد على متغيّرات tokens.css ويستعمل
-   خصائص CSS منطقية ليقلب تلقائياً مع dir (عربي RTL / إنجليزي LTR).
+   الصَّيَّاد — Base · هوية «شفق» (Aurora)
+   أساسيات + هيكل عام متحرّك (هيدر زجاجي، hero شفقي، شبكة bento، فوتر، دوك).
+   يعتمد رموز tokens.css حصراً، وخصائص CSS منطقية (RTL/LTR تلقائي).
+   كل حركة تُلغى تماماً عند prefers-reduced-motion.
    ========================================================================== */
 
-/* الخطوط انتقلت إلى fonts.css (مشتركة بين المتجر ولوحة التحكم) */
-
-
-/* --- إعادة ضبط بسيطة (reset) --- */
+/* --- إعادة ضبط --- */
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; }
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 body {
   font-family: var(--font-base);
   font-size: var(--fs-body);
@@ -19,28 +16,39 @@ body {
   color: var(--text);
   background: var(--bg);
   min-block-size: 100vh;
-  -webkit-font-smoothing: antialiased;   /* حواف حروف أنعم على الشاشات */
+  -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* الخلفية تتنفّس بلطف بين الثيمين */
+  transition: background var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out);
 }
 img, svg { display: block; max-inline-size: 100%; }
 a { color: inherit; text-decoration: none; }
-button { font: inherit; color: inherit; cursor: pointer; }
+button { font: inherit; color: inherit; cursor: pointer; background: none; border: none; }
 ul { list-style: none; padding: 0; }
-::selection { background: var(--color-sea-foam); color: var(--primary-strong); }
+::selection { background: color-mix(in srgb, var(--primary) 26%, transparent); color: var(--text); }
 
-/* حلقة تركيز موحّدة لكل ما يُتنقّل إليه بالكيبورد — بلا حلقة عند النقر بالفأرة */
 :focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
 
-h1 { font-size: var(--fs-h1); font-weight: var(--fw-bold); line-height: var(--lh-tight); }
-h2 { font-size: var(--fs-h2); font-weight: var(--fw-semibold); line-height: var(--lh-tight); }
+h1 { font-size: var(--fs-h1); font-weight: var(--fw-bold); line-height: var(--lh-tight); letter-spacing: -0.01em; }
+h2 { font-size: var(--fs-h2); font-weight: var(--fw-bold); line-height: var(--lh-tight); letter-spacing: -0.01em; }
 h3 { font-size: var(--fs-h3); font-weight: var(--fw-semibold); }
 .caption, small { font-size: var(--fs-caption); }
 
-/* --- حاوية متجاوبة: تملأ العرض حتى حدّ أقصى ثم تتمركز --------------------- */
+/* --- كشف عند التمرير (يُخفى مبدئياً فقط حين تعمل JS) --- */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity var(--dur-3) var(--ease-out), transform var(--dur-3) var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+.js .reveal.is-in { opacity: 1; transform: none; }
+
+/* --- حاوية --- */
 .container {
   inline-size: 100%;
   max-inline-size: var(--container-max);
@@ -48,92 +56,129 @@ h3 { font-size: var(--fs-h3); font-weight: var(--fw-semibold); }
   padding-inline: var(--space-4);
 }
 
-/* --- الهيدر (شريط علوي بعرض كامل، محتواه داخل حاوية) ---
-   Deep Sea بدل Tide: الغامق يعطي حضوراً أرسخ ويترك Tide للأزرار والتفاعل،
-   وهو نفس رأس لوحة التحكم — هوية واحدة بكل مكان. */
+/* ==========================================================================
+   الهيدر: شريط زجاجي لاصق يرقّ ويكتسب ظلاً عند التمرير.
+   يتكيّف مع الثيم (glass) — لا لون مفروض.
+   ========================================================================== */
 .site-header {
-  position: sticky; inset-block-start: 0; z-index: 20;
-  background: var(--primary-strong); color: var(--on-primary);
-  box-shadow: var(--shadow-sm);
+  position: sticky; inset-block-start: 0; z-index: 30;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  backdrop-filter: saturate(180%) blur(16px);
+  border-block-end: 1px solid var(--glass-border);
+  transition: box-shadow var(--dur-2) var(--ease-out), background var(--dur-2) var(--ease-out);
 }
+.site-header.is-scrolled { box-shadow: var(--shadow-md); }
 .site-header__inner {
   display: flex; align-items: center; flex-wrap: wrap;
   gap: var(--space-3) var(--space-4);
   min-block-size: var(--header-h);
   padding-block: var(--space-3);
+  transition: min-block-size var(--dur-2) var(--ease-out);
 }
-.brand { display: flex; align-items: center; gap: var(--space-2); font-weight: var(--fw-bold); }
-.brand__mark {            /* علامة مؤقتة — تُستبدل باللوغو لاحقاً */
-  inline-size: 36px; block-size: 36px;
-  display: grid; place-items: center;
-  background: var(--surface); color: var(--primary);
-  border-radius: 10px; font-weight: var(--fw-bold); font-size: 1.1rem;
-  box-shadow: var(--shadow-sm);
-}
-.brand__name { font-size: 1.25rem; letter-spacing: 0; }
+.site-header.is-scrolled .site-header__inner { min-block-size: 56px; }
 
-/* شريط البحث: سطر كامل على الموبايل، يندمج بالهيدر على سطح المكتب.
-   position: relative ليتموضع صندوق الاقتراحات الحية تحته مباشرة. */
+.brand { display: flex; align-items: center; gap: var(--space-2); font-weight: var(--fw-bold); color: var(--text); }
+.brand__mark {
+  inline-size: 40px; block-size: 40px;
+  display: grid; place-items: center;
+  background: var(--grad-mark); color: #fff;
+  border-radius: 13px; font-weight: var(--fw-bold); font-size: 1.2rem;
+  box-shadow: var(--glow-primary);
+  animation: mark-breathe 6s var(--ease-out) infinite;
+}
+@keyframes mark-breathe {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-2px) rotate(-2deg); }
+}
+.brand__name { font-size: 1.3rem; letter-spacing: -0.01em; }
+
+/* شريط البحث — حقل زجاجي على سطح الثيم */
 .searchbar { flex: 1 1 100%; position: relative; }
 .searchbar input {
-  inline-size: 100%; block-size: 46px;
-  padding-inline: var(--space-4);
-  border: 2px solid transparent; border-radius: var(--radius-pill);
+  inline-size: 100%; block-size: 48px;
+  padding-inline: var(--space-5);
+  border: 1.5px solid var(--border); border-radius: var(--radius-pill);
   background: var(--surface); color: var(--text);
   font-size: var(--fs-body);
-  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+  transition: var(--transition-fast);
 }
 .searchbar input::placeholder { color: var(--text-muted); }
 .searchbar input:focus-visible {
-  outline: none;                          /* الحلقة هنا بالحدود والظل — أنسب لحقل داخل هيدر غامق */
-  border-color: var(--accent);
-  box-shadow: var(--shadow-md);
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--focus-ring);
 }
 
-/* تنقّل علوي (سطح المكتب فقط) */
+/* تنقّل علوي */
 .top-nav { display: none; }
 .top-nav a {
   display: inline-flex; align-items: center; gap: var(--space-1);
   padding-inline: var(--space-3); padding-block: var(--space-2);
   border-radius: var(--radius-pill);
-  color: var(--on-primary); font-weight: var(--fw-medium);
+  color: var(--text-muted); font-weight: var(--fw-medium);
   white-space: nowrap;
-  transition: background var(--transition-fast);
+  transition: var(--transition-fast);
 }
-.top-nav a:hover { background: rgba(255, 255, 255, 0.12); }
-.top-nav a.is-active { background: var(--primary); font-weight: var(--fw-semibold); }
+.top-nav a:hover { background: var(--surface-2); color: var(--text); }
+.top-nav a.is-active {
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+  color: var(--primary-strong); font-weight: var(--fw-semibold);
+}
+:root[data-theme="dark"] .top-nav a.is-active,
+.top-nav a.is-active { color: var(--primary); }
+
+/* زر تبديل الثيم — يظهر فقط حين تعمل JS */
+.theme-toggle { display: none; }
+.js .theme-toggle {
+  display: inline-grid; place-items: center;
+  inline-size: 44px; block-size: 44px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--border);
+  background: var(--surface); font-size: 1.15rem;
+  transition: var(--transition-fast), transform var(--dur-1) var(--ease-out);
+}
+.js .theme-toggle:hover { border-color: var(--primary); transform: translateY(-1px); }
+@media (max-width: 767px) {
+  /* على الموبايل يجلس الزر بجانب العلامة (ترتيب flex) */
+  .js .theme-toggle { order: 3; margin-inline-start: auto; }
+}
 
 /* --- المحتوى --- */
-.app__main { padding-block: var(--space-5); }
-@media (min-width: 768px) { .app__main { padding-block: var(--space-6) var(--space-8); } }
+.app__main { padding-block: var(--space-6); }
+@media (min-width: 768px) { .app__main { padding-block: var(--space-8) var(--space-10); } }
 
-/* --- الفوتر: أعمدة منظّمة (هوية/روابط/دفع) فوق سطر خفيف ------------------- */
+/* ==========================================================================
+   الفوتر — سطح متكيّف مع خطّ شفقي علوي رفيع.
+   ========================================================================== */
 .site-footer {
-  margin-block-start: var(--space-8);
-  padding-block: var(--space-6) var(--space-5);
+  position: relative;
+  margin-block-start: var(--space-10);
+  padding-block: var(--space-8) var(--space-5);
   background: var(--surface);
   border-block-start: 1px solid var(--border);
   color: var(--text-muted); font-size: var(--fs-caption);
 }
+.site-footer::before {
+  content: ""; position: absolute; inset-block-start: -1px; inset-inline: 0;
+  block-size: 3px; background: var(--grad-underline);
+  opacity: 0.9;
+}
 .site-footer__grid {
-  display: grid; gap: var(--space-5);
+  display: grid; gap: var(--space-6);
   text-align: center;
-  margin-block-end: var(--space-5);
+  margin-block-end: var(--space-6);
 }
 @media (min-width: 768px) {
-  .site-footer__grid { grid-template-columns: 1.4fr 1fr 1fr; text-align: start; }
+  .site-footer__grid { grid-template-columns: 1.5fr 1fr 1fr; text-align: start; }
 }
 .site-footer__brand { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
 @media (min-width: 768px) { .site-footer__brand { align-items: flex-start; } }
-.site-footer__brand .brand__mark { background: var(--primary); color: var(--color-white); }
 .site-footer__brand-name { color: var(--text); font-weight: var(--fw-bold); font-size: var(--fs-h3); }
-.site-footer h3 {
-  color: var(--text); font-size: var(--fs-body);
-  margin-block-end: var(--space-2);
-}
+.site-footer h3 { color: var(--text); font-size: var(--fs-body); margin-block-end: var(--space-3); }
 .site-footer__links { display: flex; flex-direction: column; gap: var(--space-2); align-items: center; }
 @media (min-width: 768px) { .site-footer__links { align-items: flex-start; } }
-.site-footer__links a { color: var(--text-muted); min-block-size: 24px; transition: color var(--transition-fast); }
+.site-footer__links a { color: var(--text-muted); min-block-size: 24px; transition: var(--transition-fast); }
 .site-footer__links a:hover { color: var(--primary); }
 .site-footer__pay { display: flex; gap: var(--space-2); flex-wrap: wrap; justify-content: center; }
 @media (min-width: 768px) { .site-footer__pay { justify-content: flex-start; } }
@@ -145,93 +190,163 @@ h3 { font-size: var(--fs-h3); font-weight: var(--fw-semibold); }
 }
 .lang-switch { display: flex; justify-content: center; }
 
-/* --- شريط التنقّل السفلي (موبايل فقط — كل أيقونة معها كلمة، القاعدة #3) --- */
+/* ==========================================================================
+   الدوك السفلي (موبايل): شريط زجاجي عائم، العنصر النشط داخل حبّة.
+   ========================================================================== */
 .bottom-nav {
-  position: fixed; inset-block-end: 0; inset-inline: 0; z-index: 20;
+  position: fixed; z-index: 30;
+  inset-block-end: calc(env(safe-area-inset-bottom, 0px) + var(--bottomnav-gap));
+  inset-inline: var(--space-3);
   block-size: var(--bottomnav-h);
+  max-inline-size: 520px; margin-inline: auto;
   display: flex; justify-content: space-around; align-items: stretch;
-  background: rgba(255, 255, 255, 0.92);
-  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-  border-block-start: 1px solid var(--border);
-  box-shadow: 0 -2px 12px rgba(22, 38, 31, 0.06);
+  padding: 6px;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: saturate(180%) blur(18px); backdrop-filter: saturate(180%) blur(18px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
 }
 .bottom-nav__item {
   flex: 1;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
   min-block-size: var(--tap-min);
+  border-radius: var(--radius-md);
   color: var(--text-muted); font-size: var(--fs-caption);
-  transition: color var(--transition-fast);
+  transition: var(--transition-fast);
 }
-.bottom-nav__item.is-active { color: var(--primary); font-weight: var(--fw-semibold); }
+.bottom-nav__item.is-active {
+  color: var(--primary); font-weight: var(--fw-semibold);
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+}
 .bottom-nav__icon { font-size: 1.25rem; line-height: 1; }
 
-/* الأزرار وكل المكوّنات القابلة لإعادة الاستخدام → components.css */
-
-/* --- مقاطع الرئيسية --- */
+/* ==========================================================================
+   الـHero: قاعدة داكنة يطفو فوقها «شفق» متحرّك (ثلاث بقع لونية).
+   النص أبيض ثابت في الثيمين — لوحة درامية موحّدة.
+   ========================================================================== */
 .hero {
-  position: relative; overflow: clip;   /* يقصّ توهّجات الزينة عند الحواف */
-  background: linear-gradient(135deg, var(--primary-strong), var(--primary));
-  color: var(--on-primary);
-  padding: var(--space-8) var(--space-6);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  position: relative; isolation: isolate; overflow: clip;
+  background: var(--hero-base);
+  color: var(--on-dark);
+  padding: var(--space-10) var(--space-6);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
 }
-/* توهّجان خفيفان بزاويتين متقابلتين — عمق بلا صور ولا ثقل */
-.hero::before, .hero::after {
-  content: ""; position: absolute; border-radius: 50%; pointer-events: none;
-}
+/* طبقة الشفق: ثلاث هالات متحرّكة ببطء */
 .hero::before {
-  inline-size: 340px; block-size: 340px;
-  inset-block-start: -170px; inset-inline-end: -110px;
-  background: radial-gradient(circle, rgba(217, 154, 43, 0.28), transparent 65%);
+  content: ""; position: absolute; inset: -30%; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(38% 42% at 22% 28%, var(--aurora-1), transparent 60%),
+    radial-gradient(42% 46% at 82% 22%, var(--aurora-2), transparent 60%),
+    radial-gradient(46% 50% at 60% 88%, var(--aurora-3), transparent 62%);
+  filter: blur(20px) saturate(120%);
+  animation: aurora-drift 18s var(--ease-out) infinite alternate;
 }
+/* حبيبات/شبكة خفيفة تعطي ملمساً فوق الشفق */
 .hero::after {
-  inline-size: 420px; block-size: 420px;
-  inset-block-end: -260px; inset-inline-start: -140px;
-  background: radial-gradient(circle, rgba(228, 241, 237, 0.14), transparent 65%);
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: repeating-linear-gradient(115deg, transparent 0 22px, rgba(255,255,255,0.025) 22px 23px);
+  mix-blend-mode: overlay;
 }
-.hero > * { position: relative; }        /* المحتوى فوق الزينة */
-.hero h1 { max-inline-size: 18ch; }
-.hero__tagline {
-  color: var(--color-sea-foam); font-size: var(--fs-h3);
-  margin-block: var(--space-3) var(--space-5);
+@keyframes aurora-drift {
+  0%   { transform: translate3d(0,0,0) scale(1); }
+  50%  { transform: translate3d(2%, -2%, 0) scale(1.08); }
+  100% { transform: translate3d(-2%, 2%, 0) scale(1.04); }
 }
-
-.section { margin-block-start: var(--space-8); }
-/* عنوان مقطع بعلامة ذهبية جانبية — إيقاع بصري موحّد لكل المقاطع */
-.section > h2 {
+.hero > * { position: relative; }
+.hero__kicker {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  font-size: var(--fs-caption); font-weight: var(--fw-medium);
+  color: #fff;
   margin-block-end: var(--space-4);
-  padding-inline-start: var(--space-3);
-  border-inline-start: 4px solid var(--accent);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.hero h1 { max-inline-size: 20ch; }
+/* كلمة مضيئة بتدرّج الشفق داخل العنوان */
+.hero__glow {
+  background: linear-gradient(90deg, #7ff0ff, #b7a4ff 55%, #ffb59e);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero__tagline {
+  color: var(--on-dark-muted); font-size: var(--fs-h3);
+  margin-block: var(--space-3) var(--space-5);
+  max-inline-size: 46ch;
+}
+.hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+.hero__points {
+  display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5);
+  margin-block-start: var(--space-5);
+  color: var(--on-dark-muted); font-size: var(--fs-caption);
+}
+.hero__points li { display: inline-flex; align-items: center; gap: var(--space-1); }
+.hero__points li::before { content: "✦"; color: #7ff0ff; }
+
+/* شريط إحصاءات صغير (عدّادات) أسفل الـhero */
+.hero__stats {
+  display: flex; flex-wrap: wrap; gap: var(--space-6);
+  margin-block-start: var(--space-6);
+  padding-block-start: var(--space-5);
+  border-block-start: 1px solid rgba(255, 255, 255, 0.16);
+}
+.hero__stat { display: flex; flex-direction: column; }
+.hero__stat-num { font-size: var(--fs-h2); font-weight: var(--fw-bold); color: #fff; }
+.hero__stat-label { font-size: var(--fs-caption); color: var(--on-dark-muted); }
+
+/* ==========================================================================
+   إيقاع المقاطع + شبكة bento للرئيسية
+   ========================================================================== */
+.section { margin-block-start: var(--space-10); }
+.section > h2 {
+  position: relative; inline-size: fit-content;
+  padding-block-end: var(--space-2);
+  margin-block-end: var(--space-5);
+}
+.section > h2::after {
+  content: ""; position: absolute; inset-block-end: 0; inset-inline-start: 0;
+  inline-size: 60%; min-inline-size: 48px; block-size: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--grad-underline);
 }
 
-/* شبكة تتكيّف تلقائياً: عمودان على الموبايل، أكثر على الشاشات الأوسع.
-   كل عنصر داخلها يستعمل مكوّن .card (انظر components.css). */
+/* بطاقات «لماذا الصَّيَّاد» بترتيب bento (أحجام متفاوتة على الديسктоп) */
+.bento { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
+@media (min-width: 768px) {
+  .bento { grid-template-columns: repeat(4, 1fr); grid-auto-rows: 1fr; gap: var(--space-5); }
+  .bento > :nth-child(1) { grid-column: span 2; grid-row: span 2; }
+  .bento > :nth-child(4) { grid-column: span 2; }
+}
 .pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); }
 
 /* ==========================================================================
-   نقطة التحوّل: تابلت/سطح المكتب (≥ 768px)
-   - شريط البحث يندمج بالهيدر بعرض محدود.
-   - يظهر التنقّل العلوي، ويختفي الشريط السفلي.
+   نقطة التحوّل (≥ 768px)
    ========================================================================== */
 @media (min-width: 768px) {
-  .searchbar { flex: 1 1 auto; max-inline-size: 460px; }
+  .searchbar { flex: 1 1 auto; max-inline-size: 440px; order: 0; }
   .top-nav { display: flex; gap: var(--space-1); margin-inline-start: auto; }
   .bottom-nav { display: none; }
-  .hero { padding: calc(var(--space-8) + var(--space-4)) var(--space-8); }
+  .hero { padding: var(--space-12) var(--space-10); }
   .hero h1 { font-size: var(--fs-display); }
 }
 
-/* من يطلب حركة أقل (دوار/تشتّت) يحصل على واجهة ساكنة — بلا انزلاق ولا تكبير */
+/* ==========================================================================
+   احترام تقليل الحركة — يوقف كل شيء ويُظهر المخفيّ فوراً.
+   ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
   *, *::before, *::after {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+  .js .reveal { opacity: 1 !important; transform: none !important; }
 }
 
-/* مساحة سفلية على الموبايل حتى لا يغطّي الشريطُ السفلي المحتوى/الفوتر */
+/* مساحة سفلية على الموبايل حتى لا يغطّي الدوكُ العائم المحتوى */
 @media (max-width: 767px) {
-  body { padding-block-end: var(--bottomnav-h); }
+  body { padding-block-end: calc(var(--bottomnav-h) + var(--bottomnav-gap) * 2); }
 }

@@ -5,26 +5,50 @@
 
 {% block content %}
 <section class="hero">
-  <h1>{% translate 'كل شي لبيتك، بمكان واحد.' %}</h1>
-  <p class="hero__tagline">{% translate 'اطلب… ونحن نصطاد لك.' %}</p>
-  <a class="btn btn--accent" href="{% url 'catalog:category_list' %}">{% translate 'ابدأ التسوّق' %}</a>
+  <p class="hero__kicker"><span aria-hidden="true">🎣</span> {% translate 'سوقك السوري الموثوق' %}</p>
+  <h1>{% translate 'كل شي لبيتك،' %} <span class="hero__glow">{% translate 'بمكان واحد.' %}</span></h1>
+  <p class="hero__tagline">{% translate 'اطلب… ونحن نصطاد لك. توصيل لباب بيتك ودفع عند الاستلام، حتى لو هي أول مرة تتسوّق أونلاين.' %}</p>
+  <div class="hero__actions">
+    <a class="btn btn--accent" href="{% url 'catalog:category_list' %}">{% translate 'ابدأ التسوّق' %}</a>
+    <a class="btn btn--ghost" href="{% url 'orders:track' %}">{% translate 'تتبع طلبك' %}</a>
+  </div>
+  <ul class="hero__points">
+    <li>{% translate 'دفع عند الاستلام' %}</li>
+    <li>{% translate 'توصيل لكل المحافظات' %}</li>
+    <li>{% translate 'دعم سريع عالواتساب' %}</li>
+  </ul>
+  {# عدّادات تعدّ للأعلى عند ظهورها (JS) — وبدونها تعرض الرقم مباشرة #}
+  <div class="hero__stats">
+    <div class="hero__stat">
+      <span class="hero__stat-num" data-count="14" data-count-suffix="+">14+</span>
+      <span class="hero__stat-label">{% translate 'محافظة نوصّلها' %}</span>
+    </div>
+    <div class="hero__stat">
+      <span class="hero__stat-num" data-count="500" data-count-suffix="+">500+</span>
+      <span class="hero__stat-label">{% translate 'منتج وأكثر' %}</span>
+    </div>
+    <div class="hero__stat">
+      <span class="hero__stat-num" data-count="24" data-count-suffix="/7">24/7</span>
+      <span class="hero__stat-label">{% translate 'دعم ومتابعة' %}</span>
+    </div>
+  </div>
 </section>
 
 {% if categories %}
 <section class="section">
-  <h2>{% translate 'تسوّق حسب التصنيف' %}</h2>
-  <div class="chip-row">
+  <h2 class="reveal">{% translate 'تسوّق حسب التصنيف' %}</h2>
+  <div class="chip-row" data-reveal-group>
     {% for cat in categories %}
-      <a class="chip" href="{{ cat.get_absolute_url }}">{{ cat.name }}</a>
+      <a class="chip reveal" href="{{ cat.get_absolute_url }}">{{ cat.name }}</a>
     {% endfor %}
   </div>
 </section>
 {% endif %}
 
 <section class="section">
-  <h2>{% translate 'وصل حديثاً' %}</h2>
+  <h2 class="reveal">{% translate 'وصل حديثاً' %}</h2>
   {% if latest_products %}
-    <div class="product-grid">
+    <div class="product-grid" data-reveal-group>
       {% for p in latest_products %}
         {% include 'components/product_card.html' with name=p.name price=p.price_display href=p.get_absolute_url image_url=p.main_image_url product_id=p.id in_stock=p.in_stock old_price=p.old_price_display discount=p.discount_percent only %}
       {% endfor %}
@@ -38,21 +62,26 @@
 </section>
 
 <section class="section">
-  <h2>{% translate 'ليش الصَّيَّاد؟' %}</h2>
-  <div class="pillars">
-    <div class="card">
+  <h2 class="reveal">{% translate 'ليش الصَّيَّاد؟' %}</h2>
+  {# شبكة bento: البطاقة الأولى كبيرة ومميّزة بخلفية شفقية #}
+  <div class="bento" data-reveal-group>
+    <div class="card card--feature reveal">
+      <span class="card__emoji" aria-hidden="true">🛡️</span>
       <strong class="card__title">{% translate 'موثوق' %}</strong>
-      <p class="card__text">{% translate 'دفعك وتوصيلك بأمان.' %}</p>
+      <p class="card__text">{% translate 'ادفع عند الاستلام، وتابع طلبك خطوة بخطوة — بلا مخاطرة.' %}</p>
     </div>
-    <div class="card">
+    <div class="card reveal">
+      <span class="card__emoji" aria-hidden="true">🧺</span>
       <strong class="card__title">{% translate 'وافر' %}</strong>
       <p class="card__text">{% translate 'كل شي للبيت بمكان واحد.' %}</p>
     </div>
-    <div class="card">
+    <div class="card reveal">
+      <span class="card__emoji" aria-hidden="true">✨</span>
       <strong class="card__title">{% translate 'بسيط' %}</strong>
       <p class="card__text">{% translate 'سهل حتى لأول طلب أونلاين.' %}</p>
     </div>
-    <div class="card">
+    <div class="card reveal">
+      <span class="card__emoji" aria-hidden="true">🇸🇾</span>
       <strong class="card__title">{% translate 'قريب' %}</strong>
       <p class="card__text">{% translate 'سوري بالكامل: لغة ودفع وناس.' %}</p>
     </div>
