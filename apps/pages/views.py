@@ -10,7 +10,7 @@ def home(request):
     categories = Category.objects.filter(is_active=True, parent__isnull=True)[:8]
     latest_products = (
         Product.objects.filter(is_active=True)
-        .prefetch_related("images")
+        .prefetch_related("images", "options", "variants")
         [:8]                      # الترتيب الافتراضي: الأحدث أولاً (Meta.ordering)
     )
     return render(request, "pages/home.html", {

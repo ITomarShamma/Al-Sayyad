@@ -6,7 +6,7 @@
 <ul class="checkout-summary__list">
   {% for item in cart.items %}
     <li>
-      <span>{{ item.product.name }} × {{ item.quantity }}</span>
+      <span>{{ item.product.name }}{% if item.variant %} <small>({{ item.variant.short_label }})</small>{% endif %} × {{ item.quantity }}</span>
       <span class="checkout-summary__line">{{ item.line_total_display }} <small>{% translate 'ل.س' %}</small></span>
     </li>
   {% endfor %}

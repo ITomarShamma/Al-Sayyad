@@ -125,6 +125,114 @@
     counters.forEach(animateCount);
   }
 
+  /* ---------- اختيار المقاس/اللون (تحسين لصفحة المنتج) ----------
+     بدون هذا السكربت الصفحة تعمل بالكامل: الأزرار حقول radio داخل النموذج،
+     والسيرفر يحسم التركيبة ويرفض غير المتوفر برسالة. هنا نضيف فقط:
+     السعر الحيّ، وسطر التوفّر، وتعطيل التركيبات المستحيلة قبل الضغط. */
+  document.querySelectorAll("[data-variant-map]").forEach(function (form) {
+    var variants;
+    try {
+      variants = JSON.parse(form.dataset.variantMap || "[]");
+    } catch (e) {
+      return;                       // بيانات غير صالحة: نترك السلوك الأساسي
+    }
+    var priceEl = document.querySelector("[data-price]");
+    var fromEl = document.querySelector(".buybox__from");
+    var note = form.querySelector("[data-stock-note]");
+    var button = form.querySelector("[data-buy-button]");
+    var groups = Array.prototype.slice.call(form.querySelectorAll(".variant-group"));
+
+    function chosenIds() {
+      return Array.prototype.map.call(
+        form.querySelectorAll('input[type="radio"]:checked'),
+        function (r) { return parseInt(r.value, 10); });
+    }
+
+    function findVariant(ids) {
+      for (var i = 0; i < variants.length; i++) {
+        var v = variants[i];
+        if (v.values.length !== ids.length) continue;
+        var all = v.values.every(function (x) { return ids.indexOf(x) !== -1; });
+        if (all) return v;
+      }
+      return null;
+    }
+
+    /* يعطّل القيم التي لا تشكّل مع الاختيار الحالي أي تركيبة متوفرة */
+    function refreshAvailability() {
+      groups.forEach(function (group, gi) {
+        var others = [];
+        groups.forEach(function (other, i) {
+          if (i === gi) return;
+          var picked = other.querySelector('input[type="radio"]:checked');
+          if (picked) others.push(parseInt(picked.value, 10));
+        });
+        group.querySelectorAll('input[type="radio"]').forEach(function (radio) {
+          var wrap = radio.closest(".variant-option");
+          if (wrap.classList.contains("is-sold-out")) return;   // حسمه السيرفر
+          var id = parseInt(radio.value, 10);
+          var ok = variants.some(function (v) {
+            return v.stock > 0 && v.values.indexOf(id) !== -1 &&
+              others.every(function (o) { return v.values.indexOf(o) !== -1; });
+          });
+          radio.disabled = !ok;
+          wrap.classList.toggle("is-unavailable", !ok);
+        });
+      });
+    }
+
+    /* العربية تميّز المفرد والمثنى: «قطعة وحدة» / «قطعتين» / «3 قطع» */
+    function lowStockText(stock) {
+      if (stock > 5) return note.dataset.okText;
+      if (stock === 1) return note.dataset.oneText;
+      if (stock === 2) return note.dataset.twoText;
+      return note.dataset.lowText.replace("{n}", stock);
+    }
+
+    function update() {
+      // اسم القيمة المختارة بجانب عنوان المجموعة («المقاس: L»)
+      form.querySelectorAll("[data-chosen]").forEach(function (el) {
+        var picked = form.querySelector(
+          'input[name="option_' + el.dataset.chosen + '"]:checked');
+        el.textContent = picked
+          ? picked.closest(".variant-option").textContent.trim() : "";
+      });
+
+      refreshAvailability();
+
+      var ids = chosenIds();
+      if (ids.length < groups.length) {          // لسا ما اكتمل الاختيار
+        if (note) {
+          note.textContent = note.dataset.promptText || note.textContent;
+          note.className = "variant-note caption";
+        }
+        return;
+      }
+
+      var variant = findVariant(ids);
+      if (priceEl && variant) {
+        priceEl.textContent = variant.price;
+        if (fromEl) fromEl.hidden = true;        // صار السعر محدداً لا «يبدأ من»
+      }
+      if (!note) return;
+      if (!variant || variant.stock <= 0) {
+        note.textContent = note.dataset.soldText;
+        note.className = "variant-note caption variant-note--out";
+        if (button) button.disabled = true;
+      } else {
+        note.textContent = lowStockText(variant.stock);
+        note.className = "variant-note caption variant-note--ok";
+        if (button) button.disabled = false;
+      }
+    }
+
+    if (note) note.dataset.promptText = note.textContent.trim();
+    form.querySelectorAll('input[type="radio"]').forEach(function (radio) {
+      radio.addEventListener("change", update);
+    });
+    update();
+  });
+
   /* ---------- PWA: تسجيل عامل الخدمة ---------- */
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/sw.js");

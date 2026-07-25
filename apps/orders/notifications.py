@@ -28,7 +28,7 @@ def notify_new_order(order):
         return
 
     items = "\n".join(
-        f"  • {item.product_name} × {item.quantity} = {item.line_total_display} ل.س"
+        f"  • {item.display_name} × {item.quantity} = {item.line_total_display} ل.س"
         for item in order.items.all()
     )
     body = (

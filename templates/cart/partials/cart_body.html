@@ -18,13 +18,15 @@
 
         <div class="cart-item__info">
           <a class="cart-item__name" href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
-          <span class="cart-item__unit caption">{{ item.product.price_display }} {% translate 'ل.س' %} / {% translate 'قطعة' %}</span>
+          {% if item.variant %}<span class="cart-item__variant">{{ item.variant.label }}</span>{% endif %}
+          <span class="cart-item__unit caption">{{ item.unit_price_display }} {% translate 'ل.س' %} / {% translate 'قطعة' %}</span>
 
           <div class="qty">
             <form method="post" action="{% url 'cart:update' item.product.id %}"
                   hx-post="{% url 'cart:update' item.product.id %}"
                   hx-target="#cart-body" hx-swap="innerHTML">
               {% csrf_token %}
+              <input type="hidden" name="variant" value="{{ item.variant.id|default:0 }}">
               <input type="hidden" name="quantity" value="{{ item.quantity|add:'-1' }}">
               <button class="qty__btn" type="submit" aria-label="{% translate 'أنقص الكمية' %}">−</button>
             </form>
@@ -35,9 +37,10 @@
                   hx-post="{% url 'cart:update' item.product.id %}"
                   hx-target="#cart-body" hx-swap="innerHTML">
               {% csrf_token %}
+              <input type="hidden" name="variant" value="{{ item.variant.id|default:0 }}">
               <input type="hidden" name="quantity" value="{{ item.quantity|add:'1' }}">
               <button class="qty__btn" type="submit" aria-label="{% translate 'زد الكمية' %}"
-                      {% if item.quantity >= item.product.stock %}disabled title="{% translate 'وصلت أقصى كمية متوفرة' %}"{% endif %}>+</button>
+                      {% if item.quantity >= item.stock_limit %}disabled title="{% translate 'وصلت أقصى كمية متوفرة' %}"{% endif %}>+</button>
             </form>
           </div>
         </div>
@@ -48,6 +51,7 @@
                 hx-post="{% url 'cart:remove' item.product.id %}"
                 hx-target="#cart-body" hx-swap="innerHTML">
             {% csrf_token %}
+            <input type="hidden" name="variant" value="{{ item.variant.id|default:0 }}">
             <button class="cart-item__remove" type="submit">{% translate 'حذف' %} 🗑️</button>
           </form>
         </div>

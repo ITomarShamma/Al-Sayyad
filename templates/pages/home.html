@@ -50,7 +50,7 @@
   {% if latest_products %}
     <div class="product-grid" data-reveal-group>
       {% for p in latest_products %}
-        {% include 'components/product_card.html' with name=p.name price=p.price_display href=p.get_absolute_url image_url=p.main_image_url product_id=p.id in_stock=p.in_stock old_price=p.old_price_display discount=p.discount_percent only %}
+        {% include 'components/product_card.html' with name=p.name price=p.card_price_display href=p.get_absolute_url image_url=p.main_image_url product_id=p.id in_stock=p.in_stock old_price=p.old_price_display discount=p.discount_percent has_options=p.has_variants price_from=p.has_price_range only %}
       {% endfor %}
     </div>
   {% else %}

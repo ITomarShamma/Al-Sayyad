@@ -1,0 +1,9 @@
+{% load i18n %}{% comment %}
+ردّ HTMX حين تفشل الإضافة (ما اختار مقاساً، أو التركيبة نفدت):
+توست أحمر يشرح السبب بدل صمت أو إضافة غامضة. العدّادات لا تتغيّر.
+{% endcomment %}
+<div id="toast" class="toast-region" aria-live="assertive" hx-swap-oob="true">
+  <div class="toast toast--error">
+    <span aria-hidden="true">⚠️</span> {{ error }}
+  </div>
+</div>

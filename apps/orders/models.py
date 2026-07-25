@@ -246,7 +246,17 @@ class OrderItem(models.Model):
         "catalog.Product", verbose_name="المنتج",
         on_delete=models.PROTECT, related_name="order_items",
     )
+    # التركيبة المطلوبة (مقاس/لون) — NULL لمنتج بلا خيارات.
+    # PROTECT كالمنتج: تركيبة مباعة سابقاً تُعطَّل ولا تُحذف.
+    variant = models.ForeignKey(
+        "catalog.ProductVariant", verbose_name="المقاس/اللون",
+        null=True, blank=True,
+        on_delete=models.PROTECT, related_name="order_items",
+    )
     product_name = models.CharField("اسم المنتج وقت الطلب", max_length=200)
+    # لقطة نصية للتركيبة («المقاس: L، اللون: أبيض») — تبقى مقروءة بالفاتورة
+    # حتى لو أُعيدت تسمية المقاسات أو حُذفت قيمها لاحقاً
+    variant_label = models.CharField("التركيبة وقت الطلب", max_length=120, blank=True)
     unit_price = models.DecimalField("سعر القطعة وقت الطلب (ل.س)", max_digits=12, decimal_places=0)
     quantity = models.PositiveIntegerField("الكمية")
 
@@ -255,7 +265,14 @@ class OrderItem(models.Model):
         verbose_name_plural = "أسطر الطلب"
 
     def __str__(self):
-        return f"{self.product_name} × {self.quantity}"
+        return f"{self.display_name} × {self.quantity}"
+
+    @property
+    def display_name(self):
+        """«قميص قطن (المقاس: L، اللون: أبيض)» — سطر واحد يُقرأ بالفاتورة."""
+        if self.variant_label:
+            return f"{self.product_name} ({self.variant_label})"
+        return self.product_name
 
     @property
     def line_total(self):

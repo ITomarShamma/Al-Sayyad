@@ -1260,3 +1260,47 @@ msgstr "Pay on delivery and track your order step by step — no risk."
 #: .\templates\base.html
 msgid "تبديل الوضع الليلي"
 msgstr "Toggle dark mode"
+
+#: .\templates\catalog\product_detail.html
+msgid "يبدأ من"
+msgstr "From"
+
+#: .\templates\components\product_card.html
+msgid "من"
+msgstr "From"
+
+#: .\templates\catalog\product_detail.html
+msgid "الماركة:"
+msgstr "Brand:"
+
+#: .\templates\components\product_card.html
+msgid "اختر وأضف"
+msgstr "Pick size & add"
+
+#: .\templates\catalog\product_detail.html
+msgid "اختر خياراتك لتشوف السعر والتوفّر."
+msgstr "Choose your options to see price and availability."
+
+#: .\templates\catalog\product_detail.html
+msgid "متوفر ✓"
+msgstr "In stock ✓"
+
+#: .\templates\catalog\product_detail.html
+msgid "باقي قطعة وحدة فقط"
+msgstr "Only 1 left"
+
+#: .\templates\catalog\product_detail.html
+msgid "باقي قطعتين فقط"
+msgstr "Only 2 left"
+
+#: .\templates\catalog\product_detail.html
+msgid "باقي {n} قطع فقط"
+msgstr "Only {n} left"
+
+#: .\templates\catalog\product_detail.html
+msgid "هذه التركيبة نفدت — جرّب مقاساً أو لوناً غيره."
+msgstr "This combination is sold out — try another size or colour."
+
+#: .\apps\cart\views.py
+msgid "اختر المقاس/اللون أولاً — بعدين ضيف للسلة."
+msgstr "Choose a size/colour first, then add to cart."
