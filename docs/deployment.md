@@ -105,9 +105,16 @@ DJANGO_DEBUG=0
 DJANGO_ALLOWED_HOSTS=alsayyad.com,www.alsayyad.com
 DB_PASSWORD=<نفس كلمة سر الخطوة 3>
 EMAIL_HOST=smtp.gmail.com          # مع App Password لإشعارات الطلبات
-EMAIL_HOST_USER=tahashamma222@gmail.com
+EMAIL_HOST_USER=<بريد المتجر>
 EMAIL_HOST_PASSWORD=<App Password>
+ORDER_NOTIFICATION_EMAIL=<البريد اللي بدك يوصله «طلب جديد»>
 BACKUP_DIR=/srv/backups/alsayyad
+
+# بيانات التواصل المعروضة للزبائن — إلزامية، وإلا ظهرت القيم الشخصية
+# الافتراضية المكتوبة بالكود على صفحة «تواصل معنا» والفوتر:
+STORE_PHONE=<رقم المتجر>
+STORE_WHATSAPP=<رقم الواتساب بصيغة دولية بلا +>
+STORE_EMAIL=<بريد المتجر>
 ```
 
 ### 5) تجهيز Django
@@ -217,6 +224,7 @@ crontab -e   # للمستخدم deploy:
 ## رابعاً: فحوص يوم الإطلاق
 
 - [ ] `python manage.py check --deploy` نظيف
+- [ ] صفحة «تواصل معنا» تعرض **رقم المتجر وبريده**، لا الرقم الشخصي الافتراضي
 - [ ] رسوم التوصيل الحقيقية للمحافظات الـ14 (لوحة التحكم ← مناطق التوصيل)
 - [ ] طلب تجريبي كامل من موبايل حقيقي داخل سوريا: تصفح ← سلة ← إتمام ← تتبع
 - [ ] وصل بريد «طلب جديد» + زر واتساب يفتح محادثة الزبون
