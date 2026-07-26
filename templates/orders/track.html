@@ -49,7 +49,7 @@
         <ul class="checkout-summary__list" style="margin-block-start: var(--space-4);">
           {% for item in order.items.all %}
             <li>
-              <span>{{ item.product_name }} × {{ item.quantity }}</span>
+              <span>{{ item.display_name }} × {{ item.quantity }}</span>
               <span class="checkout-summary__line">{{ item.line_total_display }} <small>{% translate 'ل.س' %}</small></span>
             </li>
           {% endfor %}

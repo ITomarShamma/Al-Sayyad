@@ -1220,3 +1220,87 @@ msgstr "Product cards"
 msgid ""
 "بيانات تجريبية الآن؛ بالموديول M4 منمرّر منتجات حقيقية من قاعدة البيانات."
 msgstr "Demo data for now; module M4 feeds real products from the database."
+
+#: .\templates\pages\home.html
+msgid "كل شي لبيتك،"
+msgstr "Everything for your home,"
+
+#: .\templates\pages\home.html
+msgid "بمكان واحد."
+msgstr "in one place."
+
+#: .\templates\pages\home.html
+msgid "اطلب… ونحن نصطاد لك. توصيل لباب بيتك ودفع عند الاستلام، حتى لو هي أول مرة تتسوّق أونلاين."
+msgstr "Order… and we'll catch it for you. Delivery to your door and cash on delivery — even if it's your first time shopping online."
+
+#: .\templates\pages\home.html
+msgid "توصيل لكل المحافظات"
+msgstr "Delivery to every province"
+
+#: .\templates\pages\home.html
+msgid "دعم سريع عالواتساب"
+msgstr "Fast support on WhatsApp"
+
+#: .\templates\pages\home.html
+msgid "محافظة نوصّلها"
+msgstr "provinces we cover"
+
+#: .\templates\pages\home.html
+msgid "منتج وأكثر"
+msgstr "products and more"
+
+#: .\templates\pages\home.html
+msgid "دعم ومتابعة"
+msgstr "support & tracking"
+
+#: .\templates\pages\home.html
+msgid "ادفع عند الاستلام، وتابع طلبك خطوة بخطوة — بلا مخاطرة."
+msgstr "Pay on delivery and track your order step by step — no risk."
+
+#: .\templates\base.html
+msgid "تبديل الوضع الليلي"
+msgstr "Toggle dark mode"
+
+#: .\templates\catalog\product_detail.html
+msgid "يبدأ من"
+msgstr "From"
+
+#: .\templates\components\product_card.html
+msgid "من"
+msgstr "From"
+
+#: .\templates\catalog\product_detail.html
+msgid "الماركة:"
+msgstr "Brand:"
+
+#: .\templates\components\product_card.html
+msgid "اختر وأضف"
+msgstr "Pick size & add"
+
+#: .\templates\catalog\product_detail.html
+msgid "اختر خياراتك لتشوف السعر والتوفّر."
+msgstr "Choose your options to see price and availability."
+
+#: .\templates\catalog\product_detail.html
+msgid "متوفر ✓"
+msgstr "In stock ✓"
+
+#: .\templates\catalog\product_detail.html
+msgid "باقي قطعة وحدة فقط"
+msgstr "Only 1 left"
+
+#: .\templates\catalog\product_detail.html
+msgid "باقي قطعتين فقط"
+msgstr "Only 2 left"
+
+#: .\templates\catalog\product_detail.html
+msgid "باقي {n} قطع فقط"
+msgstr "Only {n} left"
+
+#: .\templates\catalog\product_detail.html
+msgid "هذه التركيبة نفدت — جرّب مقاساً أو لوناً غيره."
+msgstr "This combination is sold out — try another size or colour."
+
+#: .\apps\cart\views.py
+msgid "اختر المقاس/اللون أولاً — بعدين ضيف للسلة."
+msgstr "Choose a size/colour first, then add to cart."

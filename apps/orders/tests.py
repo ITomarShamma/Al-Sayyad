@@ -5,7 +5,8 @@ from decimal import Decimal
 from django.test import TestCase
 from django.urls import reverse
 
-from apps.catalog.models import Category, Product
+from apps.catalog.models import (Category, Product, ProductOption,
+                                 ProductOptionValue, ProductVariant)
 
 from .forms import CheckoutForm
 from .models import Order
@@ -461,3 +462,118 @@ class SalesDashboardTests(TestCase):
         self.client.force_login(merchant)
         self.assertNotContains(self.client.get(reverse("admin:index")),
                                "لوحة المبيعات")
+
+
+# ==========================================================================
+#  الطلبات والمقاسات/الألوان
+# ==========================================================================
+
+def make_variant_product(stock=4, price="85000"):
+    """قميص بمحورَين، مخزون لكل تركيبة على حدة."""
+    product = make_product(name="قميص قطن", price=price, stock=0)
+    size = ProductOption.objects.create(product=product, name="المقاس", sort_order=1)
+    color = ProductOption.objects.create(product=product, name="اللون", sort_order=2)
+    sizes = [ProductOptionValue.objects.create(option=size, value=v, sort_order=i)
+             for i, v in enumerate(["S", "M"])]
+    colors = [ProductOptionValue.objects.create(option=color, value=v, sort_order=i)
+              for i, v in enumerate(["أبيض", "أسود"])]
+    for s in sizes:
+        for c in colors:
+            ProductVariant.objects.create(product=product, value_1=s, value_2=c,
+                                          stock=stock)
+    product.refresh_from_db()
+    return product, sizes, colors
+
+
+class VariantOrderTests(TestCase):
+    """الطلب يسجّل التركيبة ويخصم مخزونها هي — لا مخزون المنتج كاملاً."""
+
+    def setUp(self):
+        self.product, self.sizes, self.colors = make_variant_product()
+        self.options = list(self.product.options.all())
+        self.variant = self.product.resolve_variant(
+            [self.sizes[0].id, self.colors[0].id])          # S · أبيض
+
+    def _add_to_cart(self, variant, quantity=1):
+        return self.client.post(reverse("cart:add", args=[self.product.id]), {
+            f"option_{self.options[0].id}": variant.value_1_id,
+            f"option_{self.options[1].id}": variant.value_2_id,
+            "quantity": quantity,
+        })
+
+    def test_order_snapshots_the_chosen_combination(self):
+        self._add_to_cart(self.variant, 2)
+        self.client.post(reverse("orders:checkout"), valid_form())
+
+        item = Order.objects.get().items.get()
+        self.assertEqual(item.variant, self.variant)
+        self.assertEqual(item.variant_label, "المقاس: S، اللون: أبيض")
+        self.assertEqual(item.display_name, "قميص قطن (المقاس: S، اللون: أبيض)")
+        self.assertEqual(item.quantity, 2)
+
+    def test_only_the_ordered_variant_loses_stock(self):
+        other = self.product.resolve_variant(
+            [self.sizes[1].id, self.colors[1].id])          # M · أسود
+        self._add_to_cart(self.variant, 3)
+        self.client.post(reverse("orders:checkout"), valid_form())
+
+        self.variant.refresh_from_db()
+        other.refresh_from_db()
+        self.product.refresh_from_db()
+        self.assertEqual(self.variant.stock, 1)             # 4 − 3
+        self.assertEqual(other.stock, 4)                    # ما انمسّ
+        self.assertEqual(self.product.stock, 13)            # 16 − 3 (مُزامن)
+
+    def test_variant_specific_price_is_charged_and_snapshotted(self):
+        self.variant.price = 99000
+        self.variant.save()
+        self._add_to_cart(self.variant, 1)
+        self.client.post(reverse("orders:checkout"), valid_form())
+
+        item = Order.objects.get().items.get()
+        self.assertEqual(item.unit_price, Decimal("99000"))
+        self.assertEqual(Order.objects.get().items_subtotal, Decimal("99000"))
+
+    def test_order_refused_when_that_size_ran_out_meanwhile(self):
+        """السلة عبّاها الزبون، وخلص المقاس قبل ما يأكد — نوقفه ونشرح."""
+        self._add_to_cart(self.variant, 3)
+        self.product.variants.filter(pk=self.variant.pk).update(stock=1)
+
+        response = self.client.post(reverse("orders:checkout"), valid_form())
+        self.assertEqual(Order.objects.count(), 0)
+        self.assertContains(response, "الكمية المتوفرة تغيّرت")
+        self.assertContains(response, "S · أبيض")           # يقول أي تركيبة
+
+    def test_two_sizes_of_same_product_are_two_order_lines(self):
+        second = self.product.resolve_variant(
+            [self.sizes[1].id, self.colors[0].id])          # M · أبيض
+        self._add_to_cart(self.variant, 1)
+        self._add_to_cart(second, 2)
+        self.client.post(reverse("orders:checkout"), valid_form())
+
+        order = Order.objects.get()
+        self.assertEqual(order.items.count(), 2)
+        self.assertEqual(order.total, Decimal("255000"))    # 3 قطع × 85,000
+        labels = {i.variant.short_label for i in order.items.all()}
+        self.assertEqual(labels, {"S · أبيض", "M · أبيض"})
+
+    def test_confirmation_and_tracking_show_the_size(self):
+        self._add_to_cart(self.variant, 1)
+        self.client.post(reverse("orders:checkout"), valid_form())
+        order = Order.objects.get()
+
+        confirmation = self.client.get(
+            reverse("orders:confirmation", args=[order.number]))
+        self.assertContains(confirmation, "المقاس: S، اللون: أبيض")
+
+        tracking = self.client.get(reverse("orders:track"),
+                                   {"number": order.number, "phone": order.phone})
+        self.assertContains(tracking, "المقاس: S، اللون: أبيض")
+
+    def test_sold_out_variant_cannot_be_ordered_at_all(self):
+        self.product.variants.filter(pk=self.variant.pk).update(stock=0)
+        self._add_to_cart(self.variant, 1)
+        self.assertEqual(self.client.session.get("cart", {}), {})
+        response = self.client.post(reverse("orders:checkout"), valid_form())
+        self.assertEqual(Order.objects.count(), 0)
+        self.assertRedirects(response, reverse("cart:detail"))   # السلة فاضية

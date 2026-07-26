@@ -33,8 +33,8 @@ class MerchantProfileAdmin(admin.ModelAdmin):
     @admin.display(description="الحالة", ordering="is_approved")
     def approval_display(self, obj):
         if obj.is_approved:
-            return format_html('<b style="color:#2E9E54;">● مفعّل</b>')
-        return format_html('<b style="color:#E8A317;">● قيد المراجعة</b>')
+            return format_html('<b style="color:#15803D;">● مفعّل</b>')
+        return format_html('<b style="color:#B45309;">● قيد المراجعة</b>')
 
     @admin.action(description="✓ الموافقة على التجّار المحدّدين")
     def approve_merchants(self, request, queryset):

@@ -5,7 +5,7 @@
 {% include 'cart/partials/badges_oob.html' %}
 <div id="toast" class="toast-region" aria-live="polite" hx-swap-oob="true">
   <div class="toast">
-    ✓ {% translate 'أُضيف للسلة' %}
+    ✓ {% translate 'أُضيف للسلة' %}{% if variant %} <span class="toast__variant">({{ variant.short_label }})</span>{% endif %}
     <a class="toast__link" href="{% url 'cart:detail' %}">{% translate 'اعرض السلة' %}</a>
   </div>
 </div>

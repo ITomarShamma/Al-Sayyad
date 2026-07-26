@@ -4,13 +4,18 @@ import tempfile
 from decimal import Decimal
 from io import BytesIO
 
+from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.exceptions import ValidationError
 from django.db.models import ProtectedError
-from django.test import TestCase, override_settings
+from django.db.utils import IntegrityError
+from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 
-from .models import Category, Product, ProductImage
+from .admin import ProductAdmin, ProductOptionForm
+from .models import (Brand, Category, Product, ProductImage, ProductOption,
+                     ProductOptionValue, ProductVariant)
 
 
 def make_product(**kwargs):
@@ -280,6 +285,7 @@ class ReviewTests(TestCase):
 
     def setUp(self):
         from django.contrib.auth import get_user_model
+
         from apps.orders.models import Order, OrderItem
 
         self.product = make_product(name="سماعة مُقيَّمة")
@@ -453,3 +459,281 @@ class CatalogAdminTests(TestCase):
         resp = self.client.get(url, {"stock_level": "out"})
         self.assertContains(resp, "نافد تماماً")
         self.assertNotContains(resp, "شارف يخلص")
+
+
+# ==========================================================================
+#  المقاسات والألوان (الخيارات والمتغيّرات)
+# ==========================================================================
+
+def make_variant_product(sizes=("S", "M", "L"), colors=("أبيض", "أسود"),
+                         stock=4, **kwargs):
+    """منتج بمحورَين جاهزَين + متغيّر لكل تركيبة — أساس اختبارات المقاسات."""
+    product = make_product(name="قميص قطن", price=Decimal("85000"),
+                           stock=0, **kwargs)
+    size_opt = ProductOption.objects.create(product=product, name="المقاس", sort_order=1)
+    size_values = [
+        ProductOptionValue.objects.create(option=size_opt, value=v, sort_order=i)
+        for i, v in enumerate(sizes)
+    ]
+    color_values = []
+    if colors:
+        color_opt = ProductOption.objects.create(product=product, name="اللون", sort_order=2)
+        color_values = [
+            ProductOptionValue.objects.create(option=color_opt, value=v, sort_order=i)
+            for i, v in enumerate(colors)
+        ]
+    for size in size_values:
+        for color in (color_values or [None]):
+            ProductVariant.objects.create(
+                product=product, value_1=size, value_2=color, stock=stock)
+    product.refresh_from_db()
+    return product, size_values, color_values
+
+
+class ProductOptionTests(TestCase):
+    def test_option_limited_to_two_axes(self):
+        product = make_product()
+        ProductOption.objects.create(product=product, name="المقاس")
+        ProductOption.objects.create(product=product, name="اللون")
+        third = ProductOption(product=product, name="السعة")
+        with self.assertRaises(ValidationError):
+            third.full_clean()
+
+    def test_duplicate_option_name_per_product_blocked(self):
+        product = make_product()
+        ProductOption.objects.create(product=product, name="المقاس")
+        with self.assertRaises(IntegrityError):
+            ProductOption.objects.create(product=product, name="المقاس")
+
+    def test_values_keep_manual_order_not_alphabetical(self):
+        product = make_product()
+        option = ProductOption.objects.create(product=product, name="المقاس")
+        for i, value in enumerate(["S", "M", "L", "XL"]):
+            ProductOptionValue.objects.create(option=option, value=value, sort_order=i)
+        self.assertEqual([v.value for v in option.values.all()], ["S", "M", "L", "XL"])
+
+
+class ProductVariantTests(TestCase):
+    def test_product_stock_is_sum_of_variant_stock(self):
+        product, _, _ = make_variant_product(sizes=("S", "M"), colors=("أبيض",), stock=3)
+        self.assertEqual(product.stock, 6)          # مقاسان × 3
+        self.assertTrue(product.has_variants)
+        self.assertTrue(product.in_stock)
+
+    def test_stock_resyncs_when_variant_changes_or_is_removed(self):
+        product, sizes, colors = make_variant_product(
+            sizes=("S", "M"), colors=("أبيض",), stock=5)
+        variant = product.variants.first()
+        variant.stock = 1
+        variant.save()
+        product.refresh_from_db()
+        self.assertEqual(product.stock, 6)          # 1 + 5
+
+        variant.delete()
+        product.refresh_from_db()
+        self.assertEqual(product.stock, 5)
+
+    def test_deactivated_variant_leaves_product_stock(self):
+        product, _, _ = make_variant_product(sizes=("S",), colors=("أبيض",), stock=4)
+        variant = product.variants.first()
+        variant.is_active = False
+        variant.save()
+        product.refresh_from_db()
+        self.assertEqual(product.stock, 0)
+        self.assertFalse(product.in_stock)          # ما في تركيبة تُباع
+
+    def test_duplicate_combination_blocked_by_database(self):
+        product, sizes, colors = make_variant_product(sizes=("S",), colors=("أبيض",))
+        with self.assertRaises(IntegrityError):
+            ProductVariant.objects.create(
+                product=product, value_1=sizes[0], value_2=colors[0], stock=1)
+
+    def test_two_values_from_same_axis_rejected(self):
+        product, sizes, _ = make_variant_product(sizes=("S", "M"), colors=())
+        bad = ProductVariant(product=product, value_1=sizes[0], value_2=sizes[1])
+        with self.assertRaises(ValidationError):
+            bad.full_clean()
+
+    def test_value_from_another_product_rejected(self):
+        product, sizes, _ = make_variant_product(sizes=("S",), colors=())
+        other, other_sizes, _ = make_variant_product(sizes=("XL",), colors=())
+        bad = ProductVariant(product=product, value_1=other_sizes[0])
+        with self.assertRaises(ValidationError):
+            bad.full_clean()
+
+    def test_resolve_variant_ignores_order_of_values(self):
+        product, sizes, colors = make_variant_product()
+        variant = product.resolve_variant([colors[1].id, sizes[2].id])
+        self.assertIsNotNone(variant)
+        self.assertEqual(variant.value_1, sizes[2])
+        self.assertEqual(variant.value_2, colors[1])
+
+    def test_resolve_variant_returns_none_for_impossible_combo(self):
+        product, sizes, colors = make_variant_product()
+        product.variants.filter(value_1=sizes[0], value_2=colors[0]).delete()
+        self.assertIsNone(product.resolve_variant([sizes[0].id, colors[0].id]))
+        self.assertIsNone(product.resolve_variant([]))
+        self.assertIsNone(product.resolve_variant(["مو-رقم"]))
+
+    def test_variant_price_falls_back_to_product_price(self):
+        product, sizes, colors = make_variant_product()
+        cheap = product.variants.first()
+        self.assertEqual(cheap.effective_price, product.price)
+
+        pricey = product.variants.last()
+        pricey.price = Decimal("99000")
+        pricey.save()
+        self.assertEqual(pricey.effective_price, Decimal("99000"))
+        self.assertTrue(product.has_price_range)
+        self.assertEqual(product.price_from_display, "85,000")
+
+    def test_labels_read_naturally(self):
+        product, sizes, colors = make_variant_product()
+        variant = product.resolve_variant([sizes[0].id, colors[0].id])
+        self.assertEqual(variant.short_label, "S · أبيض")
+        self.assertEqual(variant.label, "المقاس: S، اللون: أبيض")
+
+
+class VariantProductPageTests(TestCase):
+    def test_page_shows_option_buttons_for_each_axis(self):
+        product, sizes, colors = make_variant_product()
+        response = self.client.get(product.get_absolute_url())
+        self.assertContains(response, "المقاس")
+        self.assertContains(response, "اللون")
+        for value in sizes + colors:
+            self.assertContains(response, f'value="{value.id}"')
+
+    def test_sold_out_value_is_disabled_in_html(self):
+        """قيمة بلا أي تركيبة متوفرة تُعطَّل بالـHTML — قبل أي جافاسكربت."""
+        product, sizes, colors = make_variant_product(stock=2)
+        product.variants.filter(value_1=sizes[0]).update(stock=0)
+        response = self.client.get(product.get_absolute_url())
+        html = response.content.decode()
+        marker = f'value="{sizes[0].id}"'
+        self.assertIn(marker, html)
+        self.assertIn("is-sold-out", html)
+        # الزر المعطّل هو نفسه صاحب القيمة النافدة
+        self.assertIn(f'{marker} disabled', html)
+
+    def test_simple_product_page_has_no_picker(self):
+        product = make_product()
+        response = self.client.get(product.get_absolute_url())
+        self.assertNotContains(response, "variant-group")
+
+    def test_card_links_to_page_instead_of_direct_add(self):
+        """بطاقة منتج بمقاسات ما فيها «أضف للسلة» — لازم يختار أولاً."""
+        make_variant_product()
+        response = self.client.get(reverse("pages:home"))
+        self.assertContains(response, "اختر وأضف")
+
+    def test_brand_shows_on_product_page_and_is_searchable(self):
+        brand = Brand.objects.create(name="أديداس")
+        product = make_product(brand=brand, name="حذاء رياضي")
+        response = self.client.get(product.get_absolute_url())
+        self.assertContains(response, "أديداس")
+        # الماركة تدخل نص البحث فيلاقيها الزبون
+        found = self.client.get(reverse("catalog:search"), {"q": "أديداس"})
+        self.assertContains(found, "حذاء رياضي")
+
+    def test_sku_is_searchable(self):
+        make_product(name="غلاية كهربائية", sku="KT-900")
+        response = self.client.get(reverse("catalog:search"), {"q": "KT-900"})
+        self.assertContains(response, "غلاية كهربائية")
+
+
+class VariantAdminTests(TestCase):
+    """مسار إدخال البيانات باللوحة — هذا ما يستعمله موظّف المبيعات يومياً."""
+
+    def setUp(self):
+        User = get_user_model()
+        self.admin = User.objects.create_superuser("admin", "a@a.a", "pass12345")
+        self.client.force_login(self.admin)
+
+    def test_option_values_are_created_from_comma_separated_text(self):
+        """يكتب «S, M, L» بسطر واحد فتُنشأ ثلاث قيم مرتّبة."""
+        product = make_product()
+        option = ProductOption(product=product, name="المقاس")
+        form = ProductOptionForm(
+            {"name": "المقاس", "values_text": "S, M, L, XL", "sort_order": 0},
+            instance=option)
+        self.assertTrue(form.is_valid(), form.errors)
+        form.instance.product = product
+        form.save()
+        self.assertEqual([v.value for v in option.values.all()],
+                         ["S", "M", "L", "XL"])
+
+    def test_arabic_comma_and_spaces_are_handled(self):
+        product = make_product()
+        option = ProductOption(product=product, name="اللون")
+        form = ProductOptionForm(
+            {"name": "اللون", "values_text": " أحمر ، أزرق,  أخضر ", "sort_order": 0},
+            instance=option)
+        self.assertTrue(form.is_valid(), form.errors)
+        form.instance.product = product
+        form.save()
+        self.assertEqual([v.value for v in option.values.all()],
+                         ["أحمر", "أزرق", "أخضر"])
+
+    def test_removing_a_value_in_use_is_kept_not_deleted(self):
+        """قيمة عليها مخزون/طلبات لا تُحذف بمجرد مسحها من النص."""
+        product, sizes, _ = make_variant_product(sizes=("S", "M"), colors=())
+        option = product.options.first()
+        form = ProductOptionForm(
+            {"name": option.name, "values_text": "S", "sort_order": 0},
+            instance=option)
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+        self.assertIn("M", [v.value for v in option.values.all()])
+
+    def test_generate_variants_action_creates_every_combination(self):
+        product = make_product(name="قميص", stock=0)
+        size = ProductOption.objects.create(product=product, name="المقاس")
+        color = ProductOption.objects.create(product=product, name="اللون")
+        for i, v in enumerate(["S", "M", "L"]):
+            ProductOptionValue.objects.create(option=size, value=v, sort_order=i)
+        for i, v in enumerate(["أبيض", "أسود"]):
+            ProductOptionValue.objects.create(option=color, value=v, sort_order=i)
+
+        response = self.client.post(
+            reverse("admin:catalog_product_changelist"),
+            {"action": "generate_variants", "_selected_action": [product.pk]},
+            follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(product.variants.count(), 6)      # 3 مقاسات × لونان
+        self.assertContains(response, "تم توليد 6 تركيبة")
+
+    def test_generate_variants_is_idempotent_and_keeps_stock(self):
+        product, _, _ = make_variant_product(sizes=("S", "M"), colors=("أبيض",),
+                                             stock=7)
+        before = product.variants.count()
+        self.client.post(reverse("admin:catalog_product_changelist"),
+                         {"action": "generate_variants",
+                          "_selected_action": [product.pk]}, follow=True)
+        self.assertEqual(product.variants.count(), before)  # ما تكرّرت
+        self.assertEqual(product.variants.first().stock, 7)  # ولا انمسح مخزون
+
+    def test_stock_field_is_locked_for_variant_products(self):
+        product, _, _ = make_variant_product(sizes=("S",), colors=("أبيض",))
+        response = self.client.get(
+            reverse("admin:catalog_product_change", args=[product.pk]))
+        self.assertIn("stock", response.context["adminform"].readonly_fields)
+
+    def test_stock_field_stays_editable_for_simple_products(self):
+        product = make_product()
+        response = self.client.get(
+            reverse("admin:catalog_product_change", args=[product.pk]))
+        self.assertNotIn("stock", response.context["adminform"].readonly_fields)
+
+    def test_manual_stock_edit_on_variant_product_is_corrected(self):
+        """لو عدّل أحدهم المخزون يدوياً من الجدول، يُعاد حسابه فوراً."""
+        product, _, _ = make_variant_product(sizes=("S", "M"), colors=("أبيض",),
+                                             stock=5)
+        self.assertEqual(product.stock, 10)
+
+        request = RequestFactory().post("/admin/")
+        request.user = self.admin
+        product.stock = 999
+        ProductAdmin(Product, admin.site).save_model(
+            request=request, obj=product, form=None, change=True)
+        product.refresh_from_db()
+        self.assertEqual(product.stock, 10)

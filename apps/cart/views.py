@@ -8,9 +8,10 @@
 
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
-from apps.catalog.models import Product
+from apps.catalog.models import Product, ProductVariant
 from apps.orders import coupons as coupon_session
 from apps.orders.models import CouponError
 
@@ -23,6 +24,47 @@ def _quantity(request, default=1):
         return int(request.POST.get("quantity", default))
     except (TypeError, ValueError):
         return default
+
+
+def _selected_variant(request, product):
+    """يحسم التركيبة المطلوبة (المقاس/اللون) من بيانات النموذج.
+
+    يرجع (variant, error):
+      - منتج بلا خيارات      → (None, None)
+      - اختيار مكتمل ومتوفر  → (variant, None)
+      - ناقص/غير موجود/نافد  → (None, رسالة عربية للزبون)
+
+    الحسم هنا بالسيرفر عمداً: صفحة المنتج تعمل بلا جافاسكربت، ولا نثق
+    بما يصل من المتصفّح — الرقم المرسل قد يكون لمنتج آخر أو لتركيبة نفدت.
+    """
+    if not product.has_variants:
+        return None, None
+
+    # صيغتان مقبولتان: أزرار الخيارات (option_<id>) أو رقم متغيّر صريح
+    value_ids = [v for key, v in request.POST.items() if key.startswith("option_")]
+    if value_ids:
+        variant = product.resolve_variant(value_ids)
+    else:
+        variant = product.variants.filter(
+            pk=request.POST.get("variant") or None, is_active=True).first()
+
+    if variant is None:
+        return None, _("اختر المقاس/اللون أولاً — بعدين ضيف للسلة.")
+    if variant.stock <= 0:
+        return None, _("هذه التركيبة نفدت — جرّب مقاساً أو لوناً غيره.")
+    return variant, None
+
+
+def _variant_from_post(request, product):
+    """متغيّر سطر السلة عند التعديل/الحذف — من الحقل المخفي بالنموذج."""
+    variant_id = request.POST.get("variant") or 0
+    try:
+        variant_id = int(variant_id)
+    except (TypeError, ValueError):
+        return None
+    if not variant_id:
+        return None
+    return ProductVariant.objects.filter(pk=variant_id, product=product).first()
 
 
 def _cart_context(request, coupon_error=None):
@@ -49,12 +91,23 @@ def detail(request):
 
 @require_POST
 def add(request, product_id):
-    """زر «أضف للسلة» — من بطاقة منتج أو صفحته."""
-    product = get_object_or_404(Product, id=product_id, is_active=True)
-    Cart(request).add(product, _quantity(request))
+    """زر «أضف للسلة» — من بطاقة منتج أو صفحته (مع المقاس/اللون إن وُجد)."""
+    product = get_object_or_404(
+        Product.objects.prefetch_related("options"), id=product_id, is_active=True)
+
+    variant, error = _selected_variant(request, product)
+    if error:
+        # ما منضيف شي غامض للسلة: نوقف ونقول للزبون شو ناقص (القاعدة #5)
+        if request.headers.get("HX-Request"):
+            return render(request, "cart/partials/add_error_oob.html",
+                          {"error": error}, status=422)
+        messages.error(request, error)
+        return redirect(product.get_absolute_url())
+
+    Cart(request).add(product, _quantity(request), variant=variant)
     if request.headers.get("HX-Request"):
         # الزر يستعمل hx-swap="none" — التحديث كله OOB: العدّادان + توست تأكيد
-        return render(request, "cart/partials/added_oob.html")
+        return render(request, "cart/partials/added_oob.html", {"variant": variant})
     return redirect("cart:detail")
 
 
@@ -62,7 +115,8 @@ def add(request, product_id):
 def update(request, product_id):
     """تثبيت كمية سطر بالسلة (0 = حذف) — من صفحة السلة."""
     product = get_object_or_404(Product, id=product_id, is_active=True)
-    Cart(request).set(product, _quantity(request))
+    Cart(request).set(product, _quantity(request),
+                      variant=_variant_from_post(request, product))
     return _cart_page_response(request)
 
 
@@ -70,7 +124,7 @@ def update(request, product_id):
 def remove(request, product_id):
     """حذف سطر من السلة."""
     product = get_object_or_404(Product, id=product_id)
-    Cart(request).remove(product)
+    Cart(request).remove(product, variant=_variant_from_post(request, product))
     return _cart_page_response(request)
 
 

@@ -4,6 +4,8 @@
 المنتج أو التصنيف غير المفعّل غير موجود من وجهة نظر المتجر (404).
 """
 
+import json
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -58,7 +60,7 @@ def _search_queryset(q):
 def search(request):
     """صفحة نتائج البحث — ?q=كلمات البحث، مع نفس أدوات الفرز والفلترة."""
     q = request.GET.get("q", "").strip()
-    results = _search_queryset(q).prefetch_related("images")
+    results = _search_queryset(q).prefetch_related("images", "options", "variants")
     results, sort, available = apply_browse_controls(request, results)
     paginator = Paginator(results, PRODUCTS_PER_PAGE)
     page = paginator.get_page(request.GET.get("page"))
@@ -98,7 +100,7 @@ def category_detail(request, slug):
             is_active=True,
             category_id__in=category.descendant_ids(),  # الشجرة كلها، مو المباشر فقط
         )
-        .prefetch_related("images")      # يمنع استعلاماً لكل بطاقة (N+1)
+        .prefetch_related("images", "options", "variants")   # يمنع استعلاماً لكل بطاقة (N+1)
     )
     products_qs, sort, available = apply_browse_controls(request, products_qs)
     paginator = Paginator(products_qs, PRODUCTS_PER_PAGE)
@@ -116,10 +118,54 @@ def category_detail(request, slug):
 RELATED_LIMIT = 4
 
 
+def _variant_picker(product):
+    """بيانات اختيار المقاس/اللون: مجموعات الأزرار + خريطة للمتصفّح.
+
+    الخريطة (JSON) تسمح للجافاسكربت بتحديث السعر والتوفّر فور الاختيار.
+    وبدون جافاسكربت تبقى الأزرار نماذج عادية والسيرفر هو من يحسم — لذلك
+    نمرّر أيضاً `sold_out_values`: قيم لا يوجد لها أي تركيبة متوفرة، نعطّلها
+    مسبقاً بالـHTML نفسه.
+    """
+    options = list(product.options.prefetch_related("values").all())
+    if not options:
+        return {}
+
+    variants = list(
+        product.variants.filter(is_active=True)
+        .select_related("value_1", "value_2")
+    )
+    # قيمة «متاحة» إذا شاركت بتركيبة واحدة على الأقل فيها مخزون
+    available_values = set()
+    for v in variants:
+        if v.stock > 0:
+            available_values.update(v.value_ids)
+
+    variant_map = [
+        {
+            "id": v.id,
+            "values": v.value_ids,
+            "price": v.price_display,
+            "stock": v.stock,
+            "label": v.short_label,
+        }
+        for v in variants
+    ]
+    return {
+        "options": options,
+        "sold_out_values": {
+            value.id
+            for option in options for value in option.values.all()
+            if value.id not in available_values
+        },
+        "variant_map_json": json.dumps(variant_map, ensure_ascii=False),
+    }
+
+
 def product_detail(request, slug):
     """صفحة منتج: الصور والسعر والمواصفات والشراء + مشابهة + مشاركة."""
     product = get_object_or_404(
-        Product.objects.select_related("category").prefetch_related("images"),
+        Product.objects.select_related("category", "brand")
+        .prefetch_related("images", "options", "variants"),
         slug=slug,
         is_active=True,
     )
@@ -128,7 +174,7 @@ def product_detail(request, slug):
     related = (
         Product.objects.filter(is_active=True, category=product.category)
         .exclude(pk=product.pk)
-        .prefetch_related("images")
+        .prefetch_related("images", "options", "variants")
         .order_by("-stock", "-created_at")[:RELATED_LIMIT]
     )
 
@@ -148,6 +194,7 @@ def product_detail(request, slug):
 
     return render(request, "catalog/product_detail.html", {
         "product": product,
+        "picker": _variant_picker(product),
         "related": related,
         "share_text": share_text,
         "reviews": reviews,

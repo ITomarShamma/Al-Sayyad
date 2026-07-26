@@ -66,7 +66,17 @@
     {% endif %}
 
     <div class="buybox__price">
-      {{ product.price_display }} <span class="buybox__currency">{% translate 'ل.س' %}</span>
+      {% comment %}
+        مع اختلاف أسعار المقاسات نبدأ بـ«يبدأ من»، والجافاسكربت يثبّت السعر
+        الفعلي فور اختيار التركيبة (وبدونه يحسمه السيرفر عند الإضافة).
+      {% endcomment %}
+      {% if product.has_price_range %}
+        <span class="buybox__from caption">{% translate 'يبدأ من' %}</span>
+        <span data-price>{{ product.price_from_display }}</span>
+      {% else %}
+        <span data-price>{{ product.price_display }}</span>
+      {% endif %}
+      <span class="buybox__currency">{% translate 'ل.س' %}</span>
       {% if product.on_sale %}
         <s class="buybox__old-price">{{ product.old_price_display }}</s>
         <span class="badge badge--error">{% blocktranslate with discount=product.discount_percent %}خصم {{ discount }}٪{% endblocktranslate %}</span>
@@ -74,6 +84,12 @@
     </div>
 
     <p class="caption" style="color: var(--text-muted);">
+      {% if product.brand %}
+        {% translate 'الماركة:' %}
+        <a href="{% url 'catalog:search' %}?q={{ product.brand.name|urlencode }}"
+           style="color: var(--primary); font-weight: var(--fw-medium);">{{ product.brand.name }}</a>
+        ·
+      {% endif %}
       {% translate 'البائع:' %}
       <strong style="color: var(--primary-strong);">{{ product.merchant.store_name|default:'الصَّيَّاد' }}</strong>
     </p>
@@ -89,12 +105,59 @@
       {% include 'components/badge.html' with kind='shamcash' label='شام كاش' only %}
     </div>
 
-    {# زر الشراء — HTMX يحدّث عدّاد الهيدر؛ بدون JS يعمل كنموذج عادي #}
+    {% comment %}
+      زر الشراء — HTMX يحدّث عدّاد الهيدر؛ بدون JS يعمل كنموذج عادي.
+      المنتج ذو المقاسات/الألوان: الأزرار داخل النموذج نفسه، فالاختيار
+      يُرسَل مع الطلب والسيرفر هو من يحسم التركيبة (يعمل بلا جافاسكربت).
+    {% endcomment %}
     {% if product.in_stock %}
       <form method="post" action="{% url 'cart:add' product.id %}"
-            hx-post="{% url 'cart:add' product.id %}" hx-swap="none">
+            hx-post="{% url 'cart:add' product.id %}" hx-swap="none"
+            {% if picker %}class="variant-picker" data-variant-map="{{ picker.variant_map_json }}"{% endif %}>
         {% csrf_token %}
-        <button class="btn btn--primary btn--block" type="submit">
+
+        {% for option in picker.options %}
+          <fieldset class="variant-group">
+            <legend class="variant-group__label">
+              {{ option.name }}
+              <span class="variant-group__chosen" data-chosen="{{ option.id }}"></span>
+            </legend>
+            <div class="variant-group__options">
+              {% for value in option.values.all %}
+                {% if value.id in picker.sold_out_values %}
+                  {# قيمة ما إلها ولا تركيبة متوفرة — معطّلة أصلاً بالـHTML #}
+                  <label class="variant-option is-sold-out">
+                    <input type="radio" name="option_{{ option.id }}" value="{{ value.id }}" disabled>
+                    <span>{{ value.value }}</span>
+                  </label>
+                {% else %}
+                  <label class="variant-option">
+                    <input type="radio" name="option_{{ option.id }}" value="{{ value.id }}" required>
+                    <span>{{ value.value }}</span>
+                  </label>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </fieldset>
+        {% endfor %}
+
+        {% if picker %}
+          {% comment %}
+            سطر التوفّر: يملؤه الجافاسكربت عند الاختيار (وبدونه يبقى تلميحاً).
+            النصوص تُمرَّر من هنا لتبقى مترجمة — لا نكتب عربية داخل الـJS.
+          {% endcomment %}
+          <p class="variant-note caption" data-stock-note
+             data-ok-text="{% translate 'متوفر ✓' %}"
+             {% comment %}العربية تميّز المفرد والمثنى — «1 قطع» غلط{% endcomment %}
+             data-one-text="{% translate 'باقي قطعة وحدة فقط' %}"
+             data-two-text="{% translate 'باقي قطعتين فقط' %}"
+             data-low-text="{% translate 'باقي {n} قطع فقط' %}"
+             data-sold-text="{% translate 'هذه التركيبة نفدت — جرّب مقاساً أو لوناً غيره.' %}">
+            {% translate 'اختر خياراتك لتشوف السعر والتوفّر.' %}
+          </p>
+        {% endif %}
+
+        <button class="btn btn--primary btn--block" type="submit" data-buy-button>
           <span class="btn__icon" aria-hidden="true">🛒</span>
           <span class="btn__label">{% translate 'أضف للسلة' %}</span>
         </button>
@@ -182,7 +245,7 @@
   <h2>{% translate 'منتجات مشابهة' %}</h2>
   <div class="product-grid">
     {% for p in related %}
-      {% include 'components/product_card.html' with name=p.name price=p.price_display href=p.get_absolute_url image_url=p.main_image_url product_id=p.id in_stock=p.in_stock old_price=p.old_price_display discount=p.discount_percent only %}
+      {% include 'components/product_card.html' with name=p.name price=p.card_price_display href=p.get_absolute_url image_url=p.main_image_url product_id=p.id in_stock=p.in_stock old_price=p.old_price_display discount=p.discount_percent has_options=p.has_variants price_from=p.has_price_range only %}
     {% endfor %}
   </div>
 </section>
