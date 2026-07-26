@@ -9,64 +9,64 @@
 html[data-theme="light"],
 html[data-theme="dark"],
 html[data-theme="auto"] {
-  /* الهوية */
-  --primary: #0E6B5E;               /* Tide */
-  --secondary: #0B4A41;             /* Deep Sea — رأس الصفحة */
-  --accent: #D99A2B;                /* Catch Gold */
+  /* الهوية — «رحلة الصَّيَّاد»: ليل البحر + ذهب الفجر */
+  --primary: #0F62B0;               /* Sea */
+  --secondary: #0C2233;             /* Midnight — رأس الصفحة */
+  --accent: #F6A821;                /* Dawn */
   --primary-fg: #FFFFFF;
 
   /* النصوص والخلفيات */
-  --body-fg: #16261F;               /* Ink */
-  --body-bg: #FAF8F2;               /* Paper */
-  --body-quiet-color: #5B6B64;      /* Slate */
-  --body-loud-color: #0B4A41;
+  --body-fg: #101C28;               /* Ink */
+  --body-bg: #F4F7FA;               /* Cloud */
+  --body-quiet-color: #51637A;      /* Slate */
+  --body-loud-color: #14385C;       /* Harbor */
 
   /* الرأس */
-  --header-color: #E4F1ED;          /* Sea Foam */
-  --header-bg: #0B4A41;
+  --header-color: #E9F1F9;          /* Mist */
+  --header-bg: #0C2233;
   --header-branding-color: #FFFFFF;
   --header-link-color: #FFFFFF;
 
   /* مسار التنقل */
-  --breadcrumbs-fg: #5B6B64;
-  --breadcrumbs-link-fg: #0E6B5E;
-  --breadcrumbs-bg: #FAF8F2;
+  --breadcrumbs-fg: #51637A;
+  --breadcrumbs-link-fg: #0F62B0;
+  --breadcrumbs-bg: #F4F7FA;
 
   /* الروابط */
-  --link-fg: #0E6B5E;
-  --link-hover-color: #0B4A41;
-  --link-selected-fg: #0B4A41;
+  --link-fg: #0F62B0;
+  --link-hover-color: #0B4C8C;
+  --link-selected-fg: #0B4C8C;
 
   /* الحدود والفواصل */
-  --hairline-color: #E6E1D3;        /* Line */
-  --border-color: #E6E1D3;
+  --hairline-color: #DFE7EF;        /* Line */
+  --border-color: #DFE7EF;
 
   /* الأزرار */
   --button-fg: #FFFFFF;
-  --button-bg: #0E6B5E;
-  --button-hover-bg: #0B4A41;
-  --default-button-bg: #0B4A41;
-  --default-button-hover-bg: #16261F;
-  --close-button-bg: #5B6B64;
-  --close-button-hover-bg: #16261F;
-  --delete-button-bg: #D5402B;      /* Error */
-  --delete-button-hover-bg: #99301F;
+  --button-bg: #0F62B0;
+  --button-hover-bg: #0B4C8C;
+  --default-button-bg: #14385C;
+  --default-button-hover-bg: #0C2233;
+  --close-button-bg: #51637A;
+  --close-button-hover-bg: #101C28;
+  --delete-button-bg: #D93526;      /* Error */
+  --delete-button-hover-bg: #A02418;
 
   /* أدوات الكائن (أزرار «أضف …» أعلى القوائم) */
-  --object-tools-fg: #16261F;
-  --object-tools-bg: #D99A2B;       /* ذهبي مثل زر المتجر */
-  --object-tools-hover-bg: #C08620;
+  --object-tools-fg: #0C2233;
+  --object-tools-bg: #F6A821;       /* ذهبي مثل CTA المتجر */
+  --object-tools-hover-bg: #E08F00;
 
   /* التحديد والصفوف */
-  --selected-bg: #E4F1ED;           /* Sea Foam */
-  --selected-row: #F3EBDD;
-  --darkened-bg: #F3F0E8;
+  --selected-bg: #E9F1F9;           /* Mist */
+  --selected-row: #FBF0DA;
+  --darkened-bg: #EBF0F5;
 
   /* الرسائل */
-  --message-success-bg: #E6F4EC;
-  --message-warning-bg: #FBF0D8;
-  --message-error-bg: #FBE7E3;
-  --error-fg: #D5402B;
+  --message-success-bg: #E3F5EA;
+  --message-warning-bg: #FBF0DA;
+  --message-error-bg: #FCE9E6;
+  --error-fg: #D93526;
 
   /* الخط — نفس خط المتجر */
   --font-family-primary: "IBM Plex Sans Arabic", system-ui, "Segoe UI", Tahoma, sans-serif;
@@ -84,10 +84,11 @@ html[data-theme="auto"] {
 .sayyad-mark {
   inline-size: 32px; block-size: 32px;
   display: inline-grid; place-items: center;
-  background: #FFFFFF; color: #0E6B5E;
+  background: linear-gradient(135deg, #FFC14E, #F6A821 60%, #E08F00);
+  color: #0C2233;
   border-radius: 8px; font-weight: 700; font-size: 1.05rem;
 }
-.sayyad-sub { font-weight: 400; color: #E4F1ED; font-size: 0.85em; }
+.sayyad-sub { font-weight: 400; color: #E9F1F9; font-size: 0.85em; }
 
 /* بطاقات ناعمة بدل الصناديق الحادة */
 #content-main .module, .dashboard .module,
@@ -95,11 +96,11 @@ fieldset.module, .login #content {
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid var(--hairline-color);
-  box-shadow: 0 1px 2px rgba(22, 38, 31, 0.06);
+  box-shadow: 0 1px 2px rgba(12, 34, 51, 0.06);
 }
 .module h2, .module caption {
   background: var(--secondary);
-  color: #E4F1ED;
+  color: #E9F1F9;
 }
 
 /* أزرار أنعم وأهداف نقر أكبر */
@@ -151,7 +152,7 @@ textarea, select, .vTextField {
   padding: 14px 16px;
   display: grid;
   gap: 4px;
-  box-shadow: 0 1px 2px rgba(22, 38, 31, 0.06);
+  box-shadow: 0 1px 2px rgba(12, 34, 51, 0.06);
 }
 .dash-card__label { color: var(--body-quiet-color); font-size: 0.85rem; }
 .dash-card__value { color: var(--secondary); font-size: 1.35rem; }

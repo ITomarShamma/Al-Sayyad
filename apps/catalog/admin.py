@@ -123,10 +123,10 @@ class ProductAdmin(admin.ModelAdmin):
     def stock_display(self, obj):
         """إشارة ملوّنة: أحمر نافد، برتقالي منخفض، أخضر متوفر."""
         if obj.stock == 0:
-            return format_html('<b style="color:#D5402B;">● نافد</b>')
+            return format_html('<b style="color:#D93526;">● نافد</b>')
         if obj.stock <= LOW_STOCK_THRESHOLD:
-            return format_html('<b style="color:#E8A317;">● منخفض ({})</b>', obj.stock)
-        return format_html('<span style="color:#2E9E54;">● متوفر</span>')
+            return format_html('<b style="color:#B45309;">● منخفض ({})</b>', obj.stock)
+        return format_html('<span style="color:#15803D;">● متوفر</span>')
     list_per_page = 50
     inlines = [ProductImageInline]
     readonly_fields = ("created_at", "updated_at")

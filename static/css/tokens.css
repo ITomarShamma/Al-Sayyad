@@ -1,56 +1,73 @@
 /* ==========================================================================
    الصَّيَّاد — Design Tokens (المصدر الوحيد للهوية البصرية)
-   كل لون/مقاس/مسافة يُعرّف هنا مرة واحدة فقط. لا تكتب قيمة لون أو حجم
-   مباشرةً في أي ملف آخر — استعمل متغيّراً من هنا.
-   (القاعدة الذهبية #2: tokens & components فقط، لا تكرار)
+   الهوية الجديدة: «رحلة الصَّيَّاد» — يُبحر بليل البحر (كحلي عميق) ويعود
+   مع ذهب الفجر (كهرماني دافئ). كل لون/مقاس/مسافة يُعرَّف هنا مرة واحدة
+   فقط؛ لا تكتب قيمة لون أو حجم مباشرةً في أي ملف آخر.
+   كل الأزواج النصّية مدقَّقة تباينياً (WCAG AA) — لا تغيّر لوناً دون
+   إعادة فحص التباين.
    ========================================================================== */
 :root {
-  /* --- البراند: أساسي وثانوي --- */
-  --color-deep-sea: #0B4A41;
-  --color-tide:     #0E6B5E;   /* اللون الأساسي */
-  --color-gold:     #D99A2B;   /* لون التمييز */
-  --color-sea-foam: #E4F1ED;   /* خلفية فاتحة هادئة */
+  /* --- البراند: ليل البحر → ذهب الفجر --- */
+  --color-midnight: #0C2233;   /* ليل البحر: الهيدر والفوتر والأسطح الداكنة */
+  --color-harbor:   #14385C;   /* المرفأ: عمق ثانٍ للتدرّجات والنص المالي */
+  --color-sea:      #0F62B0;   /* البحر: اللون الأساسي — أزرار وروابط وتفاعل */
+  --color-sea-deep: #0B4C8C;   /* عمق البحر: حالة hover للأساسي */
+  --color-dawn:     #F6A821;   /* ذهب الفجر: التمييز — CTA وعدّاد السلة والنجوم */
+  --color-dawn-deep:#E08F00;   /* فجر أغمق: hover للتمييز */
+  --color-mist:     #E9F1F9;   /* ضباب الصباح: خلفيات هادئة (صور، اختيار، hover) */
 
-  /* --- محايدة --- */
-  --color-ink:   #16261F;      /* النص الأساسي */
-  --color-slate: #5B6B64;      /* نص ثانوي */
-  --color-line:  #E6E1D3;      /* حدود وفواصل */
-  --color-paper: #FAF8F2;      /* خلفية الصفحة */
+  /* --- محايدة (باردة، تنتمي لعائلة الأزرق) --- */
+  --color-ink:   #101C28;      /* النص الأساسي */
+  --color-slate: #51637A;      /* نص ثانوي/تلميحات */
+  --color-line:  #DFE7EF;      /* حدود وفواصل */
+  --color-cloud: #F4F7FA;      /* خلفية الصفحة (رمادي سماوي فاتح) */
   --color-white: #FFFFFF;
 
-  /* --- دلالية (Semantic) --- */
-  --color-success: #2E9E54;
-  --color-error:   #D5402B;
-  --color-warning: #E8A317;
-  --color-info:    #2D6FB3;
+  /* --- دلالية (Semantic) — درجات تقرأ كنص فوق الأبيض (AA) --- */
+  --color-success: #15803D;
+  --color-error:   #D93526;
+  --color-warning: #B45309;
+  --color-info:    #1D6FC2;
 
-  /* خلفيات فاتحة للدلالات (tints) + نص داكن يقرأ فوقها —
-     كانت مبعثرة كأرقام hex بالمكوّنات؛ الآن مصدرها واحد */
-  --tint-success: #E6F4EC;  --on-tint-success: #1D6B38;
-  --tint-error:   #FBE7E3;  --on-tint-error:   #99301F;
-  --tint-warning: #FBF0D8;  --on-tint-warning: #9A6A0A;
-  --tint-info:    #E4EEFA;  --on-tint-info:    #1F4E80;
+  /* خلفيات فاتحة للدلالات (tints) + نص داكن يُقرأ فوقها — تُستعمل ثلاثيةً */
+  --tint-success: #E3F5EA;  --on-tint-success: #0F6236;
+  --tint-error:   #FCE9E6;  --on-tint-error:   #A02418;
+  --tint-warning: #FBF0DA;  --on-tint-warning: #7A5200;
+  --tint-info:    #E5F0FB;  --on-tint-info:    #154F8C;
 
   /* --- ألوان الدفع --- */
-  --color-shamcash: #1FA37A;
+  --color-shamcash: #128A64;
   --color-cod:      #7A5B2A;
 
-  /* --- أدوار الألوان (نستعمل هدول بالواجهة، مو أسماء الألوان مباشرة) --- */
-  --bg:             var(--color-paper);
+  /* --- أدوار الألوان (الواجهة تستعمل الأدوار، لا أسماء الألوان) --- */
+  --bg:             var(--color-cloud);
   --surface:        var(--color-white);
+  --surface-dark:   var(--color-midnight);
   --text:           var(--color-ink);
   --text-muted:     var(--color-slate);
   --border:         var(--color-line);
-  --primary:        var(--color-tide);
-  --primary-strong: var(--color-deep-sea);
-  --accent:         var(--color-gold);
+  --primary:        var(--color-sea);
+  --primary-strong: var(--color-sea-deep);
+  --strong:         var(--color-harbor);   /* نص مالي/عناوين البطاقات */
+  --accent:         var(--color-dawn);
+  --accent-strong:  var(--color-dawn-deep);
   --on-primary:     var(--color-white);
+  --on-accent:      var(--color-midnight);
+  --tint:           var(--color-mist);
+
+  /* --- تدرّجات الهوية (تُستدعى جاهزة، لا تُركَّب بالملفات) --- */
+  --grad-brand:  linear-gradient(135deg, var(--color-midnight) 0%, var(--color-harbor) 55%, var(--color-sea) 140%);
+  --grad-header: linear-gradient(180deg, var(--color-midnight) 0%, #0E2B44 100%);
+  --grad-primary: linear-gradient(180deg, var(--color-sea) 0%, var(--color-sea-deep) 100%);
+  --grad-accent: linear-gradient(180deg, #FFB737 0%, var(--color-dawn) 60%, #EF9C0F 100%);
+  --grad-mark:   linear-gradient(135deg, #FFC14E 0%, var(--color-dawn) 60%, var(--color-dawn-deep) 100%);
+  --grad-underline: linear-gradient(90deg, var(--color-dawn), var(--color-sea));
 
   /* --- الطباعة --- */
   --font-base: "IBM Plex Sans Arabic", system-ui, "Segoe UI", Tahoma, sans-serif;
-  --fs-display: 2.75rem;    /* 44px — عنوان الـhero على الشاشات الكبيرة */
-  --fs-h1:      2rem;       /* 32px */
-  --fs-h2:      1.5rem;     /* 24px */
+  --fs-display: 3.25rem;    /* 52px — عنوان الـhero على الشاشات الكبيرة */
+  --fs-h1:      2.25rem;    /* 36px */
+  --fs-h2:      1.625rem;   /* 26px */
   --fs-h3:      1.125rem;   /* 18px */
   --fs-body:    1rem;       /* 16px — أبداً تحت 13px */
   --fs-caption: 0.8125rem;  /* 13px */
@@ -58,8 +75,8 @@
   --fw-medium:   500;
   --fw-semibold: 600;
   --fw-bold:     700;
-  --lh-base:  1.75;   /* line-height مريح (1.7–1.8) */
-  --lh-tight: 1.3;
+  --lh-base:  1.75;   /* line-height مريح للنص العربي */
+  --lh-tight: 1.25;
 
   /* --- سلّم المسافات (أساسه 4px) --- */
   --space-1: 0.25rem;  /*  4 */
@@ -68,29 +85,37 @@
   --space-4: 1rem;     /* 16 */
   --space-5: 1.5rem;   /* 24 */
   --space-6: 2rem;     /* 32 */
+  --space-7: 2.5rem;   /* 40 */
   --space-8: 3rem;     /* 48 */
+  --space-10: 4rem;    /* 64 */
 
-  /* --- نصف القطر (Radius) --- */
-  --radius-sm:   6px;
-  --radius-md:   12px;
-  --radius-lg:   20px;
-  --radius-pill: 999px;
+  /* --- نصف القطر (Radius) — لغة أنعم وأدفأ من السابقة --- */
+  --radius-sm:   8px;      /* مدخلات صغيرة وشارات مربّعة */
+  --radius-md:   14px;     /* بطاقات وحقول */
+  --radius-lg:   20px;     /* بطاقات المنتجات ومعرض الصور */
+  --radius-xl:   28px;     /* hero والأسطح الكبيرة */
+  --radius-pill: 999px;    /* أزرار وشارات */
 
-  /* --- ظلال (طبقتان لكل ظل = عمق أنعم وأصدق) --- */
-  --shadow-sm: 0 1px 2px rgba(22, 38, 31, 0.05), 0 1px 6px rgba(22, 38, 31, 0.04);
-  --shadow-md: 0 2px 6px rgba(22, 38, 31, 0.06), 0 8px 24px rgba(22, 38, 31, 0.08);
-  --shadow-lg: 0 4px 12px rgba(22, 38, 31, 0.08), 0 16px 48px rgba(22, 38, 31, 0.14);
+  /* --- ظلال (طبقتان لكل ظل، مصبوغة بكحلي الهوية لا بأسود محايد) --- */
+  --shadow-sm: 0 1px 2px rgba(12, 34, 51, 0.06), 0 2px 8px rgba(12, 34, 51, 0.05);
+  --shadow-md: 0 2px 4px rgba(12, 34, 51, 0.05), 0 10px 28px rgba(12, 34, 51, 0.10);
+  --shadow-lg: 0 6px 16px rgba(12, 34, 51, 0.10), 0 24px 56px rgba(12, 34, 51, 0.18);
+  /* توهّجات ملوّنة للأزرار — «الضوء يتبع الفعل» */
+  --glow-primary: 0 6px 18px rgba(15, 98, 176, 0.30);
+  --glow-accent:  0 6px 20px rgba(246, 168, 33, 0.38);
 
   /* --- حركة وتركيز --- */
   --transition-fast: 0.15s ease;
-  --transition-base: 0.25s ease;
-  --focus-ring: 0 0 0 3px rgba(14, 107, 94, 0.30);   /* Tide بشفافية */
+  --transition-base: 0.25s cubic-bezier(0.2, 0.7, 0.3, 1);
+  --focus-ring:        0 0 0 3px rgba(15, 98, 176, 0.32);    /* Sea بشفافية */
+  --focus-ring-accent: 0 0 0 3px rgba(246, 168, 33, 0.35);   /* داخل الأسطح الداكنة */
 
   /* --- تخطيط (Layout) --- */
-  --tap-min:       48px;     /* أصغر هدف نقر (القاعدة #1) */
-  --container-max: 1200px;   /* أقصى عرض للمحتوى على الشاشات الكبيرة */
-  --content-narrow: 720px;   /* عرض مريح للقراءة (نصوص/نماذج) */
-  --bp-desktop:    768px;    /* نقطة التحوّل: موبايل ↔ سطح المكتب (مرجعية) */
-  --header-h:      60px;
-  --bottomnav-h:   64px;
+  --tap-min:        48px;     /* أصغر هدف نقر */
+  --container-max:  1200px;   /* أقصى عرض للمحتوى */
+  --content-narrow: 720px;    /* عرض مريح للقراءة (نصوص/نماذج) */
+  --bp-desktop:     768px;    /* نقطة التحوّل: موبايل ↔ سطح المكتب (مرجعية) */
+  --header-h:       64px;
+  --bottomnav-h:    62px;     /* ارتفاع الدوك السفلي العائم */
+  --bottomnav-gap:  10px;     /* المسافة بين الدوك وحافة الشاشة */
 }
